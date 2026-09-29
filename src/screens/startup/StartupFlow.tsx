@@ -172,6 +172,8 @@ interface CopilotMessageItem {
 export default function StartupFlow({
   navigate,
   currentScreen,
+  goBack,
+  canGoBack,
 }: NavProps) {
   const {
     requirementText,

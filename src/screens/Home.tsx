@@ -291,18 +291,13 @@ export default function Home({ navigate }: NavProps) {
                 </svg>
               </div>
               <div className="flex flex-col">
-                <div className="flex items-center gap-1.5">
-                  <span
-                    className="font-extrabold text-xl tracking-tight text-[#0B1F4B]"
-                    style={{ fontFamily: "Plus Jakarta Sans" }}
-                  >
-                    MPI
-                  </span>
-                  <span className="text-[10px] font-bold uppercase tracking-wider bg-orange-100 text-[#F97316] px-1.5 py-0.5 rounded-sm">
-                    MPI Procurement Support
-                  </span>
-                </div>
-                <span className="text-[10px] font-medium text-slate-500 uppercase tracking-widest hidden sm:inline">
+                <span
+                  className="font-extrabold text-2xl tracking-tight text-[#0B1F4B] leading-none"
+                  style={{ fontFamily: "Plus Jakarta Sans" }}
+                >
+                  MPI
+                </span>
+                <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest mt-1 hidden sm:inline">
                   Market Procurement Intelligence
                 </span>
               </div>
@@ -310,7 +305,7 @@ export default function Home({ navigate }: NavProps) {
           </div>
 
           {/* Desktop Navigation Links */}
-          <div className="hidden lg:flex items-center gap-5 text-sm font-semibold text-slate-700">
+          <div className="hidden lg:flex items-center gap-6 text-sm font-semibold text-slate-700">
             <a
               href="#marketplace"
               className="hover:text-[#0B1F4B] transition-colors"
@@ -319,26 +314,21 @@ export default function Home({ navigate }: NavProps) {
             </a>
             <button
               onClick={() => navigate("startup.home")}
-              className="hover:text-[#0B1F4B] transition-colors cursor-pointer flex items-center gap-1.5"
+              className="hover:text-[#0B1F4B] transition-colors cursor-pointer"
             >
-              <span>🚀</span>
-              <span>Startup Hub</span>
+              Startup Hub
             </button>
             <button
               onClick={() => navigate("msme.home")}
-              className="hover:text-[#0B1F4B] transition-colors cursor-pointer flex items-center gap-1.5"
+              className="hover:text-[#0B1F4B] transition-colors cursor-pointer"
             >
-              <span>🏭</span>
-              <span>MSME Portal</span>
+              MSME Portal
             </button>
             <a
               href="#government-schemes"
-              className="hover:text-[#0B1F4B] transition-colors flex items-center gap-1.5"
+              className="hover:text-[#0B1F4B] transition-colors"
             >
-              <span>Government Schemes</span>
-              <span className="bg-[#FFF7D6] text-[#D9A400] text-[10px] px-1.5 py-0.5 rounded font-bold border border-yellow-200">
-                30 Schemes
-              </span>
+              Government Schemes
             </a>
             <button
               onClick={() => navigate("analytics.detail.ai-insights")}
@@ -350,52 +340,49 @@ export default function Home({ navigate }: NavProps) {
 
           {/* CTA Buttons - Login & Registration as instructed */}
           <div className="hidden md:flex items-center gap-2.5">
-            <MPIButton
-              variant="outline"
-              size="sm"
+            <button
               onClick={() => navigate("login.startup")}
+              className="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-600 hover:text-[#0B1F4B] hover:bg-slate-100 transition-all cursor-pointer"
             >
               Login
-            </MPIButton>
-            <MPIButton
-              variant="ghost"
-              size="sm"
+            </button>
+            <button
               onClick={() => navigate("register.startup")}
-              className="border border-slate-200 text-[#0B1F4B] hover:bg-blue-50"
+              className="group flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-[#0B1F4B] bg-gradient-to-b from-blue-50 to-blue-100/60 hover:from-blue-100 hover:to-blue-200/60 border border-blue-200/90 hover:border-blue-300 shadow-2xs hover:shadow-xs transition-all cursor-pointer"
             >
-              Register as Startup
-            </MPIButton>
-            <MPIButton
-              variant="ghost"
-              size="sm"
+              <span className="text-xs group-hover:-translate-y-0.5 transition-transform">🚀</span>
+              <span>Register as Startup</span>
+            </button>
+            <button
               onClick={() => navigate("register.msme")}
-              className="border border-orange-200 text-[#F97316] hover:bg-orange-50"
+              className="group flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-[#C2410C] bg-gradient-to-b from-orange-50 to-orange-100/60 hover:from-orange-100 hover:to-orange-200/60 border border-orange-200/90 hover:border-orange-300 shadow-2xs hover:shadow-xs transition-all cursor-pointer"
             >
-              Register as MSME
-            </MPIButton>
-            <MPIButton
-              variant="primary"
-              size="sm"
+              <span className="text-xs group-hover:-translate-y-0.5 transition-transform">🏭</span>
+              <span>Register as MSME</span>
+            </button>
+            <button
               onClick={() => navigate("startup.procurement")}
-              icon={<Icons.Sparkles className="w-3.5 h-3.5 text-orange-300" />}
+              className="group flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-white bg-gradient-to-r from-[#0B1F4B] via-[#0F2D6B] to-[#123B7A] hover:from-[#0F2D6B] hover:to-[#174691] shadow-xs hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 transition-all cursor-pointer border border-blue-800/40"
             >
-              Start Procurement
-            </MPIButton>
+              <Icons.Sparkles className="w-3.5 h-3.5 text-amber-300 group-hover:rotate-12 transition-transform" />
+              <span>Start Procurement</span>
+            </button>
           </div>
 
           {/* Mobile Menu Hamburger */}
           <div className="md:hidden flex items-center gap-2">
             <button
               onClick={() => navigate("login.startup")}
-              className="px-2.5 py-1 rounded-lg border border-slate-300 text-xs font-semibold text-slate-700"
+              className="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50 cursor-pointer"
             >
               Login
             </button>
             <button
               onClick={() => navigate("startup.procurement")}
-              className="px-3 py-1.5 rounded-lg bg-[#0B1F4B] text-white text-xs font-bold"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-[#0B1F4B] to-[#123B7A] text-white text-xs font-bold shadow-xs cursor-pointer"
             >
-              Start
+              <Icons.Sparkles className="w-3 h-3 text-amber-300" />
+              <span>Start</span>
             </button>
             <button
               onClick={() => setMobileMenuOpen((prev) => !prev)}
@@ -460,9 +447,7 @@ export default function Home({ navigate }: NavProps) {
                   <span>📜</span>
                   <span>Government Schemes</span>
                 </div>
-                <span className="text-xs bg-[#FFF7D6] text-[#D9A400] px-2 py-0.5 rounded font-bold">
-                  30 Grants
-                </span>
+                <Icons.ArrowRight className="w-4 h-4 text-slate-400" />
               </button>
               <button
                 onClick={() => {
@@ -492,50 +477,47 @@ export default function Home({ navigate }: NavProps) {
               </button>
             </div>
             <div className="pt-3 border-t border-slate-100 flex flex-col gap-2">
-              <MPIButton
-                variant="outline"
-                fullWidth
+              <button
                 onClick={() => {
                   setMobileMenuOpen(false)
                   navigate("login.startup")
                 }}
+                className="w-full py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
               >
                 Login to Account
-              </MPIButton>
+              </button>
               <div className="grid grid-cols-2 gap-2">
-                <MPIButton
-                  variant="ghost"
-                  size="sm"
-                  className="border border-slate-200"
+                <button
                   onClick={() => {
                     setMobileMenuOpen(false)
                     navigate("register.startup")
                   }}
+                  className="flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl border border-blue-200/80 bg-blue-50/70 text-xs font-bold text-[#0B1F4B] hover:bg-blue-100 transition-colors cursor-pointer"
                 >
-                  Register as Startup
-                </MPIButton>
-                <MPIButton
-                  variant="ghost"
-                  size="sm"
-                  className="border border-orange-200 text-[#F97316]"
+                  <span>🚀</span>
+                  <span>Join as Startup</span>
+                </button>
+                <button
                   onClick={() => {
                     setMobileMenuOpen(false)
                     navigate("register.msme")
                   }}
+                  className="flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl border border-orange-200/80 bg-orange-50/70 text-xs font-bold text-[#C2410C] hover:bg-orange-100 transition-colors cursor-pointer"
                 >
-                  Register as MSME
-                </MPIButton>
+                  <span>🏭</span>
+                  <span>Join as MSME</span>
+                </button>
               </div>
-              <MPIButton
-                variant="primary"
-                fullWidth
+              <button
                 onClick={() => {
                   setMobileMenuOpen(false)
                   navigate("startup.procurement")
                 }}
+                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-gradient-to-r from-[#0B1F4B] to-[#123B7A] text-white text-xs font-bold shadow-xs hover:shadow-md transition-all cursor-pointer"
               >
-                Start Procurement (Startup)
-              </MPIButton>
+                <Icons.Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                <span>Start Procurement</span>
+              </button>
             </div>
           </div>
         )}
