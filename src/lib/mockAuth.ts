@@ -1,0 +1,166 @@
+// ─────────────────────────────────────────────────────────────────────────
+// Mock authentication layer for the MPI prototype.
+//
+// This is intentionally isolated from the UI (screens/Login.tsx) so that it
+// can later be swapped for a real provider (e.g. Supabase Auth) by only
+// changing the implementations below — the calling components only depend
+// on these function signatures and the AuthResult shape.
+// ─────────────────────────────────────────────────────────────────────────
+
+export type RoleKey = "startup" | "msme" | "admin"
+
+export interface AuthCredentials {
+  email: string
+  password: string
+}
+
+export interface AuthResult {
+  success: boolean
+  error?: string
+}
+
+export interface RegisterFields {
+  name: string
+  orgName: string
+  email: string
+  password: string
+  confirmPassword: string
+}
+
+export type LoginErrors = Partial<Record<"email" | "password", string>>
+export type RegisterErrors = Partial<Record<keyof RegisterFields, string>>
+
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+export function validateEmail(email: string): boolean {
+  return EMAIL_PATTERN.test(email.trim())
+}
+
+export const ADMIN_CONFIG = {
+  username: "admin",
+  password: "bhavesh@123",
+  path: "/1982/admin",
+}
+
+const ADMIN_SESSION_STORAGE_KEY = "mpi_admin_authenticated"
+
+export function getAdminSession(): boolean {
+  try {
+    return (
+      sessionStorage.getItem(ADMIN_SESSION_STORAGE_KEY) === "true" ||
+      localStorage.getItem(ADMIN_SESSION_STORAGE_KEY) === "true"
+    )
+  } catch {
+    return false
+  }
+}
+
+export function setAdminSession(authenticated: boolean): void {
+  try {
+    if (authenticated) {
+      sessionStorage.setItem(ADMIN_SESSION_STORAGE_KEY, "true")
+      localStorage.setItem(ADMIN_SESSION_STORAGE_KEY, "true")
+    } else {
+      sessionStorage.removeItem(ADMIN_SESSION_STORAGE_KEY)
+      localStorage.removeItem(ADMIN_SESSION_STORAGE_KEY)
+    }
+  } catch {
+    // Ignore storage restrictions
+  }
+}
+
+export function validateLoginForm(
+  email: string,
+  password: string,
+  role?: RoleKey,
+): LoginErrors {
+  const errors: LoginErrors = {}
+  const trimmed = email.trim()
+  if (!trimmed) {
+    errors.email = role === "admin" ? "Username or email is required" : "Email is required"
+  } else if (role !== "admin" && !validateEmail(trimmed)) {
+    errors.email = "Enter a valid email address"
+  }
+  if (!password) {
+    errors.password = "Password is required"
+  }
+  return errors
+}
+
+export function validateRegisterForm(
+  fields: RegisterFields,
+  orgLabel: string,
+  nameLabel: string,
+): RegisterErrors {
+  const errors: RegisterErrors = {}
+  if (!fields.name.trim()) errors.name = `${nameLabel} is required`
+  if (!fields.orgName.trim()) errors.orgName = `${orgLabel} is required`
+  if (!fields.email.trim()) {
+    errors.email = "Email is required"
+  } else if (!validateEmail(fields.email)) {
+    errors.email = "Enter a valid email address"
+  }
+  if (!fields.password) {
+    errors.password = "Password is required"
+  } else if (fields.password.length < 6) {
+    errors.password = "Password must be at least 6 characters"
+  }
+  if (fields.confirmPassword !== fields.password) {
+    errors.confirmPassword = "Passwords do not match"
+  }
+  return errors
+}
+
+// Simulated network delay so the UI can show a realistic "signing in" state.
+const MOCK_DELAY_MS = 550
+
+/**
+ * Mock login call. Validates role credentials.
+ * For admin, validates username: "admin" and password: "bhavesh@123".
+ */
+export function mockLogin(
+  role: RoleKey,
+  credentials: AuthCredentials,
+): Promise<AuthResult> {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      if (role === "admin") {
+        const enteredUser = credentials.email.trim().toLowerCase()
+        const enteredPass = credentials.password
+        const isValidUser =
+          enteredUser === "admin" ||
+          enteredUser === "admin@mpi.gov.in" ||
+          enteredUser === "admin@mpi.org"
+
+        const isValidPass = enteredPass === ADMIN_CONFIG.password
+
+        if (isValidUser && isValidPass) {
+          setAdminSession(true)
+          resolve({ success: true })
+        } else {
+          resolve({
+            success: false,
+            error: "Invalid admin credentials. Please verify your username and password.",
+          })
+        }
+        return
+      }
+
+      resolve({ success: true })
+    }, MOCK_DELAY_MS)
+  })
+}
+
+/**
+ * Mock registration call. Always succeeds for the prototype — replace with a
+ * real Supabase Auth sign-up call when the backend is ready.
+ */
+export function mockRegister(
+  _role: Exclude<RoleKey, "admin">,
+  _fields: RegisterFields,
+): Promise<AuthResult> {
+  return new Promise((resolve) => {
+    setTimeout(() => resolve({ success: true }), MOCK_DELAY_MS)
+  })
+}
+
