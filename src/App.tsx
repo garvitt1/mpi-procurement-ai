@@ -28,6 +28,8 @@ import GovernmentSchemesFlow from "./screens/schemes/GovernmentSchemesFlow"
 import StartupOnboarding from "./screens/onboarding/StartupOnboarding"
 import MSMEOnboarding from "./screens/onboarding/MSMEOnboarding"
 
+import GlobalNavBar from "./components/navigation/GlobalNavBar"
+
 export type Screen = "home" | "landing" | "login.startup" | "login.msme" | "login.admin" | "register.startup" | "register.msme" | "government-schemes.match" | "government-schemes.browse" | "government-schemes.detail" | "analytics.detail.ai-insights" | "analytics.detail.total-sales" | "analytics.detail.revenue-comparison" | "analytics.detail.sales-trend" | "analytics.detail.age-range" | "analytics.add-widget" | "analytics.create-report" | "analytics.pulse" | "analytics.data" | "analytics.shared" | "analytics.notifications" | "analytics.messages" | "analytics.documents" | "analytics.support" | "analytics.profile" | "startup.home" | "startup.onboarding" | "startup.procurement" | "startup.ai-assistant" | "startup.ai-analysis" | "startup.match-results" | "startup.supplier-detail" | "startup.comparison" | "startup.shortlist" | "startup.rfq" | "startup.samples" | "startup.sample-new" | "startup.schemes" | "startup.status" | "startup.history" | "startup.profile" | "startup.settings" | "startup.analytics" | "msme.home" | "msme.onboarding" | "msme.profile" | "msme.capabilities" | "msme.products" | "msme.certifications" | "msme.verification" | "msme.verification-status" | "msme.match-readiness" | "msme.opportunities" | "msme.opportunity-detail" | "msme.proposal" | "msme.procurement-status" | "msme.schemes" | "msme.analytics" | "msme.settings" | "admin.home" | "admin.user-management" | "admin.startup-management" | "admin.msme-management" | "admin.verification" | "admin.procurement" | "admin.ai-matching" | "admin.analytics" | "admin.reports" | "admin.settings"
 
 export interface NavProps {
@@ -84,7 +86,32 @@ export default function App() {
   }, [])
 
   const goBack = useCallback(() => {
-    setHistory((prev) => (prev.length > 1 ? prev.slice(0, -1) : prev))
+    setHistory((prev) => {
+      if (prev.length > 1) {
+        return prev.slice(0, -1)
+      }
+      // Intelligent fallback when user opened directly or refreshed
+      const current = prev[0] || "home"
+      if (current.startsWith("startup.") && current !== "startup.home") {
+        return ["home", "startup.home"]
+      }
+      if (current.startsWith("msme.") && current !== "msme.home") {
+        return ["home", "msme.home"]
+      }
+      if (current.startsWith("admin.") && current !== "admin.home") {
+        return ["home", "admin.home"]
+      }
+      if (current.startsWith("analytics.")) {
+        return ["home", "startup.analytics"]
+      }
+      if (current.startsWith("government-schemes.")) {
+        return ["home"]
+      }
+      if (current.startsWith("login.") || current.startsWith("register.") || current.includes("onboarding")) {
+        return ["home"]
+      }
+      return ["home"]
+    })
     window.scrollTo({ top: 0, behavior: "smooth" })
   }, [])
 
@@ -112,36 +139,46 @@ export default function App() {
 
   const renderActiveScreen = () => {
     // Flagship Analytics Detail Pages (All buttons in Bento dashboard)
-    if (currentScreen === "analytics.detail.ai-insights")
-      return <AIInsightsDetailPage {...navProps} />
-    if (currentScreen === "analytics.detail.total-sales")
-      return <TotalSalesDetailPage {...navProps} />
-    if (currentScreen === "analytics.detail.revenue-comparison")
-      return <RevenueComparisonDetailPage {...navProps} />
-    if (currentScreen === "analytics.detail.sales-trend")
-      return <SalesTrendDetailPage {...navProps} />
-    if (currentScreen === "analytics.detail.age-range")
-      return <AgeRangeDetailPage {...navProps} />
-    if (currentScreen === "analytics.add-widget")
-      return <AddWidgetStudioPage {...navProps} />
-    if (currentScreen === "analytics.create-report")
-      return <CreateReportPage {...navProps} />
-    if (currentScreen === "analytics.pulse")
-      return <PulseLiveFeedPage {...navProps} />
-    if (currentScreen === "analytics.data")
-      return <DataCatalogPage {...navProps} />
-    if (currentScreen === "analytics.shared")
-      return <SharedTeamPage {...navProps} />
-    if (currentScreen === "analytics.notifications")
-      return <NotificationsPage {...navProps} />
-    if (currentScreen === "analytics.messages")
-      return <MessagesPage {...navProps} />
-    if (currentScreen === "analytics.documents")
-      return <DocumentsPage {...navProps} />
-    if (currentScreen === "analytics.support")
-      return <SupportPage {...navProps} />
-    if (currentScreen === "analytics.profile")
-      return <AccountProfilePage {...navProps} />
+    if (currentScreen.startsWith("analytics.")) {
+      let pageContent: React.ReactNode = null
+      if (currentScreen === "analytics.detail.ai-insights")
+        pageContent = <AIInsightsDetailPage {...navProps} />
+      else if (currentScreen === "analytics.detail.total-sales")
+        pageContent = <TotalSalesDetailPage {...navProps} />
+      else if (currentScreen === "analytics.detail.revenue-comparison")
+        pageContent = <RevenueComparisonDetailPage {...navProps} />
+      else if (currentScreen === "analytics.detail.sales-trend")
+        pageContent = <SalesTrendDetailPage {...navProps} />
+      else if (currentScreen === "analytics.detail.age-range")
+        pageContent = <AgeRangeDetailPage {...navProps} />
+      else if (currentScreen === "analytics.add-widget")
+        pageContent = <AddWidgetStudioPage {...navProps} />
+      else if (currentScreen === "analytics.create-report")
+        pageContent = <CreateReportPage {...navProps} />
+      else if (currentScreen === "analytics.pulse")
+        pageContent = <PulseLiveFeedPage {...navProps} />
+      else if (currentScreen === "analytics.data")
+        pageContent = <DataCatalogPage {...navProps} />
+      else if (currentScreen === "analytics.shared")
+        pageContent = <SharedTeamPage {...navProps} />
+      else if (currentScreen === "analytics.notifications")
+        pageContent = <NotificationsPage {...navProps} />
+      else if (currentScreen === "analytics.messages")
+        pageContent = <MessagesPage {...navProps} />
+      else if (currentScreen === "analytics.documents")
+        pageContent = <DocumentsPage {...navProps} />
+      else if (currentScreen === "analytics.support")
+        pageContent = <SupportPage {...navProps} />
+      else if (currentScreen === "analytics.profile")
+        pageContent = <AccountProfilePage {...navProps} />
+
+      return (
+        <div className="min-h-screen bg-[#F7F9FC] flex flex-col font-sans">
+          <GlobalNavBar {...navProps} />
+          <div className="flex-1">{pageContent}</div>
+        </div>
+      )
+    }
 
     // Specialized Onboarding Flows
     if (

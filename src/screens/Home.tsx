@@ -310,26 +310,34 @@ export default function Home({ navigate }: NavProps) {
           </div>
 
           {/* Desktop Navigation Links */}
-          <div className="hidden lg:flex items-center gap-6 text-sm font-semibold text-slate-700">
+          <div className="hidden lg:flex items-center gap-5 text-sm font-semibold text-slate-700">
             <a
               href="#marketplace"
               className="hover:text-[#0B1F4B] transition-colors"
             >
               7 Solution Catalogs
             </a>
-            <a
-              href="#how-it-works"
-              className="hover:text-[#0B1F4B] transition-colors"
+            <button
+              onClick={() => navigate("startup.home")}
+              className="hover:text-[#0B1F4B] transition-colors cursor-pointer flex items-center gap-1.5"
             >
-              How It Works
-            </a>
+              <span>🚀</span>
+              <span>Startup Hub</span>
+            </button>
+            <button
+              onClick={() => navigate("msme.home")}
+              className="hover:text-[#0B1F4B] transition-colors cursor-pointer flex items-center gap-1.5"
+            >
+              <span>🏭</span>
+              <span>MSME Portal</span>
+            </button>
             <a
               href="#government-schemes"
               className="hover:text-[#0B1F4B] transition-colors flex items-center gap-1.5"
             >
               <span>Government Schemes</span>
               <span className="bg-[#FFF7D6] text-[#D9A400] text-[10px] px-1.5 py-0.5 rounded font-bold border border-yellow-200">
-                Grants & Subsidies
+                30 Schemes
               </span>
             </a>
             <button
@@ -407,6 +415,32 @@ export default function Home({ navigate }: NavProps) {
         {mobileMenuOpen && (
           <div className="md:hidden bg-white border-b border-slate-200 px-4 py-4 space-y-3 animate-fade-in shadow-lg">
             <div className="flex flex-col space-y-2 text-sm font-semibold text-slate-800">
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false)
+                  navigate("startup.home")
+                }}
+                className="py-2 px-3 text-left rounded-lg hover:bg-slate-50 flex items-center justify-between cursor-pointer"
+              >
+                <div className="flex items-center gap-2">
+                  <span>🚀</span>
+                  <span>Startup Hub (Buyer Portal)</span>
+                </div>
+                <Icons.ArrowRight className="w-4 h-4 text-slate-400" />
+              </button>
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false)
+                  navigate("msme.home")
+                }}
+                className="py-2 px-3 text-left rounded-lg hover:bg-slate-50 flex items-center justify-between cursor-pointer"
+              >
+                <div className="flex items-center gap-2">
+                  <span>🏭</span>
+                  <span>MSME Supplier Portal</span>
+                </div>
+                <Icons.ArrowRight className="w-4 h-4 text-slate-400" />
+              </button>
               <a
                 href="#marketplace"
                 onClick={() => setMobileMenuOpen(false)}
@@ -415,32 +449,45 @@ export default function Home({ navigate }: NavProps) {
                 <span>7 Solution Catalogs</span>
                 <Icons.ArrowRight className="w-4 h-4 text-slate-400" />
               </a>
-              <a
-                href="#how-it-works"
-                onClick={() => setMobileMenuOpen(false)}
-                className="py-2 px-3 rounded-lg hover:bg-slate-50 flex items-center justify-between"
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false)
+                  navigate("government-schemes.match")
+                }}
+                className="py-2 px-3 text-left rounded-lg hover:bg-slate-50 flex items-center justify-between cursor-pointer"
               >
-                <span>How It Works</span>
-                <Icons.ArrowRight className="w-4 h-4 text-slate-400" />
-              </a>
-              <a
-                href="#government-schemes"
-                onClick={() => setMobileMenuOpen(false)}
-                className="py-2 px-3 rounded-lg hover:bg-slate-50 flex items-center justify-between"
-              >
-                <span>Government Schemes</span>
+                <div className="flex items-center gap-2">
+                  <span>📜</span>
+                  <span>Government Schemes</span>
+                </div>
                 <span className="text-xs bg-[#FFF7D6] text-[#D9A400] px-2 py-0.5 rounded font-bold">
-                  Grants & Subsidies
+                  30 Grants
                 </span>
-              </a>
+              </button>
               <button
                 onClick={() => {
                   setMobileMenuOpen(false)
                   navigate("analytics.detail.ai-insights")
                 }}
-                className="py-2 px-3 text-left rounded-lg hover:bg-slate-50 flex items-center justify-between text-slate-700"
+                className="py-2 px-3 text-left rounded-lg hover:bg-slate-50 flex items-center justify-between text-slate-700 cursor-pointer"
               >
-                <span>Analytics Studio</span>
+                <div className="flex items-center gap-2">
+                  <span>📊</span>
+                  <span>Analytics Studio</span>
+                </div>
+                <Icons.ArrowRight className="w-4 h-4 text-slate-400" />
+              </button>
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false)
+                  navigate("login.admin")
+                }}
+                className="py-2 px-3 text-left rounded-lg hover:bg-slate-50 flex items-center justify-between text-slate-700 cursor-pointer"
+              >
+                <div className="flex items-center gap-2">
+                  <span>🛡️</span>
+                  <span>Admin Control Center</span>
+                </div>
                 <Icons.ArrowRight className="w-4 h-4 text-slate-400" />
               </button>
             </div>

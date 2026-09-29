@@ -765,22 +765,46 @@ export default function StartupFlow({
           </nav>
         </div>
 
-        {/* Bottom Help & Home Link */}
-        <div className="p-4 border-t border-[#123B7A] space-y-2">
+        {/* Bottom Help & Cross-Hub Links */}
+        <div className="p-3.5 border-t border-[#123B7A] space-y-1.5">
           <button
             onClick={() => navigate("home")}
-            className="w-full flex items-center justify-between text-xs text-slate-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-[#123B7A] cursor-pointer"
+            className="w-full flex items-center justify-between text-xs text-slate-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-[#123B7A] cursor-pointer transition-colors"
           >
             <span className="flex items-center gap-2">
-              <Icons.ArrowLeft className="w-4 h-4" />
-              <span>Back to Marketplace</span>
+              <span className="text-xs">🏠</span>
+              <span>Home Marketplace</span>
             </span>
             <span className="text-[10px] bg-blue-900 px-1.5 py-0.5 rounded text-slate-300">
               Public
             </span>
           </button>
-          <div className="text-[10px] text-slate-400 text-center">
-            MPI Sourcing Protocol · 100% Anonymized & Verified
+          <button
+            onClick={() => navigate("msme.home")}
+            className="w-full flex items-center justify-between text-xs text-slate-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-[#123B7A] cursor-pointer transition-colors"
+          >
+            <span className="flex items-center gap-2">
+              <span className="text-xs">🏭</span>
+              <span>Switch to MSME Portal</span>
+            </span>
+            <span className="text-[10px] bg-orange-950 text-orange-300 border border-orange-800/40 px-1.5 py-0.5 rounded">
+              Supplier
+            </span>
+          </button>
+          <button
+            onClick={() => navigate("government-schemes.match")}
+            className="w-full flex items-center justify-between text-xs text-slate-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-[#123B7A] cursor-pointer transition-colors"
+          >
+            <span className="flex items-center gap-2">
+              <span className="text-xs">📜</span>
+              <span>Government Schemes</span>
+            </span>
+            <span className="text-[10px] bg-yellow-950 text-yellow-300 border border-yellow-800/40 px-1.5 py-0.5 rounded">
+              Grants
+            </span>
+          </button>
+          <div className="text-[10px] text-slate-400 text-center pt-1">
+            MPI Sourcing Protocol · Verified
           </div>
         </div>
       </aside>
@@ -788,37 +812,89 @@ export default function StartupFlow({
       {/* ─── MAIN CONTENT AREA ─────────────────────────────────────────────────── */}
       <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
         {/* Top Header */}
-        <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200 px-4 sm:px-6 py-3.5 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+        <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200 px-4 sm:px-6 py-2.5 sm:py-3.5 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
             <button
               onClick={() => setSidebarOpen(true)}
-              className="lg:hidden p-2 rounded-lg text-slate-700 hover:bg-slate-100 border border-slate-200"
+              className="lg:hidden p-2 rounded-lg text-slate-700 hover:bg-slate-100 border border-slate-200 shrink-0 cursor-pointer"
               aria-label="Open Navigation Sidebar"
             >
               <Icons.Menu className="w-5 h-5" />
             </button>
-            <div>
+
+            {/* Back Button */}
+            <button
+              onClick={goBack}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border border-slate-200 transition-colors cursor-pointer shrink-0"
+              title="Go back to previous page"
+            >
+              <Icons.ArrowLeft className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Back</span>
+            </button>
+
+            <div className="min-w-0">
+              {/* Interactive Clickable Breadcrumbs */}
+              <div className="flex items-center gap-1 text-[11px] text-slate-500 overflow-hidden text-ellipsis whitespace-nowrap">
+                <button
+                  onClick={() => navigate("home")}
+                  className="hover:text-slate-900 hover:underline cursor-pointer shrink-0"
+                >
+                  Home
+                </button>
+                <span>/</span>
+                <button
+                  onClick={() => navigate("startup.home")}
+                  className={`hover:text-slate-900 hover:underline cursor-pointer shrink-0 ${
+                    currentScreen === "startup.home" ? "font-bold text-[#0B1F4B]" : ""
+                  }`}
+                >
+                  Startup Hub
+                </button>
+                {currentScreen !== "startup.home" && (
+                  <>
+                    <span>/</span>
+                    <span className="text-[#0B1F4B] font-semibold truncate max-w-[120px] sm:max-w-[200px]">
+                      {title}
+                    </span>
+                  </>
+                )}
+              </div>
+
               <div
-                className="text-base sm:text-lg font-bold text-[#0B1F4B] tracking-tight"
+                className="text-sm sm:text-lg font-bold text-[#0B1F4B] tracking-tight truncate"
                 style={{ fontFamily: "Plus Jakarta Sans" }}
               >
                 {title}
               </div>
-              {subtitle && (
-                <div className="text-xs text-slate-500 hidden sm:block">
-                  {subtitle}
-                </div>
-              )}
             </div>
           </div>
 
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            {/* Quick Hub Navigation Links */}
+            <button
+              onClick={() => navigate("home")}
+              className="hidden xl:flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors cursor-pointer"
+              title="Return to Marketplace Home"
+            >
+              <span>🏠</span>
+              <span>Home</span>
+            </button>
+            <button
+              onClick={() => navigate("msme.home")}
+              className="hidden lg:flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors cursor-pointer"
+              title="Switch to MSME Supplier Portal"
+            >
+              <span>🏭</span>
+              <span>MSME Portal</span>
+            </button>
+
             <button
               onClick={() => navigate("startup.analytics")}
               className="flex items-center gap-2 bg-[#FFF7D6] hover:bg-[#ffefb3] text-[#8C6B00] border border-yellow-300 px-3 py-1.5 rounded-full text-xs font-bold transition-colors cursor-pointer"
             >
               <Icons.TrendingUp className="w-3.5 h-3.5 text-[#D9A400]" />
-              <span>Analytics Studio</span>
+              <span className="hidden sm:inline">Analytics Studio</span>
+              <span className="sm:hidden">Analytics</span>
             </button>
 
             <MPIButton

@@ -105,7 +105,7 @@ const SCHEME_INTEREST_OPTIONS = [
   "International Trade Fair & Sample Freight Subsidy (Up to ₹4.5L)",
 ]
 
-export default function StartupOnboarding({ navigate }: NavProps) {
+export default function StartupOnboarding({ navigate, goBack }: NavProps) {
   const { startupProfile, updateStartupProfile } = useProcurement()
 
   // Current Step (1 to 9)
@@ -320,26 +320,59 @@ export default function StartupOnboarding({ navigate }: NavProps) {
   return (
     <div className="min-h-screen bg-[#F7F9FC] text-[#0B1220] flex flex-col font-sans selection:bg-[#F97316] selection:text-white">
       {/* ── Top Header ──────────────────────────────────────────────────────── */}
-      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 px-4 sm:px-8 py-3.5 flex items-center justify-between">
-        <div className="flex items-center gap-4">
+      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 px-4 sm:px-6 py-2.5 sm:py-3.5 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2 sm:gap-4 min-w-0">
           <button
             onClick={() => navigate("home")}
-            className="hover:opacity-85 transition-opacity text-left"
+            className="hover:opacity-85 transition-opacity text-left cursor-pointer shrink-0"
           >
-            <MPILogo />
+            <MPILogo small />
           </button>
-          <div className="h-5 w-px bg-slate-300 hidden sm:block" />
-          <div className="text-xs font-bold text-[#0B1F4B] hidden sm:block">
-            Startup & Buyer Onboarding Protocol (9 Steps)
+
+          {/* Back Button */}
+          <button
+            onClick={goBack}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border border-slate-200 transition-colors cursor-pointer shrink-0"
+            title="Go back"
+          >
+            <Icons.ArrowLeft className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Back</span>
+          </button>
+
+          <div className="min-w-0">
+            {/* Interactive Clickable Breadcrumbs */}
+            <div className="flex items-center gap-1 text-[11px] text-slate-500 overflow-hidden text-ellipsis whitespace-nowrap">
+              <button
+                onClick={() => navigate("home")}
+                className="hover:text-slate-900 hover:underline cursor-pointer shrink-0"
+              >
+                Home
+              </button>
+              <span>/</span>
+              <span className="text-[#0B1F4B] font-semibold truncate">
+                Startup Onboarding
+              </span>
+            </div>
+
+            <div className="text-xs sm:text-sm font-bold text-[#0B1F4B] truncate">
+              Startup & Buyer Onboarding Protocol (9 Steps)
+            </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          <button
+            onClick={() => navigate("home")}
+            className="hidden sm:flex items-center gap-1 text-xs font-semibold text-slate-600 hover:text-slate-900 px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors cursor-pointer"
+          >
+            <span>🏠</span>
+            <span>Marketplace</span>
+          </button>
           <button
             onClick={() => navigate("login.startup")}
             className="text-xs font-semibold text-slate-600 hover:text-slate-900 px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors cursor-pointer"
           >
-            Already registered? Log In →
+            Log In →
           </button>
         </div>
       </header>
