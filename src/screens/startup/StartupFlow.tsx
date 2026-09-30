@@ -40,7 +40,6 @@ import {
   isGreetingOrInsufficientRequirement,
   type ExtractedProcurementSpecs,
 } from "../../services/aiService"
-import AISettingsModal from "../../components/AISettingsModal"
 import { formatScopeDisplay } from "../Home"
 
 // Markdown and inline formatting parser for real conversational LLM responses
@@ -171,9 +170,8 @@ interface CopilotMessageItem {
 
 export default function StartupFlow({
   navigate,
-  currentScreen,
   goBack,
-  canGoBack,
+  currentScreen,
 }: NavProps) {
   const {
     requirementText,
@@ -277,7 +275,6 @@ export default function StartupFlow({
     useState<"All" | "In Production" | "QC Pass" | "In Transit" | "Delivered">(
       "All",
     )
-  const [isAISettingsOpen, setIsAISettingsOpen] = useState(false)
 
   // ─── BLUEPRINT AI CAPABILITY STATES ─────────────────────────────────────────
   // 1. AI RFQ Readiness Gate & Specification Completeness Auditor (Items 5, 7, 11, 13, 14)
@@ -855,7 +852,7 @@ export default function StartupFlow({
                 {currentScreen !== "startup.home" && (
                   <>
                     <span>/</span>
-                    <span className="text-[#0B1F4B] font-semibold truncate max-w-[120px] sm:max-w-[200px]">
+                    <span className="text-[#0B1F4B] font-semibold truncate max-w-30 sm:max-w-50">
                       {title}
                     </span>
                   </>
@@ -2159,12 +2156,6 @@ export default function StartupFlow({
           </div>
         </div>
       )}
-
-      {/* AI ENGINE SETTINGS MODAL */}
-      <AISettingsModal
-        isOpen={isAISettingsOpen}
-        onClose={() => setIsAISettingsOpen(false)}
-      />
     </div>
   )
 
@@ -3282,24 +3273,11 @@ export default function StartupFlow({
                 <Icons.Clock className="w-3 h-3" />
                 <span className="hidden sm:inline">New Session</span>
               </button>
-              <button
-                type="button"
-                onClick={() => setIsAISettingsOpen(true)}
-                className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-white border border-slate-200 hover:border-slate-300 shadow-2xs cursor-pointer transition-colors"
-                title="Configure MPI AI settings"
-              >
-                <span
-                  className={`w-1.5 h-1.5 rounded-full ${
-                    hasLiveAIConfigured()
-                      ? "bg-emerald-500 animate-pulse"
-                      : "bg-amber-500"
-                  }`}
-                />
-                <span>
-                  {hasLiveAIConfigured() ? "Live MPI AI" : "MPI AI Settings"}
-                </span>
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200/80 shadow-2xs">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span>MPI AI</span>
                 <Icons.Sparkles className="w-3 h-3 text-[#F97316]" />
-              </button>
+              </div>
               <MPIVerifiedBadge label="Verified Intelligence" />
             </div>
           </div>

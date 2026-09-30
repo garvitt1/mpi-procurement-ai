@@ -201,7 +201,7 @@ export default function AdminFlow({
   >([
     {
       role: "ai",
-      text: `Hello Admin! I am your **MPI Admin Operations & Intelligence Copilot**, powered by real-time MPI AI neural models.
+      text: `Hello Admin! I am your **MPI Admin Operations & Intelligence Copilot**, powered by real-time MPI AI.
 
 I can actively review live platform datasets and assist you with:
 - 👥 **Buyers List Analysis**: Review 55 startup buyers, procurement budgets, and DPIIT compliance.

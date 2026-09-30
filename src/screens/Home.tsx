@@ -14,7 +14,6 @@ import {
   MPIVerifiedBadge,
 } from "../components/design-system/MPIDesignSystem"
 import { hasLiveAIConfigured, type ExtractedProcurementSpecs } from "../services/aiService"
-import AISettingsModal from "../components/AISettingsModal"
 
 export function formatScopeDisplay(category: CatalogCategory, qty: number): string {
   if (category === "Packaging & Printing") {
@@ -42,7 +41,6 @@ export function formatScopeDisplay(category: CatalogCategory, qty: number): stri
 }
 
 export default function Home({ navigate }: NavProps) {
-  const [isAISettingsOpen, setIsAISettingsOpen] = useState(false)
   const {
     requirementText,
     setRequirementText,
@@ -348,21 +346,21 @@ export default function Home({ navigate }: NavProps) {
             </button>
             <button
               onClick={() => navigate("register.startup")}
-              className="group flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-[#0B1F4B] bg-gradient-to-b from-blue-50 to-blue-100/60 hover:from-blue-100 hover:to-blue-200/60 border border-blue-200/90 hover:border-blue-300 shadow-2xs hover:shadow-xs transition-all cursor-pointer"
+              className="group flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-[#0B1F4B] bg-linear-to-b from-blue-50 to-blue-100/60 hover:from-blue-100 hover:to-blue-200/60 border border-blue-200/90 hover:border-blue-300 shadow-2xs hover:shadow-xs transition-all cursor-pointer"
             >
               <span className="text-xs group-hover:-translate-y-0.5 transition-transform">🚀</span>
               <span>Register as Startup</span>
             </button>
             <button
               onClick={() => navigate("register.msme")}
-              className="group flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-[#C2410C] bg-gradient-to-b from-orange-50 to-orange-100/60 hover:from-orange-100 hover:to-orange-200/60 border border-orange-200/90 hover:border-orange-300 shadow-2xs hover:shadow-xs transition-all cursor-pointer"
+              className="group flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-[#C2410C] bg-linear-to-b from-orange-50 to-orange-100/60 hover:from-orange-100 hover:to-orange-200/60 border border-orange-200/90 hover:border-orange-300 shadow-2xs hover:shadow-xs transition-all cursor-pointer"
             >
               <span className="text-xs group-hover:-translate-y-0.5 transition-transform">🏭</span>
               <span>Register as MSME</span>
             </button>
             <button
               onClick={() => navigate("startup.procurement")}
-              className="group flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-white bg-gradient-to-r from-[#0B1F4B] via-[#0F2D6B] to-[#123B7A] hover:from-[#0F2D6B] hover:to-[#174691] shadow-xs hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 transition-all cursor-pointer border border-blue-800/40"
+              className="group flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-white bg-linear-to-r from-[#0B1F4B] via-[#0F2D6B] to-[#123B7A] hover:from-[#0F2D6B] hover:to-[#174691] shadow-xs hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 transition-all cursor-pointer border border-blue-800/40"
             >
               <Icons.Sparkles className="w-3.5 h-3.5 text-amber-300 group-hover:rotate-12 transition-transform" />
               <span>Start Procurement</span>
@@ -379,7 +377,7 @@ export default function Home({ navigate }: NavProps) {
             </button>
             <button
               onClick={() => navigate("startup.procurement")}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-[#0B1F4B] to-[#123B7A] text-white text-xs font-bold shadow-xs cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-linear-to-r from-[#0B1F4B] to-[#123B7A] text-white text-xs font-bold shadow-xs cursor-pointer"
             >
               <Icons.Sparkles className="w-3 h-3 text-amber-300" />
               <span>Start</span>
@@ -513,7 +511,7 @@ export default function Home({ navigate }: NavProps) {
                   setMobileMenuOpen(false)
                   navigate("startup.procurement")
                 }}
-                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-gradient-to-r from-[#0B1F4B] to-[#123B7A] text-white text-xs font-bold shadow-xs hover:shadow-md transition-all cursor-pointer"
+                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-linear-to-r from-[#0B1F4B] to-[#123B7A] text-white text-xs font-bold shadow-xs hover:shadow-md transition-all cursor-pointer"
               >
                 <Icons.Sparkles className="w-3.5 h-3.5 text-amber-300" />
                 <span>Start Procurement</span>
@@ -600,25 +598,10 @@ export default function Home({ navigate }: NavProps) {
                       MPI AI Spec Engine
                     </span>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => setIsAISettingsOpen(true)}
-                    className="flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold bg-slate-100 hover:bg-blue-50 hover:border-blue-300 text-slate-700 hover:text-[#0B1F4B] border border-slate-200 transition-colors cursor-pointer"
-                    title="Configure Live MPI AI Engine"
-                  >
-                    <span
-                      className={`w-2 h-2 rounded-full ${
-                        hasLiveAIConfigured()
-                          ? "bg-emerald-500 animate-pulse"
-                          : "bg-amber-500"
-                      }`}
-                    />
-                    <span>
-                      {hasLiveAIConfigured()
-                        ? "Live MPI AI Active"
-                        : "MPI AI Settings"}
-                    </span>
-                  </button>
+                  <div className="flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200/80 shadow-2xs">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <span>MPI AI Active</span>
+                  </div>
                 </div>
 
                 {/* Sample Prompt Chips */}
@@ -688,14 +671,15 @@ export default function Home({ navigate }: NavProps) {
                 {/* Live Extraction Output Preview */}
                 {hasSimulatedExtraction && (
                   extractionResult?.isGreetingOrInsufficient ? (
-                    <div className="mt-5 pt-4 border-t border-slate-200 space-y-4 animate-fade-in bg-blue-50/70 p-4 sm:p-5 rounded-2xl border border-blue-200/80">
+                    <div className="mt-5 pt-4 space-y-4 animate-fade-in bg-blue-50/70 p-4 sm:p-5 rounded-2xl border border-blue-200/80">
                       <div className="flex items-start gap-3">
                         <div className="w-9 h-9 rounded-xl bg-[#0B1F4B] text-white flex items-center justify-center shrink-0 shadow-xs">
                           <Icons.Sparkles className="w-5 h-5 text-[#F97316]" />
                         </div>
-                        <div className="space-y-1">
+                        <div className="space-y-1">z\
+
                           <h4 className="text-sm font-bold text-[#0B1F4B]">
-                            Hello! Welcome to MPI Procurement Support 🙏
+                            Hello! Welcome to MPI Procurement Support 
                           </h4>
                           <p className="text-xs text-slate-700 leading-relaxed whitespace-pre-line">
                             {extractionResult.politeGuidanceMessage ||
@@ -2007,11 +1991,6 @@ export default function Home({ navigate }: NavProps) {
         </div>
       )}
 
-      {/* AI Settings Modal */}
-      <AISettingsModal
-        isOpen={isAISettingsOpen}
-        onClose={() => setIsAISettingsOpen(false)}
-      />
     </div>
   )
 }

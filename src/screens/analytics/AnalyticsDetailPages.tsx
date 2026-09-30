@@ -24,7 +24,6 @@ import {
   forecastDemandAndPriceWithAI,
   MacroForecastResult,
 } from "../../services/aiService"
-import AISettingsModal from "../../components/AISettingsModal"
 
 interface DetailPageProps extends NavProps {
   onBackToAnalytics?: () => void
@@ -128,7 +127,6 @@ export function AIInsightsDetailPage({ goBack }: DetailPageProps) {
     "Analyze product sales over last year. Compare revenue, quality, sales and brand by age and gender",
   )
   const [isGenerating, setIsGenerating] = useState(false)
-  const [isAISettingsOpen, setIsAISettingsOpen] = useState(false)
   const [keyFinding, setKeyFinding] = useState("+5% YoY Growth Confirmed")
   const [confidenceMetric, setConfidenceMetric] = useState(96.4)
   const [synthesisHtml, setSynthesisHtml] = useState(
@@ -206,23 +204,10 @@ export function AIInsightsDetailPage({ goBack }: DetailPageProps) {
           onBack={goBack}
           actionButton={
             <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setIsAISettingsOpen(true)}
-                className="bg-white hover:bg-stone-50 border border-stone-200 text-stone-800 text-xs font-medium px-3.5 py-2 rounded-full shadow-xs flex items-center gap-1.5 cursor-pointer transition-colors"
-                title="Configure MPI AI settings"
-              >
-                <span
-                  className={`w-2 h-2 rounded-full ${
-                    hasLiveAIConfigured()
-                      ? "bg-emerald-500 animate-pulse"
-                      : "bg-amber-500"
-                  }`}
-                />
-                <span>
-                  {hasLiveAIConfigured() ? "Live MPI AI" : "MPI AI Settings"}
-                </span>
-              </button>
+              <div className="bg-emerald-50 border border-emerald-200/80 text-emerald-800 text-xs font-semibold px-3 py-1.5 rounded-full shadow-2xs flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span>MPI AI Active</span>
+              </div>
               <button
                 onClick={() =>
                   alert("Report downloaded successfully in PDF format.")
@@ -824,10 +809,6 @@ export function AIInsightsDetailPage({ goBack }: DetailPageProps) {
           </div>
         </div>
       </div>
-      <AISettingsModal
-        isOpen={isAISettingsOpen}
-        onClose={() => setIsAISettingsOpen(false)}
-      />
     </div>
   )
 }
