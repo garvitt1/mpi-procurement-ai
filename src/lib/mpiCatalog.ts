@@ -29,7 +29,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Packaging & Printing",
     description:
       "Custom cartons services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/custom,cartons?lock=1",
+    image: "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-corrugated-boxes",
@@ -37,7 +37,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Packaging & Printing",
     description:
       "Corrugated boxes services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/corrugated,boxes?lock=2",
+    image: "https://images.unsplash.com/photo-1607166452427-7e4477079cb9?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-folding-cartons",
@@ -45,7 +45,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Packaging & Printing",
     description:
       "Folding cartons services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/folding,cartons?lock=3",
+    image: "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-rigid-boxes",
@@ -53,7 +53,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Packaging & Printing",
     description:
       "Rigid boxes services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/rigid,boxes?lock=4",
+    image: "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-product-labels",
@@ -61,7 +61,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Packaging & Printing",
     description:
       "Product labels services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/product,labels?lock=5",
+    image: "https://images.unsplash.com/photo-1626785774573-4b799315345d?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-barcode-stickers",
@@ -69,7 +69,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Packaging & Printing",
     description:
       "Barcode stickers services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/barcode,stickers?lock=6",
+    image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-tamper-evident-seals",
@@ -77,7 +77,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Packaging & Printing",
     description:
       "Tamper-evident seals services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/tamper,evident,seals?lock=7",
+    image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-pouches-and-sachets",
@@ -85,7 +85,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Packaging & Printing",
     description:
       "Pouches and sachets services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/pouches,and,sachets?lock=8",
+    image: "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-blister-packaging",
@@ -93,7 +93,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Packaging & Printing",
     description:
       "Blister packaging services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/blister,packaging?lock=9",
+    image: "https://images.unsplash.com/photo-1585435557343-3b092031a831?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-shrink-wrapping",
@@ -101,7 +101,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Packaging & Printing",
     description:
       "Shrink wrapping services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/shrink,wrapping?lock=10",
+    image: "https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-stretch-film",
@@ -109,7 +109,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Packaging & Printing",
     description:
       "Stretch film services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/stretch,film?lock=11",
+    image: "https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-bubble-wrap",
@@ -117,7 +117,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Packaging & Printing",
     description:
       "Bubble wrap services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/bubble,wrap?lock=12",
+    image: "https://images.unsplash.com/photo-1580674285054-bed31e145f59?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-thermal-tags",
@@ -125,7 +125,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Packaging & Printing",
     description:
       "Thermal tags services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/thermal,tags?lock=13",
+    image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-instruction-leaflets",
@@ -133,7 +133,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Packaging & Printing",
     description:
       "Instruction leaflets services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/instruction,leaflets?lock=14",
+    image: "https://images.unsplash.com/photo-1457369804613-52c61a468e7d?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-brochures-and-catalogs",
@@ -141,7 +141,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Packaging & Printing",
     description:
       "Brochures and catalogs services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/brochures,and,catalogs?lock=15",
+    image: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=800&q=80",
   },
 
   // Prototyping & Product Development
@@ -151,7 +151,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Prototyping & Product Development",
     description:
       "3D printing services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/3d,printing?lock=16",
+    image: "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-rapid-prototyping",
@@ -159,7 +159,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Prototyping & Product Development",
     description:
       "Rapid prototyping services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/rapid,prototyping?lock=17",
+    image: "https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-cad-design",
@@ -167,7 +167,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Prototyping & Product Development",
     description:
       "CAD design services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/cad,design?lock=18",
+    image: "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-industrial-design",
@@ -175,7 +175,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Prototyping & Product Development",
     description:
       "Industrial design services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/industrial,design?lock=19",
+    image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-model-making",
@@ -183,7 +183,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Prototyping & Product Development",
     description:
       "Model making services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/model,making?lock=20",
+    image: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-electronics-prototyping",
@@ -191,7 +191,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Prototyping & Product Development",
     description:
       "Electronics prototyping services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/electronics,prototyping?lock=21",
+    image: "https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-pcb-assembly",
@@ -199,7 +199,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Prototyping & Product Development",
     description:
       "PCB assembly services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/pcb,assembly?lock=22",
+    image: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-iot-hardware-development",
@@ -207,7 +207,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Prototyping & Product Development",
     description:
       "IoT hardware development services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/iot,hardware,development?lock=23",
+    image: "https://images.unsplash.com/photo-1558346490-a72e53ae2d4f?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-mechanical-design",
@@ -215,7 +215,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Prototyping & Product Development",
     description:
       "Mechanical design services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/mechanical,design?lock=24",
+    image: "https://images.unsplash.com/photo-1537462715879-360eeb61a0ad?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-testing-samples",
@@ -223,7 +223,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Prototyping & Product Development",
     description:
       "Testing samples services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/testing,samples?lock=25",
+    image: "https://images.unsplash.com/photo-1579154204601-01588f351e67?auto=format&fit=crop&w=800&q=80",
   },
 
   // IT & Digital Services
@@ -233,7 +233,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "IT & Digital Services",
     description:
       "Website development services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/website,development?lock=26",
+    image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-mobile-app-development",
@@ -241,7 +241,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "IT & Digital Services",
     description:
       "Mobile app development services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/mobile,app,development?lock=27",
+    image: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-ui-ux-design",
@@ -249,7 +249,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "IT & Digital Services",
     description:
       "UI/UX design services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/ui,ux,design?lock=28",
+    image: "https://images.unsplash.com/photo-1561070791-2526d30994b5?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-erp-setup",
@@ -257,7 +257,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "IT & Digital Services",
     description:
       "ERP setup services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/erp,setup?lock=29",
+    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-crm-setup",
@@ -265,7 +265,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "IT & Digital Services",
     description:
       "CRM setup services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/crm,setup?lock=30",
+    image: "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-software-qa-testing",
@@ -273,7 +273,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "IT & Digital Services",
     description:
       "Software QA testing services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/software,qa,testing?lock=31",
+    image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-cloud-hosting-setup",
@@ -281,7 +281,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "IT & Digital Services",
     description:
       "Cloud hosting setup services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/cloud,hosting,setup?lock=32",
+    image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-cybersecurity-audit",
@@ -289,7 +289,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "IT & Digital Services",
     description:
       "Cybersecurity audit services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/cybersecurity,audit?lock=33",
+    image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-api-integration",
@@ -297,7 +297,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "IT & Digital Services",
     description:
       "API integration services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/api,integration?lock=34",
+    image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-data-entry-and-digitization",
@@ -306,7 +306,7 @@ export const MPI_CATALOG: CatalogService[] = [
     description:
       "Data entry and digitization services and supplier discovery through the MPI procurement ecosystem.",
     image:
-      "https://loremflickr.com/720/480/data,entry,and,digitization?lock=35",
+      "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=800&q=80",
   },
 
   // Compliance & Legal Support
@@ -317,7 +317,7 @@ export const MPI_CATALOG: CatalogService[] = [
     description:
       "Company incorporation support services and supplier discovery through the MPI procurement ecosystem.",
     image:
-      "https://loremflickr.com/720/480/company,incorporation,support?lock=36",
+      "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-udyam-registration-support",
@@ -325,7 +325,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Compliance & Legal Support",
     description:
       "Udyam registration support services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/udyam,registration,support?lock=37",
+    image: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-gst-filing",
@@ -333,7 +333,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Compliance & Legal Support",
     description:
       "GST filing services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/gst,filing?lock=38",
+    image: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-tds-filing",
@@ -341,7 +341,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Compliance & Legal Support",
     description:
       "TDS filing services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/tds,filing?lock=39",
+    image: "https://images.unsplash.com/photo-1586486855514-8c633cc6fd38?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-roc-compliance",
@@ -349,7 +349,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Compliance & Legal Support",
     description:
       "ROC compliance services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/roc,compliance?lock=40",
+    image: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-trademark-filing",
@@ -357,7 +357,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Compliance & Legal Support",
     description:
       "Trademark filing services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/trademark,filing?lock=41",
+    image: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-copyright-filing",
@@ -365,7 +365,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Compliance & Legal Support",
     description:
       "Copyright filing services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/copyright,filing?lock=42",
+    image: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-patent-drafting-support",
@@ -373,7 +373,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Compliance & Legal Support",
     description:
       "Patent drafting support services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/patent,drafting,support?lock=43",
+    image: "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-iso-certification-support",
@@ -381,7 +381,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Compliance & Legal Support",
     description:
       "ISO certification support services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/iso,certification,support?lock=44",
+    image: "https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-zed-certification-support",
@@ -389,7 +389,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Compliance & Legal Support",
     description:
       "ZED certification support services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/zed,certification,support?lock=45",
+    image: "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?auto=format&fit=crop&w=800&q=80",
   },
 
   // Marketing & Sales Support
@@ -399,7 +399,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Marketing & Sales Support",
     description:
       "Brand identity design services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/brand,identity,design?lock=46",
+    image: "https://images.unsplash.com/photo-1634942537034-2531766767d1?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-logo-design",
@@ -407,7 +407,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Marketing & Sales Support",
     description:
       "Logo design services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/logo,design?lock=47",
+    image: "https://images.unsplash.com/photo-1626785774625-ddcddc3445e9?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-social-media-management",
@@ -415,7 +415,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Marketing & Sales Support",
     description:
       "Social media management services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/social,media,management?lock=48",
+    image: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-performance-marketing",
@@ -423,7 +423,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Marketing & Sales Support",
     description:
       "Performance marketing services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/performance,marketing?lock=49",
+    image: "https://images.unsplash.com/photo-1533750516457-a7f992034fec?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-product-photography",
@@ -431,7 +431,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Marketing & Sales Support",
     description:
       "Product photography services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/product,photography?lock=50",
+    image: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-video-editing",
@@ -439,7 +439,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Marketing & Sales Support",
     description:
       "Video editing services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/video,editing?lock=51",
+    image: "https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-catalog-design",
@@ -447,7 +447,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Marketing & Sales Support",
     description:
       "Catalog design services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/catalog,design?lock=52",
+    image: "https://images.unsplash.com/photo-1586075010923-2dd4570fb338?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-sales-deck-design",
@@ -455,7 +455,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Marketing & Sales Support",
     description:
       "Sales deck design services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/sales,deck,design?lock=53",
+    image: "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-market-research",
@@ -463,7 +463,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Marketing & Sales Support",
     description:
       "Market research services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/market,research?lock=54",
+    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-lead-generation",
@@ -471,7 +471,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Marketing & Sales Support",
     description:
       "Lead generation services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/lead,generation?lock=55",
+    image: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=800&q=80",
   },
 
   // Business & Finance Services
@@ -481,7 +481,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Business & Finance Services",
     description:
       "Accounting services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/accounting?lock=56",
+    image: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-bookkeeping",
@@ -489,7 +489,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Business & Finance Services",
     description:
       "Bookkeeping services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/bookkeeping?lock=57",
+    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-mis-reporting",
@@ -497,7 +497,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Business & Finance Services",
     description:
       "MIS reporting services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/mis,reporting?lock=58",
+    image: "https://images.unsplash.com/photo-1543286386-713bdd548da4?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-cma-preparation",
@@ -505,7 +505,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Business & Finance Services",
     description:
       "CMA preparation services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/cma,preparation?lock=59",
+    image: "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-project-report-preparation",
@@ -513,7 +513,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Business & Finance Services",
     description:
       "Project report preparation services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/project,report,preparation?lock=60",
+    image: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-valuation-support",
@@ -521,7 +521,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Business & Finance Services",
     description:
       "Valuation support services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/valuation,support?lock=61",
+    image: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-due-diligence-support",
@@ -529,7 +529,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Business & Finance Services",
     description:
       "Due diligence support services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/due,diligence,support?lock=62",
+    image: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-business-analysis",
@@ -537,7 +537,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Business & Finance Services",
     description:
       "Business analysis services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/business,analysis?lock=63",
+    image: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-payroll-processing",
@@ -545,7 +545,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Business & Finance Services",
     description:
       "Payroll processing services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/payroll,processing?lock=64",
+    image: "https://images.unsplash.com/photo-1580519542036-c47de6196ba5?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-virtual-cfo-services",
@@ -553,7 +553,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Business & Finance Services",
     description:
       "Virtual CFO services services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/virtual,cfo,services?lock=65",
+    image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=800&q=80",
   },
 
   // Specialized Startup Support
@@ -563,7 +563,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Specialized Startup Support",
     description:
       "Lab testing services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/lab,testing?lock=66",
+    image: "https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-quality-assurance",
@@ -571,7 +571,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Specialized Startup Support",
     description:
       "Quality assurance services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/quality,assurance?lock=67",
+    image: "https://images.unsplash.com/photo-1581092162384-8987c1d64718?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-certification-testing",
@@ -579,7 +579,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Specialized Startup Support",
     description:
       "Certification testing services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/certification,testing?lock=68",
+    image: "https://images.unsplash.com/photo-1582719471384-894fbb16e074?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-sample-sourcing",
@@ -587,7 +587,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Specialized Startup Support",
     description:
       "Sample sourcing services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/sample,sourcing?lock=69",
+    image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-toolroom-support",
@@ -595,7 +595,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Specialized Startup Support",
     description:
       "Toolroom support services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/toolroom,support?lock=70",
+    image: "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-packaging-design-consultation",
@@ -604,7 +604,7 @@ export const MPI_CATALOG: CatalogService[] = [
     description:
       "Packaging design consultation services and supplier discovery through the MPI procurement ecosystem.",
     image:
-      "https://loremflickr.com/720/480/packaging,design,consultation?lock=71",
+      "https://images.unsplash.com/photo-1561070791-2526d30994b5?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-procurement-advisory",
@@ -612,7 +612,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Specialized Startup Support",
     description:
       "Procurement advisory services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/procurement,advisory?lock=72",
+    image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-vendor-onboarding",
@@ -620,7 +620,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Specialized Startup Support",
     description:
       "Vendor onboarding services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/vendor,onboarding?lock=73",
+    image: "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-b2b-sourcing-coordination",
@@ -628,7 +628,7 @@ export const MPI_CATALOG: CatalogService[] = [
     category: "Specialized Startup Support",
     description:
       "B2B sourcing coordination services and supplier discovery through the MPI procurement ecosystem.",
-    image: "https://loremflickr.com/720/480/b2b,sourcing,coordination?lock=74",
+    image: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "svc-custom-small-batch-manufacturing",
@@ -637,7 +637,7 @@ export const MPI_CATALOG: CatalogService[] = [
     description:
       "Custom small-batch manufacturing services and supplier discovery through the MPI procurement ecosystem.",
     image:
-      "https://loremflickr.com/720/480/custom,small,batch,manufacturing?lock=75",
+      "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=800&q=80",
   },
 ]
 

@@ -35,13 +35,22 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     >
       {/* Top Media Image Container */}
       <div className="relative h-44 sm:h-48 w-full bg-slate-100 overflow-hidden">
-        <img
-          src={imageSrc}
-          alt={product.name}
-          loading="lazy"
-          onError={() => setImageError(true)}
-          className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
-        />
+        {imageError ? (
+          <div className="w-full h-full flex flex-col items-center justify-center bg-linear-to-br from-slate-100 via-slate-200 to-slate-100 text-slate-400">
+            <MaterialIcon name="inventory_2" size={34} className="text-slate-400 mb-1" />
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
+              {product.category.split("&")[0]}
+            </span>
+          </div>
+        ) : (
+          <img
+            src={product.image}
+            alt={product.name}
+            loading="lazy"
+            onError={() => setImageError(true)}
+            className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+          />
+        )}
 
         {/* Soft Vignette Gradient for text contrast */}
         <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/10 to-transparent pointer-events-none" />

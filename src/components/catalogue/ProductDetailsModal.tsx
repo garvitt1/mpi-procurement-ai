@@ -36,12 +36,21 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({
       >
         {/* Modal Hero Banner */}
         <div className="relative h-48 sm:h-56 bg-slate-100 overflow-hidden shrink-0">
-          <img
-            src={imageSrc}
-            alt={product.name}
-            onError={() => setImgError(true)}
-            className="w-full h-full object-cover"
-          />
+          {imgError ? (
+            <div className="w-full h-full flex flex-col items-center justify-center bg-linear-to-br from-slate-100 via-slate-200 to-slate-100 text-slate-400">
+              <MaterialIcon name="inventory_2" size={40} className="text-slate-400 mb-1" />
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                {product.category}
+              </span>
+            </div>
+          ) : (
+            <img
+              src={product.image}
+              alt={product.name}
+              onError={() => setImgError(true)}
+              className="w-full h-full object-cover"
+            />
+          )}
           <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent pointer-events-none" />
 
           {/* Close Button */}

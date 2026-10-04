@@ -240,10 +240,7 @@ export const ENRICHED_CATALOG_PRODUCTS: EnrichedCatalogProduct[] = MPI_CATALOG.m
       ]
     }
 
-    const highRes =
-      IMAGE_MAPPINGS[item.id] ||
-      IMAGE_MAPPINGS[Object.keys(IMAGE_MAPPINGS).find((k) => item.id.includes(k.replace("svc-", ""))) || ""] ||
-      item.image
+    const highRes = item.image
 
     return {
       ...item,
