@@ -706,43 +706,6 @@ export default function Home({ navigate }: NavProps) {
                   Register as MSME Supplier
                 </MPIButton>
               </div>
-
-              {/* Smart Space Utilization: Key Proof Metrics */}
-              <div className="pt-3 grid grid-cols-3 gap-3 border-t border-slate-200/80 text-left max-w-lg">
-                <div>
-                  <div
-                    className="text-base sm:text-lg font-black text-[#0B1F4B]"
-                    style={{ fontFamily: "Plus Jakarta Sans" }}
-                  >
-                    48h
-                  </div>
-                  <div className="text-[11px] text-slate-500 font-medium leading-tight">
-                    Quote Turnaround
-                  </div>
-                </div>
-                <div>
-                  <div
-                    className="text-base sm:text-lg font-black text-[#0B1F4B]"
-                    style={{ fontFamily: "Plus Jakarta Sans" }}
-                  >
-                    100%
-                  </div>
-                  <div className="text-[11px] text-slate-500 font-medium leading-tight">
-                    Verified MSME Network
-                  </div>
-                </div>
-                <div>
-                  <div
-                    className="text-base sm:text-lg font-black text-[#F97316]"
-                    style={{ fontFamily: "Plus Jakarta Sans" }}
-                  >
-                    ₹0
-                  </div>
-                  <div className="text-[11px] text-slate-500 font-medium leading-tight">
-                    Upfront Platform Fee
-                  </div>
-                </div>
-              </div>
             </div>
 
             {/* Right Column: Next-Gen Conversational AI Engine & Voice Assistant (Matching Reference Design) */}
