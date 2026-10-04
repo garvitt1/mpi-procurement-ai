@@ -1,0 +1,155 @@
+import React, { useState } from "react"
+import { EnrichedCatalogProduct } from "./catalogue.types"
+import MaterialIcon from "../ui/MaterialIcon"
+
+interface ProductCardProps {
+  product: EnrichedCatalogProduct
+  isActive?: boolean
+  isCenter?: boolean
+  onViewDetails: (product: EnrichedCatalogProduct) => void
+  onRequestQuote: (product: EnrichedCatalogProduct) => void
+  className?: string
+  style?: React.CSSProperties
+}
+
+export const ProductCard: React.FC<ProductCardProps> = ({
+  product,
+  isActive = false,
+  isCenter = false,
+  onViewDetails,
+  onRequestQuote,
+  className = "",
+  style,
+}) => {
+  const [imageError, setImageError] = useState(false)
+  const imageSrc = imageError ? product.image : product.highResImage || product.image
+
+  return (
+    <div
+      style={style}
+      className={`group relative bg-white rounded-3xl border transition-all duration-300 ease-out flex flex-col justify-between overflow-hidden select-none shrink-0 ${
+        isCenter
+          ? "border-slate-300 shadow-[0_20px_40px_-15px_rgba(11,31,75,0.14)] ring-2 ring-[#0B1F4B]/10"
+          : "border-slate-200/90 shadow-[0_8px_20px_-6px_rgba(11,31,75,0.06)] hover:border-slate-300 hover:shadow-[0_16px_32px_-8px_rgba(11,31,75,0.12)] hover:-translate-y-1"
+      } ${className}`}
+    >
+      {/* Top Media Image Container */}
+      <div className="relative h-44 sm:h-48 w-full bg-slate-100 overflow-hidden">
+        <img
+          src={imageSrc}
+          alt={product.name}
+          loading="lazy"
+          onError={() => setImageError(true)}
+          className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+        />
+
+        {/* Soft Vignette Gradient for text contrast */}
+        <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/10 to-transparent pointer-events-none" />
+
+        {/* Top Badges */}
+        <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2 pointer-events-none">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-white/95 backdrop-blur-md text-[#0B1F4B] shadow-2xs border border-white/40">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            MPI Verified
+          </span>
+
+          {product.badge && (
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#F97316]/90 backdrop-blur-md text-white shadow-2xs">
+              {product.badge}
+            </span>
+          )}
+        </div>
+
+        {/* Category Pill at Bottom of Image */}
+        <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between pointer-events-none">
+          <span className="text-[11px] font-bold text-white/90 bg-black/40 backdrop-blur-md px-2.5 py-0.5 rounded-lg border border-white/10 truncate max-w-[200px]">
+            {product.category.split("&")[0]}
+          </span>
+          <span className="text-[10px] font-semibold text-white/80 bg-black/40 backdrop-blur-md px-2 py-0.5 rounded-lg">
+            {product.startingPrice}
+          </span>
+        </div>
+      </div>
+
+      {/* Card Body */}
+      <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between">
+        <div>
+          {/* Supplier Trust Badge */}
+          <div className="flex items-center gap-1.5 mb-2">
+            <span className="w-4 h-4 rounded-full bg-blue-50 text-blue-700 flex items-center justify-center shrink-0">
+              <MaterialIcon name="verified_user" size={12} className="text-blue-700" />
+            </span>
+            <span className="text-[11px] font-bold text-slate-700">
+              {product.supplierBadge}
+            </span>
+            <span className="text-[10px] text-slate-400 font-medium">
+              • ZED & Udyam Audited
+            </span>
+          </div>
+
+          {/* Product Title */}
+          <h3
+            className="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight line-clamp-1 group-hover:text-[#0B1F4B] transition-colors mb-1.5"
+            style={{ fontFamily: "Plus Jakarta Sans" }}
+            title={product.name}
+          >
+            {product.name}
+          </h3>
+
+          {/* Description */}
+          <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed mb-3.5">
+            {product.description}
+          </p>
+
+          {/* Key Attributes Box */}
+          <div className="grid grid-cols-2 gap-2 p-2.5 rounded-2xl bg-[#F7F9FC] border border-slate-200/80 mb-4 text-[11px]">
+            <div>
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                Standard MOQ
+              </span>
+              <span className="font-bold text-slate-800 truncate block">
+                {product.moq}
+              </span>
+            </div>
+            <div>
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                Lead Time
+              </span>
+              <span className="font-bold text-slate-800 truncate block">
+                {product.leadTime}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* CTA Bar */}
+        <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              onViewDetails(product)
+            }}
+            className="text-xs font-bold text-slate-700 hover:text-[#0B1F4B] hover:underline flex items-center gap-1 cursor-pointer py-1.5 px-1"
+          >
+            <span>View Details</span>
+            <MaterialIcon name="arrow_forward" size={14} />
+          </button>
+
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              onRequestQuote(product)
+            }}
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#0B1F4B] hover:bg-[#F97316] text-white text-xs font-bold shadow-2xs hover:shadow-sm transition-all duration-200 cursor-pointer"
+          >
+            <span>Request Quote</span>
+            <MaterialIcon name="bolt" size={14} className="text-orange-300 group-hover:text-white" />
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+export default ProductCard

@@ -16,6 +16,7 @@ import {
 import { hasLiveAIConfigured, type ExtractedProcurementSpecs } from "../services/aiService"
 import AuthModal from "../components/auth/AuthModal"
 import LanguageTranslatorButton from "../components/navigation/LanguageTranslatorButton"
+import ProductCatalogue from "../components/catalogue/ProductCatalogue"
 
 export function formatScopeDisplay(category: CatalogCategory, qty: number): string {
   if (category === "Packaging & Printing") {
@@ -119,7 +120,7 @@ export default function Home({ navigate }: NavProps) {
   const [isMsmeCardFlipped, setIsMsmeCardFlipped] = useState(false)
 
   // MPI Catalogue expandable section state
-  const [isCatalogExpanded, setIsCatalogExpanded] = useState(false)
+  const [isCatalogExpanded, setIsCatalogExpanded] = useState(true)
 
   // Sample prompt chips
   const samplePrompts = [
@@ -708,7 +709,7 @@ export default function Home({ navigate }: NavProps) {
           </div>
 
           {/* Bottom Block: Next-Gen Conversational AI Engine & Voice Assistant (Horizontal Layout) */}
-          <div className="mt-10 max-w-5xl mx-auto">
+          <div id="ai-procurement-engine" className="mt-10 max-w-5xl mx-auto scroll-mt-20">
             <div className="bg-white/95 backdrop-blur-xl rounded-3xl border border-slate-200/90 p-6 sm:p-8 shadow-[0_20px_50px_rgba(11,31,75,0.08)] relative overflow-hidden">
               {/* 1. Header with Glowing MPI Brand Sphere Orb */}
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 pb-5 border-b border-slate-100">
@@ -1657,172 +1658,55 @@ export default function Home({ navigate }: NavProps) {
       </section>
 
       {/* ─── 7. 7-CATEGORY MARKETPLACE EXPLORER ─────────────────────────────── */}
-      <section id="marketplace" className="py-14 sm:py-16 bg-[#F7F9FC] transition-all">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* MPI Catalogue Trigger: Replaces the 'MPI Verified Catalog' badge */}
-          <div className="mb-4">
+      {/* ─── 7. 7-CATEGORY MARKETPLACE EXPLORER (PREMIUM HORIZONTAL SIDE-SCROLL EXPERIENCE) ─── */}
+      <div id="marketplace" className="scroll-mt-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-2">
+          {/* MPI Catalogue Trigger: Toggle button */}
+          <div className="flex items-center justify-between">
             <button
               type="button"
               onClick={() => setIsCatalogExpanded((prev) => !prev)}
               className="group inline-flex items-center gap-2.5 px-5 py-2 rounded-full font-bold text-xs uppercase tracking-widest bg-[#0B1F4B] hover:bg-[#123B7A] text-white shadow-sm hover:shadow-md transition-all cursor-pointer"
             >
               <span>MPI Catalogue</span>
-              <span className={`text-[10px] transition-transform duration-200 font-mono ${isCatalogExpanded ? "rotate-180" : ""}`}>
+              <span
+                className={`text-[10px] transition-transform duration-200 font-mono ${
+                  isCatalogExpanded ? "rotate-180" : ""
+                }`}
+              >
                 ▼
               </span>
             </button>
+            <span className="text-xs text-slate-400 font-semibold hidden sm:inline">
+              7 Approved Categories • 75+ Vetted Offerings
+            </span>
           </div>
+        </div>
 
-          {/* Revealed only when MPI Catalogue button is clicked */}
-          {isCatalogExpanded ? (
-            <div className="animate-fade-in space-y-6">
-              <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-                <div>
-                  <h2
-                    className="text-2xl sm:text-3xl font-extrabold text-[#0B1F4B] tracking-tight"
-                    style={{ fontFamily: "Plus Jakarta Sans" }}
-                  >
-                    7 Approved Procurement Categories
-                  </h2>
-                  <p className="text-xs sm:text-sm text-slate-600 mt-1">
-                    Explore hundreds of vetted products and manufacturing capabilities ready for quotation.
-                  </p>
-                </div>
-
-                {/* Search within catalog */}
-                <div className="w-full md:w-72 relative">
-                  <Icons.Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                  <input
-                    type="text"
-                    value={marketSearchQuery}
-                    onChange={(e) => setMarketSearchQuery(e.target.value)}
-                    placeholder="Search solutions, products..."
-                    className="w-full pl-10 pr-4 py-2 text-xs sm:text-sm bg-white border border-slate-300 rounded-xl focus:border-[#0B1F4B] focus:ring-2 focus:ring-blue-100 outline-none shadow-2xs"
-                  />
-                </div>
-              </div>
-
-              {/* Category Filter Pills (Strictly 7 Categories) */}
-              <div className="flex flex-wrap items-center gap-1.5">
-                <button
-                  type="button"
-                  onClick={() => setSelectedMarketCategory("All")}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                    selectedMarketCategory === "All"
-                      ? "bg-[#0B1F4B] text-white shadow-2xs"
-                      : "bg-white text-slate-700 border border-slate-200 hover:bg-slate-50"
-                  }`}
-                >
-                  All Categories ({MPI_CATALOG.length})
-                </button>
-                {CATALOG_CATEGORIES.map((cat) => {
-                  const count = MPI_CATALOG.filter((s) => s.category === cat).length
-                  const isActive = selectedMarketCategory === cat
-                  return (
-                    <button
-                      key={cat}
-                      type="button"
-                      onClick={() => setSelectedMarketCategory(cat)}
-                      className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                        isActive
-                          ? "bg-[#0B1F4B] text-white shadow-2xs"
-                          : "bg-white text-slate-700 border border-slate-200 hover:bg-slate-50"
-                      }`}
-                    >
-                      {cat} ({count})
-                    </button>
-                  )
-                })}
-              </div>
-
-              {/* Products Grid: 20% Smaller Visual Footprint, 4–6 per Row on Large Screens */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-3.5">
-                {filteredCatalog.slice(0, 18).map((item) => (
-                  <div
-                    key={item.id}
-                    className="bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md hover:border-slate-300 transition-all flex flex-col justify-between group h-full"
-                  >
-                    <div>
-                      {/* Compact Header Image */}
-                      <div className="h-24 bg-linear-to-br from-slate-100 to-slate-200 relative overflow-hidden">
-                        <img
-                          src={item.image}
-                          alt={item.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          loading="lazy"
-                          onError={(e) => {
-                            ;(e.target as HTMLElement).style.display = "none"
-                          }}
-                        />
-                        <div className="absolute top-1.5 left-1.5">
-                          <span className="text-[9px] font-bold bg-[#0B1F4B]/90 text-white px-1.5 py-0.5 rounded backdrop-blur-xs truncate max-w-30 inline-block">
-                            {item.category.split("&")[0]}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Card Content with 20% tighter spacing */}
-                      <div className="p-2.5">
-                        <div className="flex items-center gap-1 mb-1">
-                          <span className="inline-flex items-center gap-1 text-[9px] font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">
-                            <Icons.Check className="w-2.5 h-2.5" />
-                            MPI Verified
-                          </span>
-                        </div>
-                        <h4
-                          className="font-bold text-slate-900 text-xs mb-1 line-clamp-1 group-hover:text-[#0B1F4B] transition-colors"
-                          title={item.name}
-                        >
-                          {item.name}
-                        </h4>
-                        <p className="text-[11px] text-slate-500 line-clamp-2 leading-tight">
-                          {item.description}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Card Action Buttons (View Details & Request Quote) */}
-                    <div className="p-2.5 pt-0 border-t border-slate-100 mt-1 flex items-center justify-between gap-1 text-[11px]">
-                      <button
-                        type="button"
-                        onClick={() => setSelectedProductDetail(item)}
-                        className="text-slate-600 hover:text-slate-900 font-semibold cursor-pointer truncate py-1"
-                      >
-                        View Details
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setRequirementText(
-                            `Need sourcing quotation for ${item.name} (${item.category}) for our upcoming batch launch.`,
-                          )
-                          setSelectedCategory(item.category as CatalogCategory)
-                          navigate("startup.procurement")
-                        }}
-                        className="text-[#F97316] hover:text-[#ea580c] font-bold flex items-center gap-0.5 cursor-pointer shrink-0 py-1"
-                      >
-                        <span>Quote</span>
-                        <Icons.ArrowRight className="w-3 h-3" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {filteredCatalog.length > 18 && (
-                <div className="mt-8 text-center">
-                  <MPIButton
-                    variant="outline"
-                    size="sm"
-                    onClick={() => navigate("startup.procurement")}
-                  >
-                    View All {filteredCatalog.length} Catalog Offerings in Workspace →
-                  </MPIButton>
-                </div>
-              )}
-            </div>
-          ) : (
-            /* Collapsed Teaser Preview Card */
+        {isCatalogExpanded ? (
+          <ProductCatalogue
+            onQuoteProduct={(product) => {
+              setRequirementText(
+                `Need sourcing quotation for ${product.name} (${product.category}) for our upcoming batch launch.`
+              )
+              setSelectedCategory(product.category as CatalogCategory)
+              navigate("startup.procurement")
+            }}
+            onAskAI={(query, category) => {
+              if (query) setRequirementText(query)
+              if (category) setSelectedCategory(category as CatalogCategory)
+              const aiEl = document.getElementById("ai-procurement-engine")
+              if (aiEl) {
+                aiEl.scrollIntoView({ behavior: "smooth" })
+              } else {
+                navigate("startup.procurement")
+              }
+            }}
+            onExploreWorkspace={() => navigate("startup.procurement")}
+          />
+        ) : (
+          /* Collapsed Teaser Preview Card */
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div
               onClick={() => setIsCatalogExpanded(true)}
               className="bg-white rounded-2xl border-2 border-dashed border-slate-300 hover:border-[#0B1F4B] p-8 text-center cursor-pointer transition-all hover:shadow-md group"
@@ -1848,9 +1732,9 @@ export default function Home({ navigate }: NavProps) {
                 <Icons.ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>
-          )}
-        </div>
-      </section>
+          </div>
+        )}
+      </div>
 
       {/* ─── 8. GOVERNMENT SCHEMES INTELLIGENCE CENTER & CALCULATOR ─────────────── */}
       <section
