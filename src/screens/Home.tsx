@@ -644,365 +644,375 @@ export default function Home({ navigate }: NavProps) {
 
       {/* ─── 3. HERO SECTION WITH INTERACTIVE AI INTAKE SIMULATOR ──────────────── */}
       <section className="relative overflow-hidden pt-8 pb-14 lg:pt-12 lg:pb-20 bg-linear-to-b from-white via-slate-50 to-[#F7F9FC] border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
-            {/* Left Column: Value Proposition */}
-            <div className="lg:col-span-7 space-y-5 text-left">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-xs font-semibold text-[#0B1F4B]">
-                <Icons.Sparkles className="w-3.5 h-3.5 text-[#F97316]" />
-                <span>Next-Gen B2B Sourcing Infrastructure</span>
-              </div>
-
-              <h1
-                className="text-xl sm:text-2xl md:text-[27px] lg:text-[26px] xl:text-[30px] font-extrabold text-[#0B1F4B] tracking-tight leading-[1.25]"
-                style={{ fontFamily: "Plus Jakarta Sans" }}
-              >
-                <span className="block whitespace-nowrap">
-                  Your MPI Procurement Support from
-                </span>
-                <span className="block whitespace-nowrap">
-                  <span className="text-[#F97316]">Plain Requirement</span> to Verified MSME Delivery.
-                </span>
-              </h1>
-
-              <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-xl">
-                Empowering Indian startups to source packaging, prototyping,
-                compliance, digital, and specialized services with
-                institutional-grade RFQ generation, real-time quote comparison,
-                and 100% verified MSME suppliers.
-              </p>
-
-              {/* Trust Badges Bar */}
-              <div className="flex flex-wrap items-center gap-2.5 text-xs font-semibold text-slate-700">
-                <span className="inline-flex items-center gap-1.5 bg-white border border-slate-200 px-3 py-1.5 rounded-lg shadow-2xs">
-                  <Icons.ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
-                  Udyam Registered MSMEs
-                </span>
-                <span className="inline-flex items-center gap-1.5 bg-white border border-slate-200 px-3 py-1.5 rounded-lg shadow-2xs">
-                  <Icons.Award className="w-3.5 h-3.5 text-amber-600" />
-                  ZED & ISO Certified
-                </span>
-                <span className="inline-flex items-center gap-1.5 bg-blue-50/80 border border-blue-200/80 text-[#0B1F4B] px-3 py-1.5 rounded-lg font-bold">
-                  <Icons.Sparkles className="w-3.5 h-3.5 text-[#F97316]" />
-                  Reverse Margin Verified
-                </span>
-              </div>
-
-              {/* Direct Workspace Action Links */}
-              <div className="flex flex-wrap items-center gap-3.5 pt-1">
-                <MPIButton
-                  variant="primary"
-                  size="lg"
-                  onClick={() => navigate("startup.procurement")}
-                  icon={<Icons.ArrowRight className="w-4 h-4" />}
-                >
-                  Launch MPI Procurement Support
-                </MPIButton>
-                <MPIButton
-                  variant="outline"
-                  size="lg"
-                  onClick={() => navigate("register.msme")}
-                >
-                  Register as MSME Supplier
-                </MPIButton>
-              </div>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Top Block: Value Proposition (Centered above AI Engine) */}
+          <div className="max-w-4xl mx-auto text-center space-y-5 animate-fade-in">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-xs font-semibold text-[#0B1F4B]">
+              <Icons.Sparkles className="w-3.5 h-3.5 text-[#F97316]" />
+              <span>Next-Gen B2B Sourcing Infrastructure</span>
             </div>
 
-            {/* Right Column: Next-Gen Conversational AI Engine & Voice Assistant (Matching Reference Design) */}
-            <div className="lg:col-span-5">
-              <div className="bg-white/95 backdrop-blur-xl rounded-3xl border border-slate-200/90 p-6 sm:p-8 shadow-[0_20px_50px_rgba(11,31,75,0.08)] relative overflow-hidden">
-                {/* 1. Header with Glowing MPI Brand Sphere Orb */}
-                <div className="flex flex-col items-center text-center mb-6">
-                  {/* MPI Glowing Sphere Orb (Deep Blue & Orange) */}
-                  <div className="relative mb-3 group cursor-pointer" onClick={toggleVoiceRecording}>
-                    <div className="w-14 h-14 rounded-full bg-linear-to-tr from-[#0B1F4B] via-[#123B7A] to-[#F97316] shadow-[0_0_35px_rgba(249,115,22,0.45)] flex items-center justify-center transition-transform hover:scale-105 active:scale-95 animate-pulse">
-                      <div className="w-9 h-9 rounded-full bg-white/25 backdrop-blur-xs flex items-center justify-center">
-                        <Icons.Sparkles className="w-5 h-5 text-white" />
+            <h1
+              className="text-xl sm:text-2xl md:text-3xl lg:text-[34px] xl:text-[38px] font-extrabold text-[#0B1F4B] tracking-tight leading-[1.25]"
+              style={{ fontFamily: "Plus Jakarta Sans" }}
+            >
+              <span className="block whitespace-nowrap">
+                Your MPI Procurement Support from
+              </span>
+              <span className="block whitespace-nowrap mt-1">
+                <span className="text-[#F97316]">Plain Requirement</span> to Verified MSME Delivery.
+              </span>
+            </h1>
+
+            <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-2xl mx-auto">
+              Empowering Indian startups to source packaging, prototyping,
+              compliance, digital, and specialized services with
+              institutional-grade RFQ generation, real-time quote comparison,
+              and 100% verified MSME suppliers.
+            </p>
+
+            {/* Trust Badges Bar */}
+            <div className="flex flex-wrap items-center justify-center gap-2.5 text-xs font-semibold text-slate-700">
+              <span className="inline-flex items-center gap-1.5 bg-white border border-slate-200 px-3 py-1.5 rounded-lg shadow-2xs">
+                <Icons.ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
+                Udyam Registered MSMEs
+              </span>
+              <span className="inline-flex items-center gap-1.5 bg-white border border-slate-200 px-3 py-1.5 rounded-lg shadow-2xs">
+                <Icons.Award className="w-3.5 h-3.5 text-amber-600" />
+                ZED & ISO Certified
+              </span>
+              <span className="inline-flex items-center gap-1.5 bg-blue-50/80 border border-blue-200/80 text-[#0B1F4B] px-3 py-1.5 rounded-lg font-bold">
+                <Icons.Sparkles className="w-3.5 h-3.5 text-[#F97316]" />
+                Reverse Margin Verified
+              </span>
+            </div>
+
+            {/* Direct Workspace Action Links */}
+            <div className="flex flex-wrap items-center justify-center gap-3.5 pt-1">
+              <MPIButton
+                variant="primary"
+                size="lg"
+                onClick={() => navigate("startup.procurement")}
+                icon={<Icons.ArrowRight className="w-4 h-4" />}
+              >
+                Launch MPI Procurement Support
+              </MPIButton>
+              <MPIButton
+                variant="outline"
+                size="lg"
+                onClick={() => navigate("register.msme")}
+              >
+                Register as MSME Supplier
+              </MPIButton>
+            </div>
+          </div>
+
+          {/* Bottom Block: Next-Gen Conversational AI Engine & Voice Assistant (Horizontal Layout) */}
+          <div className="mt-10 max-w-5xl mx-auto">
+            <div className="bg-white/95 backdrop-blur-xl rounded-3xl border border-slate-200/90 p-6 sm:p-8 shadow-[0_20px_50px_rgba(11,31,75,0.08)] relative overflow-hidden">
+              {/* 1. Header with Glowing MPI Brand Sphere Orb */}
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 pb-5 border-b border-slate-100">
+                <div className="flex items-center gap-4 text-left">
+                  {/* MPI Glowing Sphere Orb */}
+                  <div className="relative group cursor-pointer shrink-0" onClick={toggleVoiceRecording}>
+                    <div className="w-13 h-13 rounded-full bg-linear-to-tr from-[#0B1F4B] via-[#123B7A] to-[#F97316] shadow-[0_0_30px_rgba(249,115,22,0.4)] flex items-center justify-center transition-transform hover:scale-105 active:scale-95 animate-pulse">
+                      <div className="w-8 h-8 rounded-full bg-white/25 backdrop-blur-xs flex items-center justify-center">
+                        <Icons.Sparkles className="w-4.5 h-4.5 text-white" />
                       </div>
                     </div>
-                    {/* Pulsing rings when voice recording */}
                     {isVoiceRecording && (
                       <span className="absolute inset-0 rounded-full border-2 border-orange-400 animate-ping opacity-75 pointer-events-none" />
                     )}
                   </div>
-
-                  <h3
-                    className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight"
-                    style={{ fontFamily: "Plus Jakarta Sans" }}
-                  >
-                    Good Afternoon, Founder
-                  </h3>
-                  <div
-                    className="text-2xl sm:text-3xl font-extrabold tracking-tight mt-0.5"
-                    style={{ fontFamily: "Plus Jakarta Sans" }}
-                  >
-                    What's on <span className="bg-linear-to-r from-[#0B1F4B] via-[#123B7A] to-[#F97316] bg-clip-text text-transparent">your mind?</span>
+                  <div>
+                    <h3
+                      className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight"
+                      style={{ fontFamily: "Plus Jakarta Sans" }}
+                    >
+                      Good Afternoon, Founder
+                    </h3>
+                    <div
+                      className="text-sm sm:text-base font-bold text-slate-600 mt-0.5"
+                      style={{ fontFamily: "Plus Jakarta Sans" }}
+                    >
+                      What's on <span className="bg-linear-to-r from-[#0B1F4B] via-[#123B7A] to-[#F97316] bg-clip-text text-transparent">your procurement mind?</span>
+                    </div>
                   </div>
                 </div>
 
-                {/* 2. Main Conversational AI Input Box (Matching Reference Card) */}
-                <div className="relative rounded-2xl border border-slate-200 bg-white shadow-xs focus-within:border-[#F97316] focus-within:ring-4 focus-within:ring-orange-100/70 transition-all">
-                  {/* Input area */}
-                  <div className="p-4 sm:p-5">
-                    <div className="flex items-start gap-2.5">
-                      <Icons.Sparkles className="w-4 h-4 text-[#F97316] shrink-0 mt-1" />
-                      <textarea
-                        rows={3}
-                        value={requirementText}
-                        onChange={(e) => {
-                          setRequirementText(e.target.value)
-                          setHasSimulatedExtraction(false)
-                        }}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter" && !e.shiftKey && requirementText.trim()) {
-                            e.preventDefault()
-                            handleGenerateSpecs()
-                          }
-                        }}
-                        placeholder="Ask AI a question or describe your procurement requirement (quantity, material, tolerances, target budget)..."
-                        className="w-full text-xs sm:text-sm text-slate-800 placeholder:text-slate-400 bg-transparent border-0 outline-none resize-none font-medium leading-relaxed"
-                      />
-                    </div>
+                <div className="hidden sm:flex items-center gap-2 text-xs font-semibold text-slate-500 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-200">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span>Interactive RFQ Engine • Voice & Specs</span>
+                </div>
+              </div>
+
+              {/* 2. Main Conversational AI Input Box */}
+              <div className="relative rounded-2xl border border-slate-200 bg-white shadow-xs focus-within:border-[#F97316] focus-within:ring-4 focus-within:ring-orange-100/70 transition-all">
+                {/* Input area */}
+                <div className="p-4 sm:p-5">
+                  <div className="flex items-start gap-3">
+                    <Icons.Sparkles className="w-4 h-4 text-[#F97316] shrink-0 mt-1" />
+                    <textarea
+                      rows={2}
+                      value={requirementText}
+                      onChange={(e) => {
+                        setRequirementText(e.target.value)
+                        setHasSimulatedExtraction(false)
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && !e.shiftKey && requirementText.trim()) {
+                          e.preventDefault()
+                          handleGenerateSpecs()
+                        }
+                      }}
+                      placeholder="Ask AI a question or describe your procurement requirement (quantity, material, tolerances, target budget)..."
+                      className="w-full text-xs sm:text-sm text-slate-800 placeholder:text-slate-400 bg-transparent border-0 outline-none resize-none font-medium leading-relaxed"
+                    />
                   </div>
+                </div>
 
-                  {/* Voice recording live indicator strip if active */}
-                  {isVoiceRecording && (
-                    <div className="mx-4 mb-2 p-2.5 rounded-xl bg-orange-50 border border-orange-200 text-orange-900 flex items-center justify-between text-xs animate-fade-in">
-                      <div className="flex items-center gap-2">
-                        <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping" />
-                        <span className="font-semibold">Recording voice requirement... Speak clearly.</span>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={toggleVoiceRecording}
-                        className="px-2.5 py-1 rounded-md bg-[#F97316] text-white font-bold hover:bg-orange-600 text-[11px] cursor-pointer"
-                      >
-                        Stop & Send
-                      </button>
-                    </div>
-                  )}
-
-                  {/* Bottom Controls Bar: Attach, Writing Styles, Voice Mic, Citation, Send Button */}
-                  <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 bg-slate-50/60 rounded-b-2xl border-t border-slate-100">
+                {/* Voice recording live indicator strip if active */}
+                {isVoiceRecording && (
+                  <div className="mx-4 mb-2 p-2.5 rounded-xl bg-orange-50 border border-orange-200 text-orange-900 flex items-center justify-between text-xs animate-fade-in">
                     <div className="flex items-center gap-2">
-                      {/* Attach button */}
-                      <button
-                        type="button"
-                        onClick={() => navigate("startup.procurement")}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-semibold shadow-2xs transition-all cursor-pointer"
-                        title="Attach CAD drawings, die-lines, or technical RFQ documents"
-                      >
-                        <svg className="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-                        </svg>
-                        <span>Attach</span>
-                      </button>
-
-                      {/* Writing Styles Selector */}
-                      <div className="relative">
-                        <button
-                          type="button"
-                          onClick={() => setShowStyleDropdown((prev) => !prev)}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-semibold shadow-2xs transition-all cursor-pointer"
-                        >
-                          <span>{selectedWritingStyle}</span>
-                          <span className="text-[10px] text-slate-400">▼</span>
-                        </button>
-                        {showStyleDropdown && (
-                          <div className="absolute left-0 bottom-full mb-1 w-40 bg-white rounded-xl shadow-lg border border-slate-200 py-1.5 z-30 animate-fade-in text-xs font-medium">
-                            {(["Institutional", "Technical", "Lean Startup", "Default"] as const).map((st) => (
-                              <button
-                                key={st}
-                                type="button"
-                                onClick={() => {
-                                  setSelectedWritingStyle(st)
-                                  setShowStyleDropdown(false)
-                                }}
-                                className={`w-full text-left px-3 py-1.5 hover:bg-slate-50 cursor-pointer ${
-                                  selectedWritingStyle === st ? "text-[#F97316] font-bold bg-orange-50" : "text-slate-700"
-                                }`}
-                              >
-                                {st}
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Interactive Voice Assistant Mic Button */}
-                      <button
-                        type="button"
-                        onClick={toggleVoiceRecording}
-                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-2xs ${
-                          isVoiceRecording
-                            ? "bg-red-500 text-white animate-pulse"
-                            : "bg-white border border-slate-200 text-slate-700 hover:border-orange-400 hover:text-[#F97316]"
-                        }`}
-                        title="Record requirement via Voice Assistant"
-                      >
-                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-                        </svg>
-                        <span>{isVoiceRecording ? "Listening..." : "Voice"}</span>
-                      </button>
+                      <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping" />
+                      <span className="font-semibold">Recording voice requirement... Speak clearly.</span>
                     </div>
-
-                    <div className="flex items-center gap-3">
-                      {/* Citation / Schemes Toggle Switch */}
-                      <button
-                        type="button"
-                        onClick={() => setEnableCitation((prev) => !prev)}
-                        className="inline-flex items-center gap-2 cursor-pointer select-none text-xs text-slate-600 font-medium"
-                      >
-                        <div
-                          className={`w-8 h-4.5 rounded-full transition-colors relative flex items-center px-0.5 ${
-                            enableCitation ? "bg-[#0B1F4B]" : "bg-slate-300"
-                          }`}
-                        >
-                          <div
-                            className={`w-3.5 h-3.5 rounded-full bg-white transition-transform ${
-                              enableCitation ? "translate-x-3.5" : "translate-x-0"
-                            }`}
-                          />
-                        </div>
-                        <span className="text-[11px] font-semibold text-slate-600">Citation</span>
-                      </button>
-
-                      {/* Submit / Send Arrow Button */}
-                      <button
-                        type="button"
-                        disabled={isExtractingSpecs || !requirementText.trim()}
-                        onClick={() => handleGenerateSpecs()}
-                        className="w-8 h-8 rounded-xl bg-slate-900 hover:bg-[#F97316] disabled:bg-slate-300 text-white flex items-center justify-center transition-all cursor-pointer disabled:cursor-not-allowed shadow-xs"
-                        title="Send requirement to AI Spec Engine"
-                      >
-                        {isExtractingSpecs ? (
-                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        ) : (
-                          <Icons.ArrowRight className="w-4 h-4 -rotate-90" />
-                        )}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* 3. "GET STARTED WITH AN EXAMPLE BELOW" 4 CARDS (Matching Reference Layout) */}
-                <div className="mt-6">
-                  <div className="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-widest text-slate-400 mb-3 text-left">
-                    Get started with an example below:
-                  </div>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                    {[
-                      {
-                        title: "Rigid Skincare Boxes",
-                        category: "Packaging & Printing",
-                        text: "Need 500 custom rigid printed boxes for our D2C organic skincare launch by next month, budget under ₹80k with EVA foam inserts",
-                        icon: "📦",
-                      },
-                      {
-                        title: "Rapid SLS Prototyping",
-                        category: "Prototyping & Product",
-                        text: "Require 50 units SLS 3D printed nylon PA12 enclosure prototypes with CNC milled aluminium plates within 10 days, budget ₹65k",
-                        icon: "⚙️",
-                      },
-                      {
-                        title: "Cloud ERP & Supabase",
-                        category: "IT & Digital Services",
-                        text: "Need an agency to set up custom ERP inventory workflow and Supabase database integration for 100 users, budget ₹1.8 Lakh",
-                        icon: "💻",
-                      },
-                      {
-                        title: "DPIIT Seed Compliance",
-                        category: "Specialized Startup",
-                        text: "Need specialized startup support for DPIIT seed fund compliance, MSME incubation readiness, and go-to-market mentorship, budget ₹50k",
-                        icon: "📜",
-                      },
-                    ].map((example, idx) => (
-                      <button
-                        key={example.title}
-                        type="button"
-                        onClick={() => {
-                          setRequirementText(example.text)
-                          handleGenerateSpecs(example.text)
-                        }}
-                        className="p-3 rounded-2xl bg-slate-50/80 hover:bg-white border border-slate-200/90 hover:border-orange-300 hover:shadow-sm text-left transition-all cursor-pointer flex flex-col justify-between group h-28"
-                      >
-                        <p className="text-[11px] font-semibold text-slate-700 leading-snug line-clamp-2 group-hover:text-[#F97316]">
-                          {example.title}
-                        </p>
-                        <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
-                          <span className="text-base">{example.icon}</span>
-                          <span className="text-[10px] text-slate-400 font-medium">Use</span>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* 4. Live Extraction Output Preview (if generated) */}
-                {hasSimulatedExtraction && extractionResult && (
-                  <div className="mt-6 pt-4 border-t border-slate-200 space-y-3 animate-fade-in bg-slate-50/90 p-4 rounded-2xl text-left">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-[#0B1F4B] flex items-center gap-1.5">
-                        <Icons.Check className="w-4 h-4 text-emerald-600" />
-                        AI Extraction Succeeded ({aiConfidenceScore || 96}% Confidence)
-                      </span>
-                      <span className="text-[11px] bg-orange-100 text-orange-900 font-semibold px-2 py-0.5 rounded-full">
-                        {selectedCategory}
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-2 text-xs">
-                      <div className="bg-white p-2 rounded-xl border border-slate-200">
-                        <div className="text-[10px] text-slate-400 uppercase font-bold">Category</div>
-                        <div className="font-semibold text-slate-800 truncate" title={selectedCategory}>
-                          {selectedCategory}
-                        </div>
-                      </div>
-                      <div className="bg-white p-2 rounded-xl border border-slate-200">
-                        <div className="text-[10px] text-slate-400 uppercase font-bold">Qty / Scope</div>
-                        <div className="font-semibold text-slate-800 truncate" title={formatScopeDisplay(selectedCategory, quantity)}>
-                          {formatScopeDisplay(selectedCategory, quantity)}
-                        </div>
-                      </div>
-                      <div className="bg-white p-2 rounded-xl border border-slate-200">
-                        <div className="text-[10px] text-slate-400 uppercase font-bold">Est. Savings</div>
-                        <div className="font-semibold text-emerald-600 truncate">
-                          ₹{Math.max(1500, Math.round(targetBudget * 0.24)).toLocaleString("en-IN")} (24%)
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="bg-white p-2.5 rounded-xl border border-slate-200 text-xs">
-                      <div className="text-[10px] font-bold text-slate-500 uppercase mb-1">
-                        Auto-Extracted Technical Specs:
-                      </div>
-                      <ul className="space-y-1 text-slate-700 text-[11px]">
-                        {specifications.slice(0, 3).map((spec, i) => (
-                          <li key={i} className="flex items-start gap-1.5">
-                            <span className="text-[#F97316] font-bold">•</span>
-                            <span className="truncate">{spec}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    <div className="pt-2 flex items-center justify-between">
-                      <span className="text-[11px] text-slate-500">
-                        Structured RFQ ready for verified MSME bidding.
-                      </span>
-                      <MPIButton
-                        variant="primary"
-                        size="sm"
-                        onClick={handleContinueToStartupWorkspace}
-                        icon={<Icons.ArrowRight className="w-3.5 h-3.5" />}
-                      >
-                        Refine in Workspace
-                      </MPIButton>
-                    </div>
+                    <button
+                      type="button"
+                      onClick={toggleVoiceRecording}
+                      className="px-2.5 py-1 rounded-md bg-[#F97316] text-white font-bold hover:bg-orange-600 text-[11px] cursor-pointer"
+                    >
+                      Stop & Send
+                    </button>
                   </div>
                 )}
+
+                {/* Bottom Controls Bar: Attach, Writing Styles, Voice Mic, Citation, Send Button */}
+                <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 bg-slate-50/60 rounded-b-2xl border-t border-slate-100">
+                  <div className="flex items-center gap-2">
+                    {/* Attach button */}
+                    <button
+                      type="button"
+                      onClick={() => navigate("startup.procurement")}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-semibold shadow-2xs transition-all cursor-pointer"
+                      title="Attach CAD drawings, die-lines, or technical RFQ documents"
+                    >
+                      <svg className="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                      </svg>
+                      <span>Attach</span>
+                    </button>
+
+                    {/* Writing Styles Selector */}
+                    <div className="relative">
+                      <button
+                        type="button"
+                        onClick={() => setShowStyleDropdown((prev) => !prev)}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-semibold shadow-2xs transition-all cursor-pointer"
+                      >
+                        <span>{selectedWritingStyle}</span>
+                        <span className="text-[10px] text-slate-400">▼</span>
+                      </button>
+                      {showStyleDropdown && (
+                        <div className="absolute left-0 bottom-full mb-1 w-40 bg-white rounded-xl shadow-lg border border-slate-200 py-1.5 z-30 animate-fade-in text-xs font-medium">
+                          {(["Institutional", "Technical", "Lean Startup", "Default"] as const).map((st) => (
+                            <button
+                              key={st}
+                              type="button"
+                              onClick={() => {
+                                setSelectedWritingStyle(st)
+                                setShowStyleDropdown(false)
+                              }}
+                              className={`w-full text-left px-3 py-1.5 hover:bg-slate-50 cursor-pointer ${
+                                selectedWritingStyle === st ? "text-[#F97316] font-bold bg-orange-50" : "text-slate-700"
+                              }`}
+                            >
+                              {st}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Interactive Voice Assistant Mic Button */}
+                    <button
+                      type="button"
+                      onClick={toggleVoiceRecording}
+                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-2xs ${
+                        isVoiceRecording
+                          ? "bg-red-500 text-white animate-pulse"
+                          : "bg-white border border-slate-200 text-slate-700 hover:border-orange-400 hover:text-[#F97316]"
+                      }`}
+                      title="Record requirement via Voice Assistant"
+                    >
+                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                      </svg>
+                      <span>{isVoiceRecording ? "Listening..." : "Voice"}</span>
+                    </button>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    {/* Citation / Schemes Toggle Switch */}
+                    <button
+                      type="button"
+                      onClick={() => setEnableCitation((prev) => !prev)}
+                      className="inline-flex items-center gap-2 cursor-pointer select-none text-xs text-slate-600 font-medium"
+                    >
+                      <div
+                        className={`w-8 h-4.5 rounded-full transition-colors relative flex items-center px-0.5 ${
+                          enableCitation ? "bg-[#0B1F4B]" : "bg-slate-300"
+                        }`}
+                      >
+                        <div
+                          className={`w-3.5 h-3.5 rounded-full bg-white transition-transform ${
+                            enableCitation ? "translate-x-3.5" : "translate-x-0"
+                          }`}
+                        />
+                      </div>
+                      <span className="text-[11px] font-semibold text-slate-600">Citation</span>
+                    </button>
+
+                    {/* Submit / Send Arrow Button */}
+                    <button
+                      type="button"
+                      disabled={isExtractingSpecs || !requirementText.trim()}
+                      onClick={() => handleGenerateSpecs()}
+                      className="w-8 h-8 rounded-xl bg-slate-900 hover:bg-[#F97316] disabled:bg-slate-300 text-white flex items-center justify-center transition-all cursor-pointer disabled:cursor-not-allowed shadow-xs"
+                      title="Send requirement to AI Spec Engine"
+                    >
+                      {isExtractingSpecs ? (
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <Icons.ArrowRight className="w-4 h-4 -rotate-90" />
+                      )}
+                    </button>
+                  </div>
+                </div>
               </div>
+
+              {/* 3. "GET STARTED WITH AN EXAMPLE BELOW" 4 CARDS (Horizontal 4-column layout) */}
+              <div className="mt-6">
+                <div className="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-widest text-slate-400 mb-3 text-left">
+                  Get started with an example below:
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                  {[
+                    {
+                      title: "Rigid Skincare Boxes",
+                      category: "Packaging & Printing",
+                      text: "Need 500 custom rigid printed boxes for our D2C organic skincare launch by next month, budget under ₹80k with EVA foam inserts",
+                      icon: "📦",
+                    },
+                    {
+                      title: "Rapid SLS Prototyping",
+                      category: "Prototyping & Product",
+                      text: "Require 50 units SLS 3D printed nylon PA12 enclosure prototypes with CNC milled aluminium plates within 10 days, budget ₹65k",
+                      icon: "⚙️",
+                    },
+                    {
+                      title: "Cloud ERP & Supabase",
+                      category: "IT & Digital Services",
+                      text: "Need an agency to set up custom ERP inventory workflow and Supabase database integration for 100 users, budget ₹1.8 Lakh",
+                      icon: "💻",
+                    },
+                    {
+                      title: "DPIIT Seed Compliance",
+                      category: "Specialized Startup",
+                      text: "Need specialized startup support for DPIIT seed fund compliance, MSME incubation readiness, and go-to-market mentorship, budget ₹50k",
+                      icon: "📜",
+                    },
+                  ].map((example) => (
+                    <button
+                      key={example.title}
+                      type="button"
+                      onClick={() => {
+                        setRequirementText(example.text)
+                        handleGenerateSpecs(example.text)
+                      }}
+                      className="p-3.5 rounded-2xl bg-slate-50/80 hover:bg-white border border-slate-200/90 hover:border-orange-300 hover:shadow-sm text-left transition-all cursor-pointer flex flex-col justify-between group h-28"
+                    >
+                      <div>
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-base">{example.icon}</span>
+                          <span className="text-[10px] text-slate-400 font-semibold group-hover:text-[#F97316]">Use →</span>
+                        </div>
+                        <p className="text-xs font-bold text-slate-800 leading-snug group-hover:text-[#F97316]">
+                          {example.title}
+                        </p>
+                      </div>
+                      <span className="text-[10px] text-slate-400 truncate font-medium">
+                        {example.category}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* 4. Live Extraction Output Preview (if generated) */}
+              {hasSimulatedExtraction && extractionResult && (
+                <div className="mt-6 pt-5 border-t border-slate-200 space-y-3 animate-fade-in bg-slate-50/90 p-5 rounded-2xl text-left">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="text-xs font-bold text-[#0B1F4B] flex items-center gap-1.5">
+                      <Icons.Check className="w-4 h-4 text-emerald-600" />
+                      AI Extraction Succeeded ({aiConfidenceScore || 96}% Confidence)
+                    </span>
+                    <span className="text-[11px] bg-orange-100 text-orange-900 font-semibold px-2.5 py-0.5 rounded-full">
+                      {selectedCategory}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                    <div className="bg-white p-3 rounded-xl border border-slate-200">
+                      <div className="text-[10px] text-slate-400 uppercase font-bold">Category</div>
+                      <div className="font-semibold text-slate-800 truncate" title={selectedCategory}>
+                        {selectedCategory}
+                      </div>
+                    </div>
+                    <div className="bg-white p-3 rounded-xl border border-slate-200">
+                      <div className="text-[10px] text-slate-400 uppercase font-bold">Qty / Scope</div>
+                      <div className="font-semibold text-slate-800 truncate" title={formatScopeDisplay(selectedCategory, quantity)}>
+                        {formatScopeDisplay(selectedCategory, quantity)}
+                      </div>
+                    </div>
+                    <div className="bg-white p-3 rounded-xl border border-slate-200">
+                      <div className="text-[10px] text-slate-400 uppercase font-bold">Est. Savings</div>
+                      <div className="font-semibold text-emerald-600 truncate">
+                        ₹{Math.max(1500, Math.round(targetBudget * 0.24)).toLocaleString("en-IN")} (24%)
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-white p-3 rounded-xl border border-slate-200 text-xs">
+                    <div className="text-[10px] font-bold text-slate-500 uppercase mb-1.5">
+                      Auto-Extracted Technical Specs:
+                    </div>
+                    <ul className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-slate-700 text-[11px]">
+                      {specifications.slice(0, 3).map((spec, i) => (
+                        <li key={i} className="flex items-start gap-1.5">
+                          <span className="text-[#F97316] font-bold">•</span>
+                          <span className="truncate">{spec}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div className="pt-2 flex flex-wrap items-center justify-between gap-3">
+                    <span className="text-[11px] text-slate-500">
+                      Structured RFQ ready for verified MSME bidding.
+                    </span>
+                    <MPIButton
+                      variant="primary"
+                      size="sm"
+                      onClick={handleContinueToStartupWorkspace}
+                      icon={<Icons.ArrowRight className="w-3.5 h-3.5" />}
+                    >
+                      Refine in Workspace
+                    </MPIButton>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
