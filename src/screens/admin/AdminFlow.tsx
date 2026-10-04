@@ -681,7 +681,6 @@ Select a quick analysis pill below or ask me any question!`,
           <div className="p-2.5 rounded-xl bg-[#071534] border border-[#14356E] flex items-center justify-between text-xs">
             <div>
               <div className="font-bold text-white flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                 admin
               </div>
               <div className="text-[10px] text-slate-400 font-mono">
@@ -848,7 +847,6 @@ Select a quick analysis pill below or ask me any question!`,
             </button>
 
             <div className="items-center gap-1.5 bg-slate-100 text-slate-700 px-2.5 py-1 rounded-full font-mono text-[11px] font-semibold border border-slate-200 hidden sm:flex">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
               <span>admin · authenticated</span>
             </div>
 
@@ -944,7 +942,6 @@ Select a quick analysis pill below or ask me any question!`,
       >
         <div className="relative">
           <Icons.Sparkles className="w-5 h-5 text-[#F97316]" />
-          <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
         </div>
         <span className="text-xs font-bold pr-1">Admin Copilot</span>
         <span className="text-[10px] font-mono bg-blue-900/80 text-orange-300 px-2 py-0.5 rounded-full border border-blue-400/20">
@@ -971,7 +968,6 @@ Select a quick analysis pill below or ask me any question!`,
                       MPI Admin Operations Copilot
                     </h3>
                     <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-950 text-emerald-300 border border-emerald-500/30">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                       MPI AI Engine Live
                     </span>
                   </div>
@@ -1059,7 +1055,6 @@ Select a quick analysis pill below or ask me any question!`,
                         </span>
                         {msg.isLive && (
                           <span className="text-[10px] text-emerald-700 font-semibold flex items-center gap-1">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                             Live MPI AI Response
                           </span>
                         )}

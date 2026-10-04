@@ -156,6 +156,14 @@ function renderCopilotMarkdown(text: string) {
   return elements
 }
 
+interface CopilotNextAction {
+  label: string
+  query?: string
+  screen?: string
+  badge?: string
+  icon?: string
+}
+
 interface CopilotMessageItem {
   role: "ai" | "user"
   text: string
@@ -166,6 +174,126 @@ interface CopilotMessageItem {
     screen: string
     label: string
   }
+  recommendedNextActions?: CopilotNextAction[]
+}
+
+function getRecommendedNextActions(
+  messageText: string,
+  category: string,
+  quantity: number,
+  targetBudget: number,
+): CopilotNextAction[] {
+  const lower = (messageText || "").toLowerCase()
+  if (lower.includes("pricing") || lower.includes("cost") || lower.includes("budget") || lower.includes("rate") || lower.includes("amortiz")) {
+    return [
+      {
+        label: "Calculate MSME ZED Subsidy Grant (Save up to 80%)",
+        query: `Calculate our exact subsidy grant eligibility under MSME ZED & Design Clinic for ₹${targetBudget.toLocaleString("en-IN")} order.`,
+        badge: "Grant Savings",
+        icon: "💰",
+      },
+      {
+        label: "Compare Shortlisted Supplier Bids",
+        screen: "startup.procurement",
+        badge: "Live Quotes",
+        icon: "🏭",
+      },
+      {
+        label: "Draft Volume Discount Negotiation Message",
+        query: "Draft a formal supplier negotiation message requesting a 10% repeat order discount with milestone payment escrow.",
+        badge: "Negotiation",
+        icon: "📝",
+      },
+      {
+        label: "Add Tooling Amortization Clause to RFQ",
+        query: "How do we draft the RFQ clause to amortize tooling over 3 repeat production runs?",
+        badge: "Legal / PO",
+        icon: "⚖️",
+      },
+    ]
+  } else if (lower.includes("scheme") || lower.includes("subsidy") || lower.includes("zed") || lower.includes("grant") || lower.includes("sisfs")) {
+    return [
+      {
+        label: "View All 30 Government Schemes for Startups",
+        screen: "government-schemes.match",
+        badge: "30 Schemes",
+        icon: "📜",
+      },
+      {
+        label: "Add ZED Quality Audit Verification to RFQ",
+        query: "Add standard ZED Gold certification & ISO 9001 compliance criteria into our RFQ specifications.",
+        badge: "Quality Spec",
+        icon: "✨",
+      },
+      {
+        label: "Simulate Landed Cost with Subsidy Applied",
+        query: `Simulate our final landed purchase price after deducting eligible central government manufacturing subsidies for ${category}.`,
+        badge: "Landed Cost",
+        icon: "📊",
+      },
+      {
+        label: "Proceed to Supplier Quotation Comparison",
+        screen: "startup.procurement",
+        badge: "Workspace",
+        icon: "🚀",
+      },
+    ]
+  } else if (lower.includes("spec") || lower.includes("quality") || lower.includes("drop") || lower.includes("tolerance") || lower.includes("audit")) {
+    return [
+      {
+        label: "Verify MSME Machine Capacity & Audits",
+        screen: "startup.procurement",
+        badge: "Vetted MSMEs",
+        icon: "⚙️",
+      },
+      {
+        label: "Draft 10-Milestone Inspection Pass Gates",
+        query: "Generate a 10-milestone quality inspection checklist and sign-off criteria for this production run.",
+        badge: "QC Gates",
+        icon: "🛡️",
+      },
+      {
+        label: "Run Landed Pricing Simulation",
+        query: `What is the benchmark manufacturing cost per unit for ${quantity} units with these quality specifications?`,
+        badge: "Benchmarking",
+        icon: "📈",
+      },
+      {
+        label: "Check Applicable MSME Quality Subsidies",
+        query: "Can we claim quality certification subsidies under the Ministry of MSME for these testing protocols?",
+        badge: "Subsidy Match",
+        icon: "📜",
+      },
+    ]
+  }
+
+  // Default universal next-step recommendations
+  return [
+    {
+      label: "Benchmark Unit Pricing & Tooling Amortization",
+      query: `Break down the industrial unit economics, tooling fee amortization across ${quantity} units, and target landed cost for ${category}.`,
+      badge: "Pricing Intelligence",
+      icon: "📊",
+    },
+    {
+      label: "Unlock MSME ZED Testing Subsidies (Save Up to 80%)",
+      query: `Which central government MSME schemes, such as ZED Certification or Design Clinic, can subsidize our tooling and testing costs for ${category}?`,
+      badge: "Subsidies",
+      icon: "💰",
+    },
+    {
+      label: "Match & Compare Verified MSME Suppliers",
+      screen: "startup.procurement",
+      badge: "Supplier Search",
+      icon: "🏭",
+    },
+    {
+      label: "Draft Supplier Negotiation Script & Milestone Terms",
+      query: `Draft a professional negotiation message for suppliers for ${category} with 10-milestone escrow protection and volume repeat discount.`,
+      badge: "Negotiation",
+      icon: "🤝",
+    },
+  ]
 }
 
 export default function StartupFlow({
@@ -256,12 +384,43 @@ export default function StartupFlow({
         "ISTA-1A Certified Drop-Test Compliance",
         "MSME ZED Quality Audit Verification",
       ],
+      recommendedNextActions: [
+        {
+          label: "Benchmark Unit Pricing & Tooling Amortization",
+          query: `Break down the industrial unit economics, tooling fee amortization across ${quantity} units, and target landed cost for ${selectedCategory}.`,
+          badge: "Unit Economics",
+          icon: "📊",
+        },
+        {
+          label: "Unlock MSME ZED Testing Subsidies (Save Up to 80%)",
+          query: `Which central government MSME schemes, such as ZED Certification or Design Clinic, can subsidize our tooling and testing costs for ${selectedCategory}?`,
+          badge: "Subsidies",
+          icon: "💰",
+        },
+        {
+          label: "Match & Compare Verified MSME Suppliers",
+          screen: "startup.procurement",
+          badge: "Supplier Search",
+          icon: "🏭",
+        },
+        {
+          label: "Draft Supplier Negotiation Script & Milestone Terms",
+          query: `Draft a professional negotiation message for suppliers for ${selectedCategory} with 10-milestone escrow protection and volume repeat discount.`,
+          badge: "Negotiation",
+          icon: "🤝",
+        },
+      ],
     },
   ])
   const [copilotInput, setCopilotInput] = useState("")
   const [selectedLanguage, setSelectedLanguage] = useState<"en" | "hi" | "ta" | "te" | "mr" | "gu">("en")
   const [isCopilotTyping, setIsCopilotTyping] = useState(false)
   const [specAddedToast, setSpecAddedToast] = useState<string | null>(null)
+
+  // Voice Assistant state in AI Copilot Workspace
+  const [isCopilotVoiceActive, setIsCopilotVoiceActive] = useState(false)
+  const [copilotVoiceStatus, setCopilotVoiceStatus] = useState("")
+  const [copilotAudioLevel, setCopilotAudioLevel] = useState(0)
 
   // Mobile sidebar drawer
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -519,6 +678,94 @@ export default function StartupFlow({
     ])
   }
 
+  // Voice Assistant: Web Speech API for AI Copilot Workspace
+  const toggleCopilotVoice = () => {
+    if (isCopilotVoiceActive) {
+      setIsCopilotVoiceActive(false)
+      setCopilotVoiceStatus("")
+      return
+    }
+
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+
+    // Map selected language to BCP-47 tag
+    const langMap: Record<string, string> = {
+      en: "en-IN",
+      hi: "hi-IN",
+      ta: "ta-IN",
+      te: "te-IN",
+      mr: "mr-IN",
+      gu: "gu-IN",
+    }
+    const recognitionLang = langMap[selectedLanguage] || "en-IN"
+
+    if (!SpeechRecognition) {
+      // Fallback voice simulation if browser does not support Web Speech API
+      setIsCopilotVoiceActive(true)
+      setCopilotVoiceStatus("Listening to voice command...")
+      const simulatedVoiceText =
+        "Can you benchmark standard tooling fees for 1500 units and suggest three mandatory quality testing clauses?"
+
+      let charIdx = 0
+      const interval = setInterval(() => {
+        charIdx += 6
+        setCopilotInput(simulatedVoiceText.slice(0, charIdx))
+        setCopilotAudioLevel(Math.random() * 80 + 20)
+        if (charIdx >= simulatedVoiceText.length) {
+          clearInterval(interval)
+          setIsCopilotVoiceActive(false)
+          setCopilotVoiceStatus("Voice command captured!")
+          setCopilotAudioLevel(0)
+          handleCopilotSend(simulatedVoiceText)
+        }
+      }, 120)
+      return
+    }
+
+    try {
+      const recognition = new SpeechRecognition()
+      recognition.continuous = false
+      recognition.interimResults = true
+      recognition.lang = recognitionLang
+
+      recognition.onstart = () => {
+        setIsCopilotVoiceActive(true)
+        setCopilotVoiceStatus(`Listening in ${recognitionLang}... Speak your requirement or question.`)
+      }
+
+      recognition.onresult = (event: any) => {
+        let transcript = ""
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          transcript += event.results[i][0].transcript
+        }
+        if (transcript) {
+          setCopilotInput(transcript)
+        }
+      }
+
+      recognition.onerror = (event: any) => {
+        console.warn("Copilot voice recognition error:", event.error)
+        setIsCopilotVoiceActive(false)
+        setCopilotVoiceStatus(`Microphone notice: ${event.error}`)
+      }
+
+      recognition.onend = () => {
+        setIsCopilotVoiceActive(false)
+        setCopilotVoiceStatus("Voice input completed.")
+        if (copilotInput.trim().length > 3) {
+          handleCopilotSend(copilotInput)
+        }
+      }
+
+      recognition.start()
+    } catch (e) {
+      console.error("Speech recognition could not be started", e)
+      setIsCopilotVoiceActive(false)
+      setCopilotVoiceStatus("Microphone access unavailable.")
+    }
+  }
+
   const handleCopilotSend = async (customPrompt?: string) => {
     const userMsg = (customPrompt || copilotInput).trim()
     if (!userMsg) return
@@ -552,6 +799,12 @@ export default function StartupFlow({
           isLive: response.isLive,
           suggestedSpecs: response.suggestedSpecs,
           suggestedNavigation: response.suggestedNavigation,
+          recommendedNextActions: getRecommendedNextActions(
+            response.reply,
+            selectedCategory,
+            quantity,
+            targetBudget,
+          ),
         },
       ])
 
@@ -586,6 +839,12 @@ export default function StartupFlow({
           isLive: false,
           suggestedSpecs: fallback.suggestedSpecs,
           suggestedNavigation: fallback.suggestedNavigation,
+          recommendedNextActions: getRecommendedNextActions(
+            fallback.reply,
+            selectedCategory,
+            quantity,
+            targetBudget,
+          ),
         },
       ])
       if (fallback.detectedParameters) {
@@ -779,18 +1038,6 @@ export default function StartupFlow({
             </span>
           </button>
           <button
-            onClick={() => navigate("msme.home")}
-            className="w-full flex items-center justify-between text-xs text-slate-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-[#123B7A] cursor-pointer transition-colors"
-          >
-            <span className="flex items-center gap-2">
-              <span className="text-xs">🏭</span>
-              <span>Switch to MSME Portal</span>
-            </span>
-            <span className="text-[10px] bg-orange-950 text-orange-300 border border-orange-800/40 px-1.5 py-0.5 rounded">
-              Supplier
-            </span>
-          </button>
-          <button
             onClick={() => navigate("government-schemes.match")}
             className="w-full flex items-center justify-between text-xs text-slate-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-[#123B7A] cursor-pointer transition-colors"
           >
@@ -877,14 +1124,6 @@ export default function StartupFlow({
             >
               <span>🏠</span>
               <span>Home</span>
-            </button>
-            <button
-              onClick={() => navigate("msme.home")}
-              className="hidden lg:flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors cursor-pointer"
-              title="Switch to MSME Supplier Portal"
-            >
-              <span>🏭</span>
-              <span>MSME Portal</span>
             </button>
 
             <button
@@ -2165,50 +2404,112 @@ export default function StartupFlow({
   if (currentScreen === "startup.home") {
     return renderShell(
       <div className="space-y-6">
-        {/* KPI strip */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
-          <MPIStatCard
-            title="Active RFQs"
-            value="3"
-            change="+1 this cycle"
-            trend="up"
-            icon={<Icons.FileText className="w-4 h-4 text-[#0B1F4B]" />}
-          />
-          <MPIStatCard
-            title="Shortlisted Suppliers"
-            value={shortlistedSupplierIds.length.toString()}
-            change="100% verified"
-            trend="neutral"
-            icon={<Icons.ShieldCheck className="w-4 h-4 text-[#0B1F4B]" />}
-          />
-          <MPIStatCard
-            title="Landed Savings"
-            value="₹42,850"
-            change="24% reverse-margin"
-            trend="up"
-            icon={<Icons.TrendingUp className="w-4 h-4 text-[#D9A400]" />}
-          />
-          <MPIStatCard
-            title="Turnaround Days"
-            value="8-12 Days"
-            change="6 days faster"
-            trend="up"
-            icon={<Icons.Clock className="w-4 h-4 text-[#F97316]" />}
-          />
-          <MPIStatCard
-            title="Orders in Flight"
-            value="2"
-            change="Escrow active"
-            trend="neutral"
-            icon={<Icons.Coins className="w-4 h-4 text-[#0B1F4B]" />}
-          />
-          <MPIStatCard
-            title="Escrow Balance"
-            value="₹1,40,250"
-            change="QC locked"
-            trend="neutral"
-            icon={<Icons.Award className="w-4 h-4 text-[#D9A400]" />}
-          />
+        {/* KPI strip - Concise 4 Cards consolidating all key sourcing metrics */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Card 1: RFQ & Verified Suppliers */}
+          <div className="bg-white border border-[#E6EAF0] rounded-2xl p-5 shadow-xs hover:border-slate-300 hover:shadow-sm transition-all flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between text-xs text-slate-500 mb-2">
+                <span className="font-semibold text-slate-600 uppercase tracking-wider text-[11px]">
+                  Active RFQs & Suppliers
+                </span>
+                <Icons.FileText className="w-4 h-4 text-[#0B1F4B]" />
+              </div>
+              <div className="flex items-baseline gap-2">
+                <div className="text-2xl sm:text-3xl font-extrabold text-[#0B1220] tracking-tight">
+                  3
+                </div>
+                <span className="text-xs text-slate-500 font-medium">
+                  Active RFQs
+                </span>
+              </div>
+            </div>
+            <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+              <span className="text-[#168A5B] font-semibold flex items-center gap-0.5 text-[11px]">
+                ↑ +1 this cycle
+              </span>
+              <span className="text-slate-600 font-medium text-[11px] bg-slate-100 px-2 py-0.5 rounded-full flex items-center gap-1">
+                <Icons.ShieldCheck className="w-3 h-3 text-blue-600" />
+                {shortlistedSupplierIds.length} Shortlisted (100% Vetted)
+              </span>
+            </div>
+          </div>
+
+          {/* Card 2: Landed Cost Savings */}
+          <div className="bg-white border border-[#E6EAF0] rounded-2xl p-5 shadow-xs hover:border-slate-300 hover:shadow-sm transition-all flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between text-xs text-slate-500 mb-2">
+                <span className="font-semibold text-slate-600 uppercase tracking-wider text-[11px]">
+                  Landed Savings
+                </span>
+                <Icons.TrendingUp className="w-4 h-4 text-[#D9A400]" />
+              </div>
+              <div className="text-2xl sm:text-3xl font-extrabold text-[#0B1220] tracking-tight">
+                ₹42,850
+              </div>
+            </div>
+            <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+              <span className="text-[#168A5B] font-semibold flex items-center gap-0.5 text-[11px]">
+                ↑ 24% reverse-margin
+              </span>
+              <span className="text-slate-500 font-medium text-[11px]">
+                Verified benchmark
+              </span>
+            </div>
+          </div>
+
+          {/* Card 3: Turnaround Days */}
+          <div className="bg-white border border-[#E6EAF0] rounded-2xl p-5 shadow-xs hover:border-slate-300 hover:shadow-sm transition-all flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between text-xs text-slate-500 mb-2">
+                <span className="font-semibold text-slate-600 uppercase tracking-wider text-[11px]">
+                  Turnaround SLA
+                </span>
+                <Icons.Clock className="w-4 h-4 text-[#F97316]" />
+              </div>
+              <div className="text-2xl sm:text-3xl font-extrabold text-[#0B1220] tracking-tight">
+                8-12 Days
+              </div>
+            </div>
+            <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+              <span className="text-[#168A5B] font-semibold flex items-center gap-0.5 text-[11px]">
+                ↑ 6 days faster
+              </span>
+              <span className="text-slate-500 font-medium text-[11px]">
+                Direct MSME dispatch
+              </span>
+            </div>
+          </div>
+
+          {/* Card 4: Orders in Flight & Escrow Balance */}
+          <div className="bg-white border border-[#E6EAF0] rounded-2xl p-5 shadow-xs hover:border-slate-300 hover:shadow-sm transition-all flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between text-xs text-slate-500 mb-2">
+                <span className="font-semibold text-slate-600 uppercase tracking-wider text-[11px]">
+                  Orders & Escrow Locked
+                </span>
+                <Icons.Coins className="w-4 h-4 text-[#0B1F4B]" />
+              </div>
+              <div className="flex items-baseline justify-between gap-2">
+                <div className="text-2xl sm:text-3xl font-extrabold text-[#0B1220] tracking-tight">
+                  ₹1,40,250
+                </div>
+                <span className="text-xs font-bold text-blue-900 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200">
+                  2 Orders in Flight
+                </span>
+              </div>
+            </div>
+            <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+              <span className="text-emerald-700 font-semibold text-[11px] flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                Escrow active
+              </span>
+              <span className="text-slate-500 font-medium text-[11px] flex items-center gap-1">
+                <Icons.Award className="w-3 h-3 text-amber-500" />
+                QC inspection locked
+              </span>
+            </div>
+          </div>
         </div>
 
         {/* Guided Builder Launcher & Live Order status */}
@@ -2404,17 +2705,17 @@ export default function StartupFlow({
   // ════════════════════════════════════════════════════════════════════════════
   if (currentScreen === "startup.procurement") {
     const steps = [
-      { num: 1, name: "Requirement" },
-      { num: 2, name: "Category & Specs" },
-      { num: 3, name: "Quantity & Budget" },
-      { num: 4, name: "Compliance" },
-      { num: 5, name: "Supplier Discovery" },
-      { num: 6, name: "AI RFQ Document" },
-      { num: 7, name: "Dispatch & Verify" },
+      { num: 1, display: "1", name: "Requirement" },
+      { num: 2, display: "2a", name: "Category & Specs" },
+      { num: 3, display: "2b", name: "Quantity & Budget" },
+      { num: 4, display: "3", name: "Compliance" },
+      { num: 5, display: "4", name: "Supplier Discovery" },
+      { num: 6, display: "5", name: "AI RFQ Document" },
+      { num: 7, display: "6", name: "Dispatch & Verify" },
     ]
 
     return renderShell(
-      <div className="max-w-4xl mx-auto space-y-6">
+      <div className="max-w-5xl mx-auto space-y-6">
         {/* 7-Step Stepper Bar */}
         <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-xs overflow-x-auto">
           <div className="flex items-center justify-between min-w-137.5 relative">
@@ -2433,7 +2734,7 @@ export default function StartupFlow({
                   className="relative z-10 flex flex-col items-center group cursor-pointer"
                 >
                   <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
+                    className={`w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-bold transition-all ${
                       isCurrent
                         ? "bg-[#0B1F4B] text-white ring-4 ring-blue-100 scale-110"
                         : isPast
@@ -2441,7 +2742,7 @@ export default function StartupFlow({
                           : "bg-white text-slate-500 border-2 border-slate-300"
                     }`}
                   >
-                    {isPast ? <Icons.Check className="w-4 h-4" /> : s.num}
+                    {isPast ? <Icons.Check className="w-4 h-4" /> : s.display}
                   </div>
                   <span
                     className={`text-[11px] font-semibold mt-1.5 whitespace-nowrap ${
@@ -2582,18 +2883,18 @@ export default function StartupFlow({
                 isLoading={isExtractingSpecs}
                 icon={<Icons.ArrowRight className="w-4 h-4" />}
               >
-                Analyze & Proceed to Specs →
+                Analyze & Proceed to 2a. Specs →
               </MPIButton>
             </div>
           </div>
         )}
 
-        {/* STEP 2: CATEGORY & SPECS */}
+        {/* STEP 2a: CATEGORY & SPECS */}
         {builderStep === 2 && (
           <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-5 animate-fade-in">
             <div>
               <h3 className="text-lg font-bold text-[#0B1F4B]">
-                Step 2: Category & Technical Specifications
+                Step 2a: Category & Technical Specifications
               </h3>
               <p className="text-xs text-slate-500 mt-0.5">
                 Confirm your procurement category (strictly 7 approved
@@ -2796,18 +3097,18 @@ export default function StartupFlow({
                 ← Back
               </MPIButton>
               <MPIButton variant="primary" onClick={() => setBuilderStep(3)}>
-                Next: Quantity & Budget →
+                Next: 2b. Quantity & Budget →
               </MPIButton>
             </div>
           </div>
         )}
 
-        {/* STEP 3: QUANTITY, TIMELINES & BUDGET */}
+        {/* STEP 2b: QUANTITY, TIMELINES & BUDGET */}
         {builderStep === 3 && (
           <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-5 animate-fade-in">
             <div>
               <h3 className="text-lg font-bold text-[#0B1F4B]">
-                Step 3: Quantities, Timelines & Target Budget
+                Step 2b: Quantities, Timelines & Target Budget
               </h3>
               <p className="text-xs text-slate-500 mt-0.5">
                 Set volume parameters and delivery deadlines for competitive
@@ -2872,18 +3173,18 @@ export default function StartupFlow({
                 ← Back
               </MPIButton>
               <MPIButton variant="primary" onClick={() => setBuilderStep(4)}>
-                Next: Compliance Criteria →
+                Next: 3. Compliance Criteria →
               </MPIButton>
             </div>
           </div>
         )}
 
-        {/* STEP 4: COMPLIANCE & CERTIFICATIONS */}
+        {/* STEP 3: COMPLIANCE & CERTIFICATIONS */}
         {builderStep === 4 && (
           <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-5 animate-fade-in">
             <div>
               <h3 className="text-lg font-bold text-[#0B1F4B]">
-                Step 4: Statutory Compliance & Quality Gates
+                Step 3: Statutory Compliance & Quality Gates
               </h3>
               <p className="text-xs text-slate-500 mt-0.5">
                 MPI filters only suppliers meeting your strict statutory and
@@ -2958,19 +3259,19 @@ export default function StartupFlow({
                 ← Back
               </MPIButton>
               <MPIButton variant="primary" onClick={() => setBuilderStep(5)}>
-                Next: Discover Suppliers →
+                Next: 4. Discover Suppliers →
               </MPIButton>
             </div>
           </div>
         )}
 
-        {/* STEP 5: SUPPLIER DISCOVERY & SHORTLISTING */}
+        {/* STEP 4: SUPPLIER DISCOVERY & SHORTLISTING */}
         {builderStep === 5 && (
           <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-5 animate-fade-in">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-lg font-bold text-[#0B1F4B]">
-                  Step 5: Verified Supplier Discovery
+                  Step 4: Verified Supplier Discovery
                 </h3>
                 <p className="text-xs text-slate-500 mt-0.5">
                   Verified suppliers matching your specifications. Real
@@ -2982,84 +3283,117 @@ export default function StartupFlow({
               </span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {publicStartupSuppliers.map((sup) => {
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-stretch">
+              {publicStartupSuppliers.slice(0, 3).map((sup, index) => {
                 const isShortlisted = shortlistedSupplierIds.includes(sup.id)
+                const isRecommended = index === 1
                 return (
                   <div
                     key={sup.id}
-                    className={`p-4 rounded-xl border flex flex-col justify-between transition-all ${
-                      isShortlisted
-                        ? "border-[#0B1F4B] bg-blue-50/30 shadow-xs"
-                        : "border-slate-200 bg-white hover:border-slate-300"
+                    className={`p-4 rounded-xl border flex flex-col justify-between transition-all relative ${
+                      isRecommended
+                        ? "border-2 border-[#F97316] bg-linear-to-b from-orange-50/40 via-white to-blue-50/20 shadow-md ring-2 ring-orange-300/40 md:-translate-y-1"
+                        : isShortlisted
+                          ? "border-[#0B1F4B] bg-blue-50/30 shadow-xs"
+                          : "border-slate-200 bg-white hover:border-slate-300 shadow-xs"
                     }`}
                   >
-                    <div>
-                      <div className="flex items-start justify-between gap-2 mb-2">
-                        <div>
-                          <div className="text-xs font-bold text-slate-900">
-                            {sup.displayName}
+                    <div className="flex flex-col flex-1">
+                      {isRecommended ? (
+                        <div className="mb-2">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#F97316] text-white shadow-xs">
+                            <Icons.Sparkles className="w-3 h-3 text-white" />
+                            MPI Recommendation
+                          </span>
+                        </div>
+                      ) : (
+                        <div className="mb-2 hidden md:block h-[19px]" />
+                      )}
+
+                      <div className="flex items-start justify-between gap-1.5 mb-2">
+                        <div className="min-w-0">
+                          <div className="text-xs font-bold text-slate-900 truncate flex items-center gap-1.5">
+                            <span className="truncate">{sup.displayName}</span>
+                            {isRecommended && (
+                              <span className="text-[9px] font-bold text-[#F97316] bg-orange-50 border border-orange-200 px-1 py-0.2 rounded shrink-0">
+                                Preferred
+                              </span>
+                            )}
                           </div>
-                          <div className="text-[10px] text-slate-500">
+                          <div className="text-[10px] text-slate-500 truncate">
                             {sup.category} · {sup.city}, {sup.state}
                           </div>
                         </div>
-                        <span className="text-xs font-bold text-[#0B1F4B] bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                        <span
+                          className={`text-[11px] font-bold px-2 py-0.5 rounded-md border shrink-0 ${
+                            isRecommended
+                              ? "text-[#F97316] bg-orange-50 border-orange-200"
+                              : "text-[#0B1F4B] bg-blue-50 border-blue-200"
+                          }`}
+                        >
                           {sup.matchScore}% Match
                         </span>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-600 mb-3 bg-slate-50 p-2 rounded-lg">
+                      <div className="grid grid-cols-2 gap-1.5 text-[11px] text-slate-600 mb-2.5 bg-slate-50 p-2 rounded-lg border border-slate-100">
                         <div>
-                          MOQ: <strong>{sup.moq}</strong>
+                          <span className="text-slate-400 text-[9px] uppercase font-semibold block">MOQ</span>
+                          <strong className="text-slate-800 text-[11px]">{sup.moq}</strong>
                         </div>
                         <div>
-                          Lead Time: <strong>{sup.leadTime}</strong>
+                          <span className="text-slate-400 text-[9px] uppercase font-semibold block">Lead Time</span>
+                          <strong className="text-slate-800 text-[11px]">{sup.leadTime}</strong>
                         </div>
                       </div>
 
-                      <div className="flex flex-wrap gap-1 mb-3">
-                        {sup.certifications.map((c) => (
+                      <div className="flex flex-wrap gap-1 mb-2.5 min-h-[40px]">
+                        {sup.certifications.slice(0, 3).map((c) => (
                           <span
                             key={c}
-                            className="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.2 rounded font-medium"
+                            className="text-[9px] bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded font-medium border border-slate-200/60"
                           >
                             {c}
                           </span>
                         ))}
                       </div>
 
-                      {/* Grounded Match Evidence (Blueprint Item 16) */}
-                      <div className="p-2.5 bg-blue-50/60 rounded-lg border border-blue-100 text-[11px] text-slate-700 mb-2">
+                      {/* Grounded Match Evidence */}
+                      <div
+                        className={`p-2.5 rounded-lg border text-[10px] text-slate-700 mb-3 ${
+                          isRecommended
+                            ? "bg-orange-50/60 border-orange-200/80"
+                            : "bg-blue-50/60 border-blue-100"
+                        }`}
+                      >
                         <div className="flex items-center gap-1 font-bold text-[#0B1F4B] mb-0.5 text-[10px]">
                           <Icons.Sparkles className="w-3 h-3 text-[#F97316]" />
-                          <span>Grounded Match Rationale:</span>
+                          <span>Grounded Match:</span>
                         </div>
-                        <p className="text-slate-600 text-[10px] leading-tight">
-                          Audited facility in {sup.city} · In-house {sup.machinery.slice(0, 2).join(" & ")} · Past batch yield 99.4% with verified ZED compliance.
+                        <p className="text-slate-600 text-[10px] leading-snug line-clamp-3">
+                          Audited facility in {sup.city} · In-house {sup.machinery.slice(0, 2).join(" & ")} · Past batch yield 99.4% with verified ZED.
                         </p>
                       </div>
                     </div>
 
-                    <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                    <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between gap-1.5 mt-auto">
                       <button
                         onClick={() => setSelectedSupplierDetail(sup)}
                         className="text-xs text-[#0B1F4B] hover:underline font-semibold cursor-pointer"
                       >
                         View Details
                       </button>
-                      <div className="flex items-center gap-1.5">
-                        <button
-                          onClick={() => toggleShortlistSupplier(sup.id)}
-                          className={`text-xs px-3 py-1 rounded-lg font-semibold transition-colors cursor-pointer ${
-                            isShortlisted
-                              ? "bg-[#0B1F4B] text-white"
+                      <button
+                        onClick={() => toggleShortlistSupplier(sup.id)}
+                        className={`text-xs px-2.5 py-1.5 rounded-lg font-semibold transition-colors cursor-pointer ${
+                          isShortlisted
+                            ? "bg-[#0B1F4B] text-white"
+                            : isRecommended
+                              ? "bg-[#F97316] text-white hover:bg-orange-600"
                               : "border border-slate-200 text-slate-700 hover:bg-slate-100"
-                          }`}
-                        >
-                          {isShortlisted ? "✓ Shortlisted" : "+ Shortlist"}
-                        </button>
-                      </div>
+                        }`}
+                      >
+                        {isShortlisted ? "✓ Shortlisted" : "+ Shortlist"}
+                      </button>
                     </div>
                   </div>
                 )
@@ -3071,19 +3405,19 @@ export default function StartupFlow({
                 ← Back
               </MPIButton>
               <MPIButton variant="primary" onClick={() => setBuilderStep(6)}>
-                Next: Generate AI RFQ →
+                Next: 5. Generate AI RFQ →
               </MPIButton>
             </div>
           </div>
         )}
 
-        {/* STEP 6: AI RFQ GENERATOR */}
+        {/* STEP 5: AI RFQ GENERATOR */}
         {builderStep === 6 && (
           <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-5 animate-fade-in">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-lg font-bold text-[#0B1F4B]">
-                  Step 6: Institutional AI RFQ Document
+                  Step 5: Institutional AI RFQ Document
                 </h3>
                 <p className="text-xs text-slate-500 mt-0.5">
                   Generated procurement specification ready for dispatch to
@@ -3156,7 +3490,7 @@ export default function StartupFlow({
           </div>
         )}
 
-        {/* STEP 7: DISPATCH & VERIFY CONFIRMATION */}
+        {/* STEP 6: DISPATCH & VERIFY CONFIRMATION */}
         {builderStep === 7 && (
           <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-xs text-center space-y-5 animate-fade-in">
             <div className="w-16 h-16 rounded-full bg-blue-100 text-[#0B1F4B] flex items-center justify-center mx-auto">
@@ -3167,7 +3501,7 @@ export default function StartupFlow({
               className="text-xl font-extrabold text-[#0B1F4B]"
               style={{ fontFamily: "Plus Jakarta Sans" }}
             >
-              RFQ Transmitted Successfully!
+              Step 6: RFQ Transmitted Successfully!
             </h3>
             <p className="text-xs sm:text-sm text-slate-600 max-w-lg mx-auto leading-relaxed">
               Your institutional RFQ has been dispatched to{" "}
@@ -3220,65 +3554,35 @@ export default function StartupFlow({
         {/* Left Pane: Conversational Copilot Chat */}
         <div className="lg:col-span-6 bg-white rounded-2xl border border-slate-200 flex flex-col justify-between overflow-hidden shadow-xs">
           {/* Header */}
-          <div className="p-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-lg bg-[#F97316] text-white flex items-center justify-center font-bold text-xs shadow-xs">
+          <div className="p-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between gap-3 flex-wrap">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="w-7 h-7 rounded-lg bg-[#F97316] text-white flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
                 AI
               </div>
-              <div>
-                <div className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-                  <span>MPI Procurement Copilot</span>
-                  <span className="text-[9px] bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.2 rounded">
-                    LLM Active
-                  </span>
+              <div className="min-w-0">
+                <div className="text-xs sm:text-sm font-bold text-slate-900 whitespace-nowrap">
+                  MPI Procurement Copilot
                 </div>
-                <div className="text-[10px] text-[#0B1F4B] font-semibold flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#0B1F4B] animate-pulse" />
+                <div className="text-[10px] text-[#0B1F4B] font-semibold flex items-center gap-1 whitespace-nowrap">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#0B1F4B] animate-pulse shrink-0" />
                   Active session · RFQ-2026-0891
                 </div>
               </div>
             </div>
-            <div className="flex items-center gap-2 flex-wrap">
-              {/* Multilingual Voice & Chat Selector (Blueprint Item 59) */}
-              <div className="flex items-center gap-1 bg-white p-0.5 rounded-full border border-slate-200">
-                {([
-                  { code: "en", label: "EN" },
-                  { code: "hi", label: "हिन्दी" },
-                  { code: "ta", label: "தமிழ்" },
-                  { code: "te", label: "తెలుగు" },
-                  { code: "mr", label: "मराठी" },
-                  { code: "gu", label: "ગુજરાતી" },
-                ] as const).map((lang) => (
-                  <button
-                    key={lang.code}
-                    type="button"
-                    onClick={() => setSelectedLanguage(lang.code)}
-                    className={`px-2 py-0.5 rounded-full text-[10px] font-bold transition-all cursor-pointer ${
-                      selectedLanguage === lang.code
-                        ? "bg-[#0B1F4B] text-white shadow-2xs"
-                        : "text-slate-500 hover:text-slate-900"
-                    }`}
-                  >
-                    {lang.label}
-                  </button>
-                ))}
-              </div>
-
+            <div className="flex items-center gap-2 shrink-0">
               <button
                 type="button"
                 onClick={handleResetCopilotChat}
-                className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-white border border-slate-200 hover:bg-slate-100 text-slate-600 transition-colors cursor-pointer"
+                className="flex items-center gap-1 px-3 py-1.5 rounded-full text-[11px] font-semibold bg-white border border-slate-200 hover:bg-slate-100 text-slate-600 transition-colors cursor-pointer shadow-2xs"
                 title="Reset Copilot Conversation"
               >
-                <Icons.Clock className="w-3 h-3" />
-                <span className="hidden sm:inline">New Session</span>
+                <Icons.Clock className="w-3.5 h-3.5" />
+                <span>New Session</span>
               </button>
-              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200/80 shadow-2xs">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200/80 shadow-2xs">
                 <span>MPI AI</span>
-                <Icons.Sparkles className="w-3 h-3 text-[#F97316]" />
+                <Icons.Sparkles className="w-3.5 h-3.5 text-[#F97316]" />
               </div>
-              <MPIVerifiedBadge label="Verified Intelligence" />
             </div>
           </div>
 
@@ -3318,51 +3622,48 @@ export default function StartupFlow({
                     <div className="space-y-1">
                       {renderCopilotMarkdown(msg.text)}
 
-                      {/* Interactive Suggested Specs Action Chips */}
-                      {msg.suggestedSpecs && msg.suggestedSpecs.length > 0 && (
-                        <div className="mt-3 pt-2.5 border-t border-slate-100">
-                          <div className="text-[10px] uppercase font-bold text-slate-500 mb-1.5 flex items-center gap-1">
-                            <Icons.Sparkles className="w-3 h-3 text-[#F97316]" />
-                            Recommended Specs (Click to add to your RFQ):
+                      {/* What I Recommend Next (Clean & Compact) */}
+                      {msg.role === "ai" && (
+                        <div className="mt-2.5 pt-2 border-t border-slate-100">
+                          <div className="text-[10px] uppercase font-bold text-slate-500 mb-1.5 flex items-center gap-1.5 tracking-wider">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#F97316]" />
+                            <span>What I recommend next:</span>
                           </div>
-                          <div className="flex flex-wrap gap-1.5">
-                            {msg.suggestedSpecs.map((spec, sIdx) => {
-                              const alreadyAdded = specifications.includes(spec)
-                              return (
-                                <button
-                                  key={sIdx}
-                                  type="button"
-                                  disabled={alreadyAdded}
-                                  onClick={() => {
-                                    if (!alreadyAdded) {
-                                      addSpecification(spec)
-                                      setSpecAddedToast(spec)
-                                      setTimeout(
-                                        () => setSpecAddedToast(null),
-                                        3500,
-                                      )
-                                    }
-                                  }}
-                                  className={`text-[10px] font-semibold px-2.5 py-1 rounded-full border transition-all flex items-center gap-1 ${
-                                    alreadyAdded
-                                      ? "bg-emerald-50 border-emerald-300 text-emerald-700 cursor-default"
-                                      : "bg-blue-50/70 border-blue-200 hover:border-[#0B1F4B] text-[#0B1F4B] hover:bg-blue-100/60 cursor-pointer shadow-2xs"
-                                  }`}
-                                >
-                                  {alreadyAdded ? (
-                                    <Icons.Check className="w-2.5 h-2.5 text-emerald-600" />
-                                  ) : (
-                                    "+"
-                                  )}
-                                  <span>{spec}</span>
-                                  {alreadyAdded && (
-                                    <span className="text-[9px] font-bold">
-                                      (In RFQ)
-                                    </span>
-                                  )}
-                                </button>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                            {(
+                              msg.recommendedNextActions ||
+                              getRecommendedNextActions(
+                                msg.text,
+                                selectedCategory,
+                                quantity,
+                                targetBudget,
                               )
-                            })}
+                            ).map((action, aIdx) => (
+                              <button
+                                key={aIdx}
+                                type="button"
+                                disabled={isCopilotTyping}
+                                onClick={() => {
+                                  if (action.query) {
+                                    handleCopilotSend(action.query)
+                                  } else if (action.screen) {
+                                    navigate(action.screen as Screen)
+                                  }
+                                }}
+                                className="group/action text-left px-2.5 py-1.5 rounded-lg bg-slate-50/80 hover:bg-white border border-slate-200/80 hover:border-[#F97316]/50 transition-all cursor-pointer flex items-center justify-between gap-2 shadow-2xs"
+                              >
+                                <div className="min-w-0 flex items-center gap-1.5">
+                                  {action.icon && (
+                                    <span className="text-[11px] shrink-0">{action.icon}</span>
+                                  )}
+                                  <span className="text-[10.5px] font-semibold text-slate-700 group-hover/action:text-[#0B1F4B] truncate leading-tight">
+                                    {action.label}
+                                  </span>
+                                </div>
+                                <Icons.ArrowRight className="w-3 h-3 text-slate-400 group-hover/action:text-[#F97316] shrink-0 transition-transform group-hover/action:translate-x-0.5" />
+                              </button>
+                            ))}
                           </div>
                         </div>
                       )}
@@ -3419,47 +3720,49 @@ export default function StartupFlow({
             )}
           </div>
 
-          {/* Quick Prompt Pills (Instant Click to Execute) */}
-          <div className="px-4 py-2.5 bg-slate-50 border-t border-slate-100 flex items-center gap-2 overflow-x-auto text-[11px]">
-            <span className="text-slate-400 font-bold shrink-0 text-[10px] uppercase">
-              Instant AI Actions:
-            </span>
-            {[
-              {
-                label: "Check ZED Subsidy & Schemes",
-                query:
-                  "What specific government MSME schemes, such as ZED Certification or Design Clinic, can subsidize our tooling or testing costs for this order?",
-              },
-              {
-                label: "Benchmark Tooling & MOQ",
-                query:
-                  "How should I negotiate the tooling fee and MOQ with suppliers? Can we amortize the tooling across repeat orders?",
-              },
-              {
-                label: "Draft Supplier Negotiation Message",
-                query:
-                  "Draft a professional negotiation email to the shortlisted supplier requesting a 10% repeat-order volume discount and milestone escrow payment terms.",
-              },
-              {
-                label: "Recommend Quality Specs",
-                query:
-                  "What drop-test certifications (like ISTA-1A), material GSM, and dimensional tolerance standards should I mandate in this RFQ?",
-              },
-            ].map((chip) => (
+          {/* Voice Recording Live Indicator Strip */}
+          {isCopilotVoiceActive && (
+            <div className="px-4 py-2 bg-gradient-to-r from-purple-50 via-indigo-50 to-purple-50 border-t border-purple-200 text-purple-900 flex items-center justify-between text-xs animate-fade-in">
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping" />
+                <span className="font-semibold text-[11px]">
+                  {copilotVoiceStatus || "Listening to voice command... Speak clearly."}
+                </span>
+              </div>
               <button
-                key={chip.label}
                 type="button"
-                onClick={() => handleCopilotSend(chip.query)}
-                disabled={isCopilotTyping}
-                className="bg-white hover:bg-blue-50 border border-slate-200 hover:border-blue-300 text-slate-700 hover:text-[#0B1F4B] px-2.5 py-1 rounded-full shrink-0 cursor-pointer transition-colors shadow-2xs font-medium disabled:opacity-50"
+                onClick={toggleCopilotVoice}
+                className="px-2.5 py-0.5 rounded-full bg-purple-600 hover:bg-purple-700 text-white font-bold text-[10px] cursor-pointer transition-colors"
               >
-                + {chip.label}
+                Done
               </button>
-            ))}
-          </div>
+            </div>
+          )}
 
-          {/* Input Box */}
-          <div className="p-3 border-t border-slate-200 bg-white flex gap-2">
+          {/* Input Box with Voice Assistant Mic */}
+          <div className="p-3 border-t border-slate-200 bg-white flex items-center gap-2">
+            {/* Voice Command Button */}
+            <button
+              type="button"
+              onClick={toggleCopilotVoice}
+              disabled={isCopilotTyping}
+              className={`p-2.5 rounded-xl border transition-all cursor-pointer flex items-center justify-center shrink-0 ${
+                isCopilotVoiceActive
+                  ? "bg-red-500 text-white border-red-600 animate-pulse shadow-sm"
+                  : "bg-slate-50 border-slate-200 hover:border-purple-400 hover:text-purple-600 text-slate-600 hover:bg-purple-50"
+              }`}
+              title="Voice Assistant: Speak requirement or prompt"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"
+                />
+              </svg>
+            </button>
+
             <input
               type="text"
               value={copilotInput}
@@ -3468,9 +3771,10 @@ export default function StartupFlow({
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !isCopilotTyping) handleCopilotSend()
               }}
-              placeholder="Ask about pricing benchmarks, negotiation tactics, specs, or MSME subsidies..."
-              className="flex-1 text-xs px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-[#0B1F4B] disabled:opacity-60"
+              placeholder="Ask about pricing benchmarks, specs, or speak using the mic..."
+              className="flex-1 text-xs px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-[#0B1F4B] disabled:opacity-60 font-medium"
             />
+
             <MPIButton
               variant="ai"
               size="sm"
@@ -3623,10 +3927,29 @@ export default function StartupFlow({
         </div>
 
         {/* Side-by-side comparative cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
-          {publicStartupQuotes.map((q, idx) => {
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 items-stretch">
+          {publicStartupQuotes.slice(0, 3).map((q, idx) => {
             const isSelected = selectedQuoteId === q.id
-            const isTopRecommended = idx === 0
+            const isTopRecommended = idx === 1
+
+            const tiers = [
+              {
+                name: "Good",
+                badge: "bg-slate-100 text-slate-700 border-slate-300",
+                accent: "Cost-Effective Baseline",
+              },
+              {
+                name: "Better",
+                badge: "bg-amber-100 text-amber-900 border-amber-300 font-extrabold",
+                accent: "MPI AI Sweet Spot",
+              },
+              {
+                name: "Best",
+                badge: "bg-blue-100 text-[#0B1F4B] border-blue-300 font-bold",
+                accent: "Fastest Turnaround",
+              },
+            ]
+            const currentTier = tiers[idx] || tiers[0]
 
             return (
               <div
@@ -3634,22 +3957,38 @@ export default function StartupFlow({
                 className={`bg-white rounded-2xl border flex flex-col justify-between overflow-hidden transition-all shadow-xs ${
                   isSelected
                     ? "border-[#0B1F4B] ring-2 ring-[#0B1F4B] shadow-md"
-                    : "border-slate-200 hover:border-slate-300"
+                    : isTopRecommended
+                      ? "border-[#F97316] ring-2 ring-orange-300/60 shadow-md"
+                      : "border-slate-200 hover:border-slate-300"
                 }`}
               >
                 <div>
                   {/* Top recommendation pill */}
-                  {isTopRecommended && (
+                  {isTopRecommended ? (
                     <div className="bg-[#0B1F4B] text-white text-[10px] font-bold uppercase tracking-wider py-1.5 px-3 text-center flex items-center justify-center gap-1.5">
                       <Icons.Sparkles className="w-3.5 h-3.5 text-[#F97316]" />
                       <span>MPI AI Recommended</span>
                     </div>
+                  ) : (
+                    <div className="hidden md:block h-[31px]" />
                   )}
 
                   <div className="p-5">
-                    {/* Anonymized Supplier Title */}
+                    {/* Anonymized Supplier Title & Tier Badge */}
                     <div className="flex items-start justify-between gap-2 mb-2">
                       <div>
+                        <div className="flex items-center gap-1.5 mb-1.5">
+                          <span
+                            className={`text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md border tracking-wider ${currentTier.badge}`}
+                          >
+                            {currentTier.name}
+                          </span>
+                          {isTopRecommended && (
+                            <span className="text-[10px] font-bold text-[#F97316] bg-orange-50 border border-orange-200 px-1.5 py-0.5 rounded-md flex items-center gap-1">
+                              <Icons.Sparkles className="w-3 h-3 text-[#F97316]" /> Recommended
+                            </span>
+                          )}
+                        </div>
                         <h4 className="text-sm font-bold text-slate-900 leading-snug">
                           {q.supplierDisplayName}
                         </h4>

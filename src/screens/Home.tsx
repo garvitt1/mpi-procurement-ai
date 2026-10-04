@@ -14,6 +14,8 @@ import {
   MPIVerifiedBadge,
 } from "../components/design-system/MPIDesignSystem"
 import { hasLiveAIConfigured, type ExtractedProcurementSpecs } from "../services/aiService"
+import AuthModal from "../components/auth/AuthModal"
+import LanguageTranslatorButton from "../components/navigation/LanguageTranslatorButton"
 
 export function formatScopeDisplay(category: CatalogCategory, qty: number): string {
   if (category === "Packaging & Printing") {
@@ -58,6 +60,17 @@ export default function Home({ navigate }: NavProps) {
     schemes,
   } = useProcurement()
 
+  // Auth modal state for Login and Sign In
+  const [authModal, setAuthModal] = useState<{ open: boolean; mode: "login" | "signin" }>({
+    open: false,
+    mode: "login",
+  })
+
+  const openSignInModal = (role: "startup" | "msme" | "admin" = "startup") => {
+    void role
+    setAuthModal({ open: true, mode: "signin" })
+  }
+
   // Mobile menu state
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
@@ -69,6 +82,18 @@ export default function Home({ navigate }: NavProps) {
   const [activePromptIndex, setActivePromptIndex] = useState(0)
   const [hasSimulatedExtraction, setHasSimulatedExtraction] = useState(false)
   const [extractionResult, setExtractionResult] = useState<ExtractedProcurementSpecs | null>(null)
+
+  // Voice Assistant states
+  const [isVoiceRecording, setIsVoiceRecording] = useState(false)
+  const [voiceTranscript, setVoiceTranscript] = useState("")
+  const [voiceStatusText, setVoiceStatusText] = useState("")
+  const [audioLevel, setAudioLevel] = useState(0)
+
+  // AI writing style & citation toggles
+  const [selectedWritingStyle, setSelectedWritingStyle] = useState<"Default" | "Institutional" | "Technical" | "Lean Startup">("Institutional")
+  const [showStyleDropdown, setShowStyleDropdown] = useState(false)
+  const [enableCitation, setEnableCitation] = useState(true)
+
 
   // Marketplace explorer state
   const [selectedMarketCategory, setSelectedMarketCategory] =
@@ -88,6 +113,13 @@ export default function Home({ navigate }: NavProps) {
     useState<boolean>(false)
   // Interactive 5-Step Journey active index
   const [activeJourneyStep, setActiveJourneyStep] = useState(0)
+
+  // Platform Workspace 3D Flip Card state
+  const [isStartupCardFlipped, setIsStartupCardFlipped] = useState(false)
+  const [isMsmeCardFlipped, setIsMsmeCardFlipped] = useState(false)
+
+  // MPI Catalogue expandable section state
+  const [isCatalogExpanded, setIsCatalogExpanded] = useState(false)
 
   // Sample prompt chips
   const samplePrompts = [
@@ -152,10 +184,90 @@ export default function Home({ navigate }: NavProps) {
   }, [paletteQuery])
 
   // Handle AI spec generation in hero
-  const handleGenerateSpecs = async () => {
-    const res = await runAIExtraction(requirementText)
+  const handleGenerateSpecs = async (textToExtract?: string) => {
+    const text = typeof textToExtract === "string" ? textToExtract : requirementText
+    const res = await runAIExtraction(text)
     setExtractionResult(res)
     setHasSimulatedExtraction(true)
+  }
+
+  // Voice Assistant: Web Speech API Recognition + Interactive Fallback
+  const toggleVoiceRecording = () => {
+    if (isVoiceRecording) {
+      setIsVoiceRecording(false)
+      setVoiceStatusText("Voice recording stopped.")
+      return
+    }
+
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+
+    if (!SpeechRecognition) {
+      // Graceful fallback simulation if browser doesn't have webkitSpeechRecognition
+      setIsVoiceRecording(true)
+      setVoiceStatusText("Listening to your voice requirement...")
+      const sampleVoiceText =
+        "Require 2000 units food-grade biodegradable paper pouches with zip lock for specialty tea packaging, delivery in 14 days, budget 45000"
+      
+      let charIdx = 0
+      const interval = setInterval(() => {
+        charIdx += 8
+        const currentSlice = sampleVoiceText.slice(0, charIdx)
+        setRequirementText(currentSlice)
+        setAudioLevel(Math.random() * 80 + 20)
+        if (charIdx >= sampleVoiceText.length) {
+          clearInterval(interval)
+          setIsVoiceRecording(false)
+          setVoiceStatusText("Voice requirement captured successfully!")
+          setAudioLevel(0)
+          handleGenerateSpecs(sampleVoiceText)
+        }
+      }, 150)
+      return
+    }
+
+    try {
+      const recognition = new SpeechRecognition()
+      recognition.continuous = false
+      recognition.interimResults = true
+      recognition.lang = "en-IN"
+
+      recognition.onstart = () => {
+        setIsVoiceRecording(true)
+        setVoiceStatusText("Listening... Speak your procurement requirement now.")
+      }
+
+      recognition.onresult = (event: any) => {
+        let transcript = ""
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          transcript += event.results[i][0].transcript
+        }
+        if (transcript) {
+          setRequirementText(transcript)
+          setVoiceTranscript(transcript)
+        }
+      }
+
+      recognition.onerror = (event: any) => {
+        console.warn("Speech recognition error:", event.error)
+        setIsVoiceRecording(false)
+        setVoiceStatusText(`Voice input: ${event.error || "Unable to access microphone"}`)
+      }
+
+      recognition.onend = () => {
+        setIsVoiceRecording(false)
+        setVoiceStatusText("Voice captured. Analyzing requirement...")
+        if (requirementText.trim().length > 5) {
+          handleGenerateSpecs()
+        }
+      }
+
+      recognition.start()
+    } catch (e) {
+      console.error("Speech recognition could not be started", e)
+      setIsVoiceRecording(false)
+      setVoiceStatusText("Could not access microphone.")
+    }
   }
 
   // Select sample prompt chip
@@ -191,38 +303,36 @@ export default function Home({ navigate }: NavProps) {
   const journeySteps = [
     {
       num: "01",
-      title: "Plain-Language Intake",
-      desc: "Type your sourcing requirements in plain conversational English without rigid procurement jargon.",
-      metric: "< 60 seconds to initiate",
-      badge: "Unstructured to Structured",
+      title: "Describe & Specify",
+      subtitle: "Plain Language → Institutional RFQ",
+      desc: "Type your sourcing requirement in plain English. MPI AI instantly extracts manufacturing tolerances, material grades, quantities, and delivery constraints into a structured, institutional-grade RFQ specification.",
+      metric: "99.2% Spec Completeness",
+      highlights: ["Natural language intake", "Auto-extracted BOMs & tolerances", "< 60 seconds to initiate"],
+      icon: "📝",
+      gradient: "from-[#0B1F4B] to-[#162D63]",
+      accentColor: "deepBlue",
     },
     {
       num: "02",
-      title: "AI Specification Extraction",
-      desc: "MPI extracts manufacturing tolerances, material grades, quantities, and delivery constraints automatically.",
-      metric: "99.2% Spec Completeness",
-      badge: "Institutional RFQ Spec",
+      title: "Match & Compare",
+      subtitle: "Verified MSMEs → Transparent Landed Costs",
+      desc: "Our engine cross-checks Udyam registration, machine capacity, and ISO certifications to surface vetted suppliers, then delivers itemized quotes with full cost transparency across tooling, fabrication, logistics, GST, and subsidies.",
+      metric: "Avg 38% Landed Savings",
+      highlights: ["1,240+ audited MSME suppliers", "Reverse margin cost breakdown", "Zero hidden fees"],
+      icon: "🔍",
+      gradient: "from-[#F97316] to-[#EA580C]",
+      accentColor: "orange",
     },
     {
       num: "03",
-      title: "Supplier Discovery",
-      desc: "Our engine cross-checks Udyam registration, active machine capacity, and ISO certifications to match vetted suppliers.",
-      metric: "1,240+ Audited Suppliers",
-      badge: "100% Statutory Vetted",
-    },
-    {
-      num: "04",
-      title: "Landed Cost Quote Matrix",
-      desc: "Receive itemized quotes with full transparency into base tooling, unit fabrication, logistics, GST, and Government Schemes.",
-      metric: "Avg 38% Landed Savings",
-      badge: "Zero Hidden Fees",
-    },
-    {
-      num: "05",
-      title: "PO & Escrow Milestone Delivery",
-      desc: "Digitally generate Purchase Orders, track 10 order milestones, and release payment only upon certified QC inspection passes.",
+      title: "Order & Deliver",
+      subtitle: "Escrow PO → QC-Gated Milestone Release",
+      desc: "Digitally generate Purchase Orders, track 10 order milestones with QC inspection gates, and release payment only upon certified passes. Fully escrow-backed for zero advance risk.",
       metric: "10-Milestone Protection",
-      badge: "Escrow Peace of Mind",
+      highlights: ["Digital PO generation", "Escrow-backed milestones", "Certified QC gate sign-offs"],
+      icon: "🚀",
+      gradient: "from-[#0B1F4B] via-[#123B7A] to-[#F97316]",
+      accentColor: "deepBlueOrange",
     },
   ]
 
@@ -303,25 +413,14 @@ export default function Home({ navigate }: NavProps) {
           </div>
 
           {/* Desktop Navigation Links */}
-          <div className="hidden lg:flex items-center gap-6 text-sm font-semibold text-slate-700">
+          <div className="hidden lg:flex items-center gap-7 text-sm font-semibold text-slate-700">
             <a
               href="#marketplace"
+              onClick={() => setIsCatalogExpanded(true)}
               className="hover:text-[#0B1F4B] transition-colors"
             >
-              7 Solution Catalogs
+              MPI Catalogue
             </a>
-            <button
-              onClick={() => navigate("startup.home")}
-              className="hover:text-[#0B1F4B] transition-colors cursor-pointer"
-            >
-              Startup Hub
-            </button>
-            <button
-              onClick={() => navigate("msme.home")}
-              className="hover:text-[#0B1F4B] transition-colors cursor-pointer"
-            >
-              MSME Portal
-            </button>
             <a
               href="#government-schemes"
               className="hover:text-[#0B1F4B] transition-colors"
@@ -336,27 +435,40 @@ export default function Home({ navigate }: NavProps) {
             </button>
           </div>
 
-          {/* CTA Buttons - Login & Registration as instructed */}
+          {/* CTA Buttons - Language Translator, Login & Sign In (Google Auth) & Start Procurement */}
           <div className="hidden md:flex items-center gap-2.5">
+            {/* Language Translator Button (Matching User's Reference: Globe + EN) */}
+            <LanguageTranslatorButton variant="default" />
+
             <button
-              onClick={() => navigate("login.startup")}
-              className="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-600 hover:text-[#0B1F4B] hover:bg-slate-100 transition-all cursor-pointer"
+              onClick={() => setAuthModal({ open: true, mode: "login" })}
+              className="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-[#0B1F4B] hover:bg-slate-100 transition-all cursor-pointer"
             >
               Login
             </button>
             <button
-              onClick={() => navigate("register.startup")}
-              className="group flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-[#0B1F4B] bg-linear-to-b from-blue-50 to-blue-100/60 hover:from-blue-100 hover:to-blue-200/60 border border-blue-200/90 hover:border-blue-300 shadow-2xs hover:shadow-xs transition-all cursor-pointer"
+              onClick={() => setAuthModal({ open: true, mode: "signin" })}
+              className="group flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold text-[#0B1F4B] bg-white hover:bg-slate-50 border border-slate-200 hover:border-slate-300 shadow-2xs hover:shadow-xs transition-all cursor-pointer"
             >
-              <span className="text-xs group-hover:-translate-y-0.5 transition-transform">🚀</span>
-              <span>Register as Startup</span>
-            </button>
-            <button
-              onClick={() => navigate("register.msme")}
-              className="group flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-[#C2410C] bg-linear-to-b from-orange-50 to-orange-100/60 hover:from-orange-100 hover:to-orange-200/60 border border-orange-200/90 hover:border-orange-300 shadow-2xs hover:shadow-xs transition-all cursor-pointer"
-            >
-              <span className="text-xs group-hover:-translate-y-0.5 transition-transform">🏭</span>
-              <span>Register as MSME</span>
+              <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24">
+                <path
+                  fill="#4285F4"
+                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                />
+                <path
+                  fill="#34A853"
+                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                />
+                <path
+                  fill="#FBBC05"
+                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+                />
+                <path
+                  fill="#EA4335"
+                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+                />
+              </svg>
+              <span>Sign In</span>
             </button>
             <button
               onClick={() => navigate("startup.procurement")}
@@ -369,15 +481,40 @@ export default function Home({ navigate }: NavProps) {
 
           {/* Mobile Menu Hamburger */}
           <div className="md:hidden flex items-center gap-2">
+            <LanguageTranslatorButton variant="default" />
             <button
-              onClick={() => navigate("login.startup")}
-              className="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50 cursor-pointer"
+              onClick={() => setAuthModal({ open: true, mode: "login" })}
+              className="px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50 cursor-pointer"
             >
               Login
             </button>
             <button
+              onClick={() => setAuthModal({ open: true, mode: "signin" })}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-blue-200 bg-blue-50/80 text-xs font-bold text-[#0B1F4B] cursor-pointer"
+            >
+              <svg className="w-3 h-3 shrink-0" viewBox="0 0 24 24">
+                <path
+                  fill="#4285F4"
+                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                />
+                <path
+                  fill="#34A853"
+                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                />
+                <path
+                  fill="#FBBC05"
+                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+                />
+                <path
+                  fill="#EA4335"
+                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+                />
+              </svg>
+              <span>Sign In</span>
+            </button>
+            <button
               onClick={() => navigate("startup.procurement")}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-linear-to-r from-[#0B1F4B] to-[#123B7A] text-white text-xs font-bold shadow-xs cursor-pointer"
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#0B1F4B]/88 backdrop-blur-md border border-white/20 text-white text-xs font-bold shadow-[inset_0_1px_1px_rgba(255,255,255,0.22)] hover:bg-[#123B7A]/94 hover:border-white/35 transition-all cursor-pointer"
             >
               <Icons.Sparkles className="w-3 h-3 text-amber-300" />
               <span>Start</span>
@@ -400,38 +537,15 @@ export default function Home({ navigate }: NavProps) {
         {mobileMenuOpen && (
           <div className="md:hidden bg-white border-b border-slate-200 px-4 py-4 space-y-3 animate-fade-in shadow-lg">
             <div className="flex flex-col space-y-2 text-sm font-semibold text-slate-800">
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false)
-                  navigate("startup.home")
-                }}
-                className="py-2 px-3 text-left rounded-lg hover:bg-slate-50 flex items-center justify-between cursor-pointer"
-              >
-                <div className="flex items-center gap-2">
-                  <span>🚀</span>
-                  <span>Startup Hub (Buyer Portal)</span>
-                </div>
-                <Icons.ArrowRight className="w-4 h-4 text-slate-400" />
-              </button>
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false)
-                  navigate("msme.home")
-                }}
-                className="py-2 px-3 text-left rounded-lg hover:bg-slate-50 flex items-center justify-between cursor-pointer"
-              >
-                <div className="flex items-center gap-2">
-                  <span>🏭</span>
-                  <span>MSME Supplier Portal</span>
-                </div>
-                <Icons.ArrowRight className="w-4 h-4 text-slate-400" />
-              </button>
               <a
                 href="#marketplace"
-                onClick={() => setMobileMenuOpen(false)}
+                onClick={() => {
+                  setIsCatalogExpanded(true)
+                  setMobileMenuOpen(false)
+                }}
                 className="py-2 px-3 rounded-lg hover:bg-slate-50 flex items-center justify-between"
               >
-                <span>7 Solution Catalogs</span>
+                <span>MPI Catalogue</span>
                 <Icons.ArrowRight className="w-4 h-4 text-slate-400" />
               </a>
               <button
@@ -475,35 +589,42 @@ export default function Home({ navigate }: NavProps) {
               </button>
             </div>
             <div className="pt-3 border-t border-slate-100 flex flex-col gap-2">
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false)
-                  navigate("login.startup")
-                }}
-                className="w-full py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
-              >
-                Login to Account
-              </button>
               <div className="grid grid-cols-2 gap-2">
                 <button
                   onClick={() => {
                     setMobileMenuOpen(false)
-                    navigate("register.startup")
+                    setAuthModal({ open: true, mode: "login" })
                   }}
-                  className="flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl border border-blue-200/80 bg-blue-50/70 text-xs font-bold text-[#0B1F4B] hover:bg-blue-100 transition-colors cursor-pointer"
+                  className="w-full py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer text-center"
                 >
-                  <span>🚀</span>
-                  <span>Join as Startup</span>
+                  Login
                 </button>
                 <button
                   onClick={() => {
                     setMobileMenuOpen(false)
-                    navigate("register.msme")
+                    setAuthModal({ open: true, mode: "signin" })
                   }}
-                  className="flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl border border-orange-200/80 bg-orange-50/70 text-xs font-bold text-[#C2410C] hover:bg-orange-100 transition-colors cursor-pointer"
+                  className="flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-blue-200 bg-blue-50/80 text-xs font-bold text-[#0B1F4B] hover:bg-blue-100 transition-colors cursor-pointer"
                 >
-                  <span>🏭</span>
-                  <span>Join as MSME</span>
+                  <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24">
+                    <path
+                      fill="#4285F4"
+                      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                    />
+                    <path
+                      fill="#34A853"
+                      d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                    />
+                    <path
+                      fill="#FBBC05"
+                      d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+                    />
+                    <path
+                      fill="#EA4335"
+                      d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+                    />
+                  </svg>
+                  <span>Sign In</span>
                 </button>
               </div>
               <button
@@ -522,27 +643,29 @@ export default function Home({ navigate }: NavProps) {
       </nav>
 
       {/* ─── 3. HERO SECTION WITH INTERACTIVE AI INTAKE SIMULATOR ──────────────── */}
-      <section className="relative overflow-hidden pt-10 pb-16 lg:pt-16 lg:pb-24 bg-linear-to-b from-white via-slate-50 to-[#F7F9FC] border-b border-slate-200">
+      <section className="relative overflow-hidden pt-8 pb-14 lg:pt-12 lg:pb-20 bg-linear-to-b from-white via-slate-50 to-[#F7F9FC] border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
             {/* Left Column: Value Proposition */}
-            <div className="lg:col-span-6 space-y-6 text-left">
+            <div className="lg:col-span-7 space-y-5 text-left">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-xs font-semibold text-[#0B1F4B]">
                 <Icons.Sparkles className="w-3.5 h-3.5 text-[#F97316]" />
                 <span>Next-Gen B2B Sourcing Infrastructure</span>
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
               </div>
 
               <h1
-                className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#0B1F4B] tracking-tight leading-[1.15]"
+                className="text-xl sm:text-2xl md:text-[27px] lg:text-[26px] xl:text-[30px] font-extrabold text-[#0B1F4B] tracking-tight leading-[1.25]"
                 style={{ fontFamily: "Plus Jakarta Sans" }}
               >
-                Your MPI Procurement Support.{" "}
-                <span className="text-[#F97316]">From Plain Requirement</span>{" "}
-                to Verified MSME Delivery.
+                <span className="block whitespace-nowrap">
+                  Your MPI Procurement Support from
+                </span>
+                <span className="block whitespace-nowrap">
+                  <span className="text-[#F97316]">Plain Requirement</span> to Verified MSME Delivery.
+                </span>
               </h1>
 
-              <p className="text-base sm:text-lg text-slate-600 leading-relaxed">
+              <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-xl">
                 Empowering Indian startups to source packaging, prototyping,
                 compliance, digital, and specialized services with
                 institutional-grade RFQ generation, real-time quote comparison,
@@ -550,23 +673,23 @@ export default function Home({ navigate }: NavProps) {
               </p>
 
               {/* Trust Badges Bar */}
-              <div className="flex flex-wrap items-center gap-3 pt-2 text-xs font-semibold text-slate-700">
-                <span className="inline-flex items-center gap-1.5 bg-white border border-slate-200 px-2.5 py-1 rounded-md shadow-2xs">
+              <div className="flex flex-wrap items-center gap-2.5 text-xs font-semibold text-slate-700">
+                <span className="inline-flex items-center gap-1.5 bg-white border border-slate-200 px-3 py-1.5 rounded-lg shadow-2xs">
                   <Icons.ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
                   Udyam Registered MSMEs
                 </span>
-                <span className="inline-flex items-center gap-1.5 bg-white border border-slate-200 px-2.5 py-1 rounded-md shadow-2xs">
+                <span className="inline-flex items-center gap-1.5 bg-white border border-slate-200 px-3 py-1.5 rounded-lg shadow-2xs">
                   <Icons.Award className="w-3.5 h-3.5 text-amber-600" />
                   ZED & ISO Certified
                 </span>
-                <span className="inline-flex items-center gap-1.5 bg-white border border-slate-200 px-2.5 py-1 rounded-md shadow-2xs">
-                  <Icons.Coins className="w-3.5 h-3.5 text-emerald-600" />
-                  Avg 38% Cost Reduction
+                <span className="inline-flex items-center gap-1.5 bg-blue-50/80 border border-blue-200/80 text-[#0B1F4B] px-3 py-1.5 rounded-lg font-bold">
+                  <Icons.Sparkles className="w-3.5 h-3.5 text-[#F97316]" />
+                  Reverse Margin Verified
                 </span>
               </div>
 
               {/* Direct Workspace Action Links */}
-              <div className="flex flex-wrap items-center gap-4 pt-4">
+              <div className="flex flex-wrap items-center gap-3.5 pt-1">
                 <MPIButton
                   variant="primary"
                   size="lg"
@@ -583,218 +706,338 @@ export default function Home({ navigate }: NavProps) {
                   Register as MSME Supplier
                 </MPIButton>
               </div>
+
+              {/* Smart Space Utilization: Key Proof Metrics */}
+              <div className="pt-3 grid grid-cols-3 gap-3 border-t border-slate-200/80 text-left max-w-lg">
+                <div>
+                  <div
+                    className="text-base sm:text-lg font-black text-[#0B1F4B]"
+                    style={{ fontFamily: "Plus Jakarta Sans" }}
+                  >
+                    48h
+                  </div>
+                  <div className="text-[11px] text-slate-500 font-medium leading-tight">
+                    Quote Turnaround
+                  </div>
+                </div>
+                <div>
+                  <div
+                    className="text-base sm:text-lg font-black text-[#0B1F4B]"
+                    style={{ fontFamily: "Plus Jakarta Sans" }}
+                  >
+                    100%
+                  </div>
+                  <div className="text-[11px] text-slate-500 font-medium leading-tight">
+                    Verified MSME Network
+                  </div>
+                </div>
+                <div>
+                  <div
+                    className="text-base sm:text-lg font-black text-[#F97316]"
+                    style={{ fontFamily: "Plus Jakarta Sans" }}
+                  >
+                    ₹0
+                  </div>
+                  <div className="text-[11px] text-slate-500 font-medium leading-tight">
+                    Upfront Platform Fee
+                  </div>
+                </div>
+              </div>
             </div>
 
-            {/* Right Column: Interactive AI Intake Simulator Card */}
-            <div className="lg:col-span-6">
-              <div className="bg-white rounded-2xl border-2 border-[#0B1F4B]/10 p-5 sm:p-6 shadow-xl relative overflow-hidden">
-                {/* Header ribbon */}
-                <div className="flex items-center justify-between pb-4 border-b border-slate-100">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-red-400" />
-                    <div className="w-3 h-3 rounded-full bg-amber-400" />
-                    <div className="w-3 h-3 rounded-full bg-emerald-400" />
-                    <span className="ml-2 text-xs font-bold text-slate-700 uppercase tracking-wider">
-                      MPI AI Spec Engine
-                    </span>
+            {/* Right Column: Next-Gen Conversational AI Engine & Voice Assistant (Matching Reference Design) */}
+            <div className="lg:col-span-5">
+              <div className="bg-white/95 backdrop-blur-xl rounded-3xl border border-slate-200/90 p-6 sm:p-8 shadow-[0_20px_50px_rgba(11,31,75,0.08)] relative overflow-hidden">
+                {/* 1. Header with Glowing MPI Brand Sphere Orb */}
+                <div className="flex flex-col items-center text-center mb-6">
+                  {/* MPI Glowing Sphere Orb (Deep Blue & Orange) */}
+                  <div className="relative mb-3 group cursor-pointer" onClick={toggleVoiceRecording}>
+                    <div className="w-14 h-14 rounded-full bg-linear-to-tr from-[#0B1F4B] via-[#123B7A] to-[#F97316] shadow-[0_0_35px_rgba(249,115,22,0.45)] flex items-center justify-center transition-transform hover:scale-105 active:scale-95 animate-pulse">
+                      <div className="w-9 h-9 rounded-full bg-white/25 backdrop-blur-xs flex items-center justify-center">
+                        <Icons.Sparkles className="w-5 h-5 text-white" />
+                      </div>
+                    </div>
+                    {/* Pulsing rings when voice recording */}
+                    {isVoiceRecording && (
+                      <span className="absolute inset-0 rounded-full border-2 border-orange-400 animate-ping opacity-75 pointer-events-none" />
+                    )}
                   </div>
-                  <div className="flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200/80 shadow-2xs">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                    <span>MPI AI Active</span>
+
+                  <h3
+                    className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight"
+                    style={{ fontFamily: "Plus Jakarta Sans" }}
+                  >
+                    Good Afternoon, Founder
+                  </h3>
+                  <div
+                    className="text-2xl sm:text-3xl font-extrabold tracking-tight mt-0.5"
+                    style={{ fontFamily: "Plus Jakarta Sans" }}
+                  >
+                    What's on <span className="bg-linear-to-r from-[#0B1F4B] via-[#123B7A] to-[#F97316] bg-clip-text text-transparent">your mind?</span>
                   </div>
                 </div>
 
-                {/* Sample Prompt Chips */}
-                <div className="mt-4">
-                  <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-2">
-                    Try a real startup requirement:
-                  </label>
-                  <div className="grid grid-cols-2 gap-2">
-                    {samplePrompts.map((chip, idx) => (
+                {/* 2. Main Conversational AI Input Box (Matching Reference Card) */}
+                <div className="relative rounded-2xl border border-slate-200 bg-white shadow-xs focus-within:border-[#F97316] focus-within:ring-4 focus-within:ring-orange-100/70 transition-all">
+                  {/* Input area */}
+                  <div className="p-4 sm:p-5">
+                    <div className="flex items-start gap-2.5">
+                      <Icons.Sparkles className="w-4 h-4 text-[#F97316] shrink-0 mt-1" />
+                      <textarea
+                        rows={3}
+                        value={requirementText}
+                        onChange={(e) => {
+                          setRequirementText(e.target.value)
+                          setHasSimulatedExtraction(false)
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" && !e.shiftKey && requirementText.trim()) {
+                            e.preventDefault()
+                            handleGenerateSpecs()
+                          }
+                        }}
+                        placeholder="Ask AI a question or describe your procurement requirement (quantity, material, tolerances, target budget)..."
+                        className="w-full text-xs sm:text-sm text-slate-800 placeholder:text-slate-400 bg-transparent border-0 outline-none resize-none font-medium leading-relaxed"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Voice recording live indicator strip if active */}
+                  {isVoiceRecording && (
+                    <div className="mx-4 mb-2 p-2.5 rounded-xl bg-orange-50 border border-orange-200 text-orange-900 flex items-center justify-between text-xs animate-fade-in">
+                      <div className="flex items-center gap-2">
+                        <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping" />
+                        <span className="font-semibold">Recording voice requirement... Speak clearly.</span>
+                      </div>
                       <button
-                        key={chip.label}
                         type="button"
-                        onClick={() => handleSelectPromptChip(idx)}
-                        className={`text-left text-xs p-2.5 rounded-lg border transition-all cursor-pointer ${
-                          activePromptIndex === idx
-                            ? "bg-blue-50/80 border-[#0B1F4B] text-[#0B1F4B] font-semibold ring-1 ring-[#0B1F4B]"
-                            : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100"
-                        }`}
+                        onClick={toggleVoiceRecording}
+                        className="px-2.5 py-1 rounded-md bg-[#F97316] text-white font-bold hover:bg-orange-600 text-[11px] cursor-pointer"
                       >
-                        <div className="font-bold truncate">{chip.label}</div>
-                        <div className="text-[10px] text-slate-500 truncate">
-                          {chip.cat}
+                        Stop & Send
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Bottom Controls Bar: Attach, Writing Styles, Voice Mic, Citation, Send Button */}
+                  <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 bg-slate-50/60 rounded-b-2xl border-t border-slate-100">
+                    <div className="flex items-center gap-2">
+                      {/* Attach button */}
+                      <button
+                        type="button"
+                        onClick={() => navigate("startup.procurement")}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-semibold shadow-2xs transition-all cursor-pointer"
+                        title="Attach CAD drawings, die-lines, or technical RFQ documents"
+                      >
+                        <svg className="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                        </svg>
+                        <span>Attach</span>
+                      </button>
+
+                      {/* Writing Styles Selector */}
+                      <div className="relative">
+                        <button
+                          type="button"
+                          onClick={() => setShowStyleDropdown((prev) => !prev)}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-semibold shadow-2xs transition-all cursor-pointer"
+                        >
+                          <span>{selectedWritingStyle}</span>
+                          <span className="text-[10px] text-slate-400">▼</span>
+                        </button>
+                        {showStyleDropdown && (
+                          <div className="absolute left-0 bottom-full mb-1 w-40 bg-white rounded-xl shadow-lg border border-slate-200 py-1.5 z-30 animate-fade-in text-xs font-medium">
+                            {(["Institutional", "Technical", "Lean Startup", "Default"] as const).map((st) => (
+                              <button
+                                key={st}
+                                type="button"
+                                onClick={() => {
+                                  setSelectedWritingStyle(st)
+                                  setShowStyleDropdown(false)
+                                }}
+                                className={`w-full text-left px-3 py-1.5 hover:bg-slate-50 cursor-pointer ${
+                                  selectedWritingStyle === st ? "text-[#F97316] font-bold bg-orange-50" : "text-slate-700"
+                                }`}
+                              >
+                                {st}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Interactive Voice Assistant Mic Button */}
+                      <button
+                        type="button"
+                        onClick={toggleVoiceRecording}
+                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-2xs ${
+                          isVoiceRecording
+                            ? "bg-red-500 text-white animate-pulse"
+                            : "bg-white border border-slate-200 text-slate-700 hover:border-orange-400 hover:text-[#F97316]"
+                        }`}
+                        title="Record requirement via Voice Assistant"
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                        </svg>
+                        <span>{isVoiceRecording ? "Listening..." : "Voice"}</span>
+                      </button>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      {/* Citation / Schemes Toggle Switch */}
+                      <button
+                        type="button"
+                        onClick={() => setEnableCitation((prev) => !prev)}
+                        className="inline-flex items-center gap-2 cursor-pointer select-none text-xs text-slate-600 font-medium"
+                      >
+                        <div
+                          className={`w-8 h-4.5 rounded-full transition-colors relative flex items-center px-0.5 ${
+                            enableCitation ? "bg-[#0B1F4B]" : "bg-slate-300"
+                          }`}
+                        >
+                          <div
+                            className={`w-3.5 h-3.5 rounded-full bg-white transition-transform ${
+                              enableCitation ? "translate-x-3.5" : "translate-x-0"
+                            }`}
+                          />
+                        </div>
+                        <span className="text-[11px] font-semibold text-slate-600">Citation</span>
+                      </button>
+
+                      {/* Submit / Send Arrow Button */}
+                      <button
+                        type="button"
+                        disabled={isExtractingSpecs || !requirementText.trim()}
+                        onClick={() => handleGenerateSpecs()}
+                        className="w-8 h-8 rounded-xl bg-slate-900 hover:bg-[#F97316] disabled:bg-slate-300 text-white flex items-center justify-center transition-all cursor-pointer disabled:cursor-not-allowed shadow-xs"
+                        title="Send requirement to AI Spec Engine"
+                      >
+                        {isExtractingSpecs ? (
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                          <Icons.ArrowRight className="w-4 h-4 -rotate-90" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 3. "GET STARTED WITH AN EXAMPLE BELOW" 4 CARDS (Matching Reference Layout) */}
+                <div className="mt-6">
+                  <div className="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-widest text-slate-400 mb-3 text-left">
+                    Get started with an example below:
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                    {[
+                      {
+                        title: "Rigid Skincare Boxes",
+                        category: "Packaging & Printing",
+                        text: "Need 500 custom rigid printed boxes for our D2C organic skincare launch by next month, budget under ₹80k with EVA foam inserts",
+                        icon: "📦",
+                      },
+                      {
+                        title: "Rapid SLS Prototyping",
+                        category: "Prototyping & Product",
+                        text: "Require 50 units SLS 3D printed nylon PA12 enclosure prototypes with CNC milled aluminium plates within 10 days, budget ₹65k",
+                        icon: "⚙️",
+                      },
+                      {
+                        title: "Cloud ERP & Supabase",
+                        category: "IT & Digital Services",
+                        text: "Need an agency to set up custom ERP inventory workflow and Supabase database integration for 100 users, budget ₹1.8 Lakh",
+                        icon: "💻",
+                      },
+                      {
+                        title: "DPIIT Seed Compliance",
+                        category: "Specialized Startup",
+                        text: "Need specialized startup support for DPIIT seed fund compliance, MSME incubation readiness, and go-to-market mentorship, budget ₹50k",
+                        icon: "📜",
+                      },
+                    ].map((example, idx) => (
+                      <button
+                        key={example.title}
+                        type="button"
+                        onClick={() => {
+                          setRequirementText(example.text)
+                          handleGenerateSpecs(example.text)
+                        }}
+                        className="p-3 rounded-2xl bg-slate-50/80 hover:bg-white border border-slate-200/90 hover:border-orange-300 hover:shadow-sm text-left transition-all cursor-pointer flex flex-col justify-between group h-28"
+                      >
+                        <p className="text-[11px] font-semibold text-slate-700 leading-snug line-clamp-2 group-hover:text-[#F97316]">
+                          {example.title}
+                        </p>
+                        <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
+                          <span className="text-base">{example.icon}</span>
+                          <span className="text-[10px] text-slate-400 font-medium">Use</span>
                         </div>
                       </button>
                     ))}
                   </div>
                 </div>
 
-                {/* Requirement Input Textarea */}
-                <div className="mt-4">
-                  <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-xs font-semibold text-slate-800">
-                      Procurement Requirement
-                    </span>
-                    <span className="text-[11px] text-slate-400">
-                      Natural language input
-                    </span>
-                  </div>
-                  <textarea
-                    rows={3}
-                    value={requirementText}
-                    onChange={(e) => {
-                      setRequirementText(e.target.value)
-                      setHasSimulatedExtraction(false)
-                    }}
-                    placeholder="Describe what you need manufactured or sourced (quantity, specifications, materials, budget)..."
-                    className="w-full p-3 text-xs sm:text-sm bg-slate-50 border border-slate-300 rounded-xl text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-[#0B1F4B] focus:ring-2 focus:ring-blue-100 outline-none transition-all resize-none font-medium"
-                  />
-                </div>
-
-                {/* Action Button */}
-                <div className="mt-3 flex items-center justify-between gap-3">
-                  <div className="text-[11px] text-slate-500 hidden sm:block">
-                    ⚡ Auto-detects 7 verified categories
-                  </div>
-                  <MPIButton
-                    variant="ai"
-                    size="md"
-                    isLoading={isExtractingSpecs}
-                    onClick={handleGenerateSpecs}
-                    icon={<Icons.Sparkles className="w-4 h-4" />}
-                  >
-                    Analyze & Generate Specs
-                  </MPIButton>
-                </div>
-
-                {/* Live Extraction Output Preview */}
-                {hasSimulatedExtraction && (
-                  extractionResult?.isGreetingOrInsufficient ? (
-                    <div className="mt-5 pt-4 space-y-4 animate-fade-in bg-blue-50/70 p-4 sm:p-5 rounded-2xl border border-blue-200/80">
-                      <div className="flex items-start gap-3">
-                        <div className="w-9 h-9 rounded-xl bg-[#0B1F4B] text-white flex items-center justify-center shrink-0 shadow-xs">
-                          <Icons.Sparkles className="w-5 h-5 text-[#F97316]" />
-                        </div>
-                        <div className="space-y-1">z\
-
-                          <h4 className="text-sm font-bold text-[#0B1F4B]">
-                            Hello! Welcome to MPI Procurement Support 
-                          </h4>
-                          <p className="text-xs text-slate-700 leading-relaxed whitespace-pre-line">
-                            {extractionResult.politeGuidanceMessage ||
-                              "Rather than guessing your needs, please describe what product or service you wish to source or manufacture (e.g. quantity, material, tolerances, or budget). We will then calibrate technical specifications and market benchmarks for you."}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="pt-3 border-t border-blue-200/70">
-                        <span className="text-[11px] font-bold text-slate-700 block mb-2">
-                          Try one of these real startup requirements to see the AI Spec Engine calibrate specifications:
-                        </span>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                          {samplePrompts.map((chip, idx) => (
-                            <button
-                              key={chip.label}
-                              type="button"
-                              onClick={async () => {
-                                handleSelectPromptChip(idx)
-                                const res = await runAIExtraction(chip.text)
-                                setExtractionResult(res)
-                                setHasSimulatedExtraction(true)
-                              }}
-                              className="text-left p-2.5 bg-white hover:bg-blue-50/90 rounded-xl border border-blue-200/80 hover:border-[#0B1F4B] transition-all cursor-pointer group shadow-2xs"
-                            >
-                              <div className="text-xs font-bold text-[#0B1F4B] flex items-center justify-between">
-                                <span>{chip.label}</span>
-                                <Icons.ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#0B1F4B] transition-transform group-hover:translate-x-0.5" />
-                              </div>
-                              <div className="text-[10px] text-slate-500 mt-0.5 truncate">
-                                {chip.cat} · {chip.qty.toLocaleString("en-IN")} units · ₹{(chip.budget / 1000).toFixed(0)}k
-                              </div>
-                            </button>
-                          ))}
-                        </div>
-                      </div>
+                {/* 4. Live Extraction Output Preview (if generated) */}
+                {hasSimulatedExtraction && extractionResult && (
+                  <div className="mt-6 pt-4 border-t border-slate-200 space-y-3 animate-fade-in bg-slate-50/90 p-4 rounded-2xl text-left">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-[#0B1F4B] flex items-center gap-1.5">
+                        <Icons.Check className="w-4 h-4 text-emerald-600" />
+                        AI Extraction Succeeded ({aiConfidenceScore || 96}% Confidence)
+                      </span>
+                      <span className="text-[11px] bg-orange-100 text-orange-900 font-semibold px-2 py-0.5 rounded-full">
+                        {selectedCategory}
+                      </span>
                     </div>
-                  ) : (
-                    <div className="mt-5 pt-4 border-t border-slate-200 space-y-3 animate-fade-in bg-slate-50/80 p-4 rounded-xl">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-[#0B1F4B] flex items-center gap-1.5">
-                          <Icons.Check className="w-4 h-4 text-emerald-600" />
-                          AI Extraction Succeeded ({aiConfidenceScore || 96}% Confidence)
-                        </span>
-                        <span className="text-[11px] bg-blue-100 text-blue-800 font-semibold px-2 py-0.5 rounded">
+
+                    <div className="grid grid-cols-3 gap-2 text-xs">
+                      <div className="bg-white p-2 rounded-xl border border-slate-200">
+                        <div className="text-[10px] text-slate-400 uppercase font-bold">Category</div>
+                        <div className="font-semibold text-slate-800 truncate" title={selectedCategory}>
                           {selectedCategory}
-                        </span>
-                      </div>
-
-                      <div className="grid grid-cols-3 gap-2 text-xs">
-                        <div className="bg-white p-2 rounded-lg border border-slate-200">
-                          <div className="text-[10px] text-slate-400 uppercase font-bold">
-                            Category
-                          </div>
-                          <div className="font-semibold text-slate-800 truncate" title={selectedCategory}>
-                            {selectedCategory}
-                          </div>
-                        </div>
-                        <div className="bg-white p-2 rounded-lg border border-slate-200">
-                          <div className="text-[10px] text-slate-400 uppercase font-bold">
-                            Qty / Scope
-                          </div>
-                          <div className="font-semibold text-slate-800 truncate" title={formatScopeDisplay(selectedCategory, quantity)}>
-                            {formatScopeDisplay(selectedCategory, quantity)}
-                          </div>
-                        </div>
-                        <div className="bg-white p-2 rounded-lg border border-slate-200">
-                          <div className="text-[10px] text-slate-400 uppercase font-bold">
-                            Est. Savings
-                          </div>
-                          <div className="font-semibold text-emerald-600 truncate">
-                            ₹{Math.max(1500, Math.round(targetBudget * 0.24)).toLocaleString("en-IN")} (24%)
-                          </div>
                         </div>
                       </div>
-
-                      <div className="bg-white p-2.5 rounded-lg border border-slate-200 text-xs">
-                        <div className="text-[10px] font-bold text-slate-500 uppercase mb-1">
-                          Auto-Extracted Technical Specs:
+                      <div className="bg-white p-2 rounded-xl border border-slate-200">
+                        <div className="text-[10px] text-slate-400 uppercase font-bold">Qty / Scope</div>
+                        <div className="font-semibold text-slate-800 truncate" title={formatScopeDisplay(selectedCategory, quantity)}>
+                          {formatScopeDisplay(selectedCategory, quantity)}
                         </div>
-                        <ul className="space-y-1 text-slate-700 text-[11px]">
-                          {specifications.slice(0, 3).map((spec, i) => (
-                            <li key={i} className="flex items-start gap-1.5">
-                              <span className="text-orange-500 font-bold">•</span>
-                              <span className="truncate">{spec}</span>
-                            </li>
-                          ))}
-                        </ul>
                       </div>
-
-                      {/* Requirement Assessment & Next Steps (Suppliers are not suggested at the initial intake stage) */}
-                      <div className="bg-white p-3 rounded-xl border border-slate-200 text-xs space-y-2">
-                        <div className="flex items-center gap-1.5 text-slate-800 font-bold">
-                          <Icons.Sparkles className="w-3.5 h-3.5 text-[#F97316]" />
-                          <span>Requirement Assessment & Next Steps:</span>
-                        </div>
-                        <p className="text-[11px] text-slate-600 leading-relaxed">
-                          We have carefully structured your requirement with institutional manufacturing specifications, standard tolerances, and quality benchmarks to elevate it to your exact expectations.
-                        </p>
-                        <div className="pt-2 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                          <span className="text-[11px] text-slate-500 font-medium">
-                            Refine specifications & tolerances before initiating supplier matching.
-                          </span>
-                          <MPIButton
-                            variant="primary"
-                            size="sm"
-                            onClick={handleContinueToStartupWorkspace}
-                            icon={<Icons.ArrowRight className="w-3.5 h-3.5" />}
-                          >
-                            Refine in Workspace
-                          </MPIButton>
+                      <div className="bg-white p-2 rounded-xl border border-slate-200">
+                        <div className="text-[10px] text-slate-400 uppercase font-bold">Est. Savings</div>
+                        <div className="font-semibold text-emerald-600 truncate">
+                          ₹{Math.max(1500, Math.round(targetBudget * 0.24)).toLocaleString("en-IN")} (24%)
                         </div>
                       </div>
                     </div>
-                  )
+
+                    <div className="bg-white p-2.5 rounded-xl border border-slate-200 text-xs">
+                      <div className="text-[10px] font-bold text-slate-500 uppercase mb-1">
+                        Auto-Extracted Technical Specs:
+                      </div>
+                      <ul className="space-y-1 text-slate-700 text-[11px]">
+                        {specifications.slice(0, 3).map((spec, i) => (
+                          <li key={i} className="flex items-start gap-1.5">
+                            <span className="text-[#F97316] font-bold">•</span>
+                            <span className="truncate">{spec}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <div className="pt-2 flex items-center justify-between">
+                      <span className="text-[11px] text-slate-500">
+                        Structured RFQ ready for verified MSME bidding.
+                      </span>
+                      <MPIButton
+                        variant="primary"
+                        size="sm"
+                        onClick={handleContinueToStartupWorkspace}
+                        icon={<Icons.ArrowRight className="w-3.5 h-3.5" />}
+                      >
+                        Refine in Workspace
+                      </MPIButton>
+                    </div>
+                  </div>
                 )}
               </div>
             </div>
@@ -911,73 +1154,444 @@ export default function Home({ navigate }: NavProps) {
         </div>
       </section>
 
-      {/* ─── 5. HOW IT WORKS (THE 5-STEP HORIZONTAL JOURNEY) ───────────────────── */}
-      <section id="how-it-works" className="py-16 sm:py-20 bg-[#F7F9FC]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-12">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#F97316] bg-orange-50 px-3 py-1 rounded-full border border-orange-200">
-              End-To-End Sourcing Lifecycle
+      {/* ─── DUAL PLATFORM WORKSPACE GATEWAYS (3D FLIPPING CARDS) ──────────────── */}
+      <section className="py-20 bg-gradient-to-b from-[#0B1F4B] via-[#0E275E] to-[#0B1F4B] text-white relative overflow-hidden">
+        {/* Ambient background glows */}
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(#ffffff0a_1px,transparent_1px)] bg-size-[24px_24px] pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center max-w-3xl mx-auto mb-14">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest bg-white/10 text-orange-400 border border-white/15 backdrop-blur-md mb-3">
+              ⚡ Tailored Operating Systems
             </span>
             <h2
-              className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0B1F4B] tracking-tight mt-3"
+              className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight"
+              style={{ fontFamily: "Plus Jakarta Sans" }}
+            >
+              Choose Your Platform Workspace
+            </h2>
+            <p className="text-sm sm:text-base text-slate-300 mt-3">
+              Whether you are an emerging startup seeking manufacturing or an established MSME seeking high-intent purchase orders. Hover or click to flip & inspect modules.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10">
+            {/* 1. STARTUP GATEWAY FLIPPING CARD */}
+            <div className="perspective-1000 h-125">
+              <div
+                className={`relative w-full h-full duration-700 transform-style-preserve-3d transition-transform ${
+                  isStartupCardFlipped ? "rotate-y-180" : ""
+                }`}
+              >
+                {/* FRONT FACE */}
+                <div
+                  className={`absolute inset-0 w-full h-full backface-hidden rounded-3xl bg-slate-900/90 backdrop-blur-xl border-2 border-blue-400/40 p-8 sm:p-9 flex flex-col justify-between shadow-[0_12px_40px_rgba(11,31,75,0.4)] ${
+                    isStartupCardFlipped ? "pointer-events-none" : "pointer-events-auto"
+                  }`}
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-blue-500/20 text-blue-300 border border-blue-400/30 text-xs font-bold tracking-wide">
+                        <span>For Buyers & Founders</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setIsStartupCardFlipped(true)}
+                        className="text-xs text-blue-300 hover:text-white bg-blue-500/20 hover:bg-blue-500/30 px-3 py-1 rounded-full border border-blue-400/30 font-semibold flex items-center gap-1.5 transition-all cursor-pointer"
+                        title="Flip to see features"
+                      >
+                        <span>🔄 Flip to Deep Dive</span>
+                      </button>
+                    </div>
+
+                    <h3
+                      className="text-2xl font-black text-white mb-3"
+                      style={{ fontFamily: "Plus Jakarta Sans" }}
+                    >
+                      Startup Procurement Command Center
+                    </h3>
+                    <p className="text-sm text-slate-300 leading-relaxed mb-6">
+                      Intake plain requirements, auto-generate engineering RFQs, compare verified bids side-by-side, unlock Government Schemes, and manage purchase orders.
+                    </p>
+
+                    <ul className="space-y-3 text-xs sm:text-sm text-slate-200 font-medium">
+                      <li className="flex items-center gap-3">
+                        <div className="w-5 h-5 rounded-full bg-blue-500/20 border border-blue-400/40 flex items-center justify-center shrink-0">
+                          <Icons.Check className="w-3.5 h-3.5 text-blue-400" />
+                        </div>
+                        <span>AI specification extraction & RFQ generator</span>
+                      </li>
+                      <li className="flex items-center gap-3">
+                        <div className="w-5 h-5 rounded-full bg-blue-500/20 border border-blue-400/40 flex items-center justify-center shrink-0">
+                          <Icons.Check className="w-3.5 h-3.5 text-blue-400" />
+                        </div>
+                        <span>Multi-quote landed cost comparison matrix</span>
+                      </li>
+                      <li className="flex items-center gap-3">
+                        <div className="w-5 h-5 rounded-full bg-blue-500/20 border border-blue-400/40 flex items-center justify-center shrink-0">
+                          <Icons.Check className="w-3.5 h-3.5 text-blue-400" />
+                        </div>
+                        <span>10-milestone order tracking with inspection gates</span>
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div className="space-y-3 pt-4 border-t border-white/10">
+                    <button
+                      type="button"
+                      onClick={() => navigate("startup.home")}
+                      className="w-full py-3.5 px-6 rounded-xl font-bold text-sm bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-lg shadow-blue-500/30 flex items-center justify-center gap-2 transition-all cursor-pointer"
+                    >
+                      <span>Enter as Startup</span>
+                      <Icons.ArrowRight className="w-4 h-4" />
+                    </button>
+                    <div className="text-center">
+                      <button
+                        type="button"
+                        onClick={() => openSignInModal("startup")}
+                        className="text-xs text-blue-300 hover:text-white font-semibold transition-colors cursor-pointer"
+                      >
+                        Need an account? Register as Startup →
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* BACK FACE */}
+                <div
+                  className={`absolute inset-0 w-full h-full backface-hidden rotate-y-180 rounded-3xl bg-linear-to-br from-[#0c1f4a] via-[#102b66] to-[#14327a] border-2 border-blue-400 p-8 sm:p-9 flex flex-col justify-between shadow-2xl text-white ${
+                    isStartupCardFlipped ? "pointer-events-auto" : "pointer-events-none"
+                  }`}
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-xs font-bold uppercase tracking-wider text-blue-300">
+                        ⚡ Built-in Capabilities
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setIsStartupCardFlipped(false)}
+                        className="text-xs text-blue-200 hover:text-white bg-white/10 hover:bg-white/20 px-3 py-1 rounded-full border border-white/20 font-semibold flex items-center gap-1.5 transition-all cursor-pointer"
+                      >
+                        <span>🔄 Flip Back</span>
+                      </button>
+                    </div>
+                    <h4 className="text-xl font-bold text-white mb-4">
+                      Startup Operating Engine
+                    </h4>
+
+                    <div className="space-y-3 text-xs sm:text-[13px] text-blue-100 leading-relaxed">
+                      <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+                        <div className="font-bold text-white mb-0.5">Reverse Margin Intelligence</div>
+                        <div>Reverse engineering formulas breakdown raw material cost vs tooling vs margins.</div>
+                      </div>
+                      <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+                        <div className="font-bold text-white mb-0.5">DPIIT & ZED Subsidies</div>
+                        <div>Instant eligibility mapping across 7 Central & State incentive schemes.</div>
+                      </div>
+                      <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+                        <div className="font-bold text-white mb-0.5">Escrow-backed Milestones</div>
+                        <div>Zero advance risk with staged milestone payments and QC gate sign-offs.</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="pt-3 border-t border-white/10 space-y-2">
+                    <button
+                      type="button"
+                      onClick={() => navigate("startup.home")}
+                      className="w-full py-3 px-5 rounded-xl font-bold text-xs bg-white text-[#0B1F4B] hover:bg-slate-100 shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer"
+                    >
+                      <span>Launch Startup Workspace Now</span>
+                      <Icons.ArrowRight className="w-4 h-4" />
+                    </button>
+                    <div className="text-center">
+                      <button
+                        type="button"
+                        onClick={() => setIsStartupCardFlipped(false)}
+                        className="text-xs text-blue-300 hover:text-white transition-colors cursor-pointer"
+                      >
+                        ← Return to Overview
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 2. MSME GATEWAY FLIPPING CARD */}
+            <div className="perspective-1000 h-125">
+              <div
+                className={`relative w-full h-full duration-700 transform-style-preserve-3d transition-transform ${
+                  isMsmeCardFlipped ? "rotate-y-180" : ""
+                }`}
+              >
+                {/* FRONT FACE */}
+                <div
+                  className={`absolute inset-0 w-full h-full backface-hidden rounded-3xl bg-slate-900/90 backdrop-blur-xl border-2 border-orange-400/40 p-8 sm:p-9 flex flex-col justify-between shadow-[0_12px_40px_rgba(249,115,22,0.25)] ${
+                    isMsmeCardFlipped ? "pointer-events-none" : "pointer-events-auto"
+                  }`}
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-orange-500/20 text-orange-300 border border-orange-400/30 text-xs font-bold tracking-wide">
+                        <span>For Suppliers & Manufacturers</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setIsMsmeCardFlipped(true)}
+                        className="text-xs text-orange-300 hover:text-white bg-orange-500/20 hover:bg-orange-500/30 px-3 py-1 rounded-full border border-orange-400/30 font-semibold flex items-center gap-1.5 transition-all cursor-pointer"
+                        title="Flip to see features"
+                      >
+                        <span>🔄 Flip to Deep Dive</span>
+                      </button>
+                    </div>
+
+                    <h3
+                      className="text-2xl font-black text-white mb-3"
+                      style={{ fontFamily: "Plus Jakarta Sans" }}
+                    >
+                      MSME Business Command Center
+                    </h3>
+                    <p className="text-sm text-slate-300 leading-relaxed mb-6">
+                      Complete statutory verification (Udyam, GST, ISO), list machine capacities across 7 categories, and quote directly on verified startup RFQs.
+                    </p>
+
+                    <ul className="space-y-3 text-xs sm:text-sm text-slate-200 font-medium">
+                      <li className="flex items-center gap-3">
+                        <div className="w-5 h-5 rounded-full bg-orange-500/20 border border-orange-400/40 flex items-center justify-center shrink-0">
+                          <Icons.Check className="w-3.5 h-3.5 text-[#F97316]" />
+                        </div>
+                        <span>Real-time RFQ opportunities feed with match scores</span>
+                      </li>
+                      <li className="flex items-center gap-3">
+                        <div className="w-5 h-5 rounded-full bg-orange-500/20 border border-orange-400/40 flex items-center justify-center shrink-0">
+                          <Icons.Check className="w-3.5 h-3.5 text-[#F97316]" />
+                        </div>
+                        <span>Itemized quote response builder with tooling costs</span>
+                      </li>
+                      <li className="flex items-center gap-3">
+                        <div className="w-5 h-5 rounded-full bg-orange-500/20 border border-orange-400/40 flex items-center justify-center shrink-0">
+                          <Icons.Check className="w-3.5 h-3.5 text-[#F97316]" />
+                        </div>
+                        <span>Machinery capacity & statutory certification ledger</span>
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div className="space-y-3 pt-4 border-t border-white/10">
+                    <button
+                      type="button"
+                      onClick={() => navigate("msme.home")}
+                      className="w-full py-3.5 px-6 rounded-xl font-bold text-sm bg-linear-to-r from-orange-500 to-amber-600 hover:from-orange-400 hover:to-amber-500 text-white shadow-lg shadow-orange-500/30 flex items-center justify-center gap-2 transition-all cursor-pointer"
+                    >
+                      <span>Enter as MSME Supplier</span>
+                      <Icons.ArrowRight className="w-4 h-4" />
+                    </button>
+                    <div className="text-center">
+                      <button
+                        type="button"
+                        onClick={() => openSignInModal("msme")}
+                        className="text-xs text-orange-300 hover:text-white font-semibold transition-colors cursor-pointer"
+                      >
+                        New supplier? Register as MSME →
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* BACK FACE */}
+                <div
+                  className={`absolute inset-0 w-full h-full backface-hidden rotate-y-180 rounded-3xl bg-linear-to-br from-[#4d2105] via-[#6d2f07] to-[#8d3c0a] border-2 border-orange-400 p-8 sm:p-9 flex flex-col justify-between shadow-2xl text-white ${
+                    isMsmeCardFlipped ? "pointer-events-auto" : "pointer-events-none"
+                  }`}
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-xs font-bold uppercase tracking-wider text-orange-300">
+                        🏭 Supplier Growth Engine
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setIsMsmeCardFlipped(false)}
+                        className="text-xs text-orange-200 hover:text-white bg-white/10 hover:bg-white/20 px-3 py-1 rounded-full border border-white/20 font-semibold flex items-center gap-1.5 transition-all cursor-pointer"
+                      >
+                        <span>🔄 Flip Back</span>
+                      </button>
+                    </div>
+                    <h4 className="text-xl font-bold text-white mb-4">
+                      MSME Digital Factory Tools
+                    </h4>
+
+                    <div className="space-y-3 text-xs sm:text-[13px] text-orange-100 leading-relaxed">
+                      <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+                        <div className="font-bold text-white mb-0.5">High-Intent PO Matching</div>
+                        <div>Zero junk inquiries. Only pre-budgeted, spec-validated demand routed to your machines.</div>
+                      </div>
+                      <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+                        <div className="font-bold text-white mb-0.5">45-Day Payment Guarantee</div>
+                        <div>TReDS discounting & MSMED Act Section 15 compliance built into every milestone.</div>
+                      </div>
+                      <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+                        <div className="font-bold text-white mb-0.5">ZED Gold Certification Fast-Track</div>
+                        <div>Get audited & verified to win institutional public sector and export orders.</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="pt-3 border-t border-white/10 space-y-2">
+                    <button
+                      type="button"
+                      onClick={() => navigate("msme.home")}
+                      className="w-full py-3 px-5 rounded-xl font-bold text-xs bg-white text-[#F97316] hover:bg-slate-100 shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer"
+                    >
+                      <span>Launch MSME Workspace Now</span>
+                      <Icons.ArrowRight className="w-4 h-4" />
+                    </button>
+                    <div className="text-center">
+                      <button
+                        type="button"
+                        onClick={() => setIsMsmeCardFlipped(false)}
+                        className="text-xs text-orange-300 hover:text-white transition-colors cursor-pointer"
+                      >
+                        ← Return to Overview
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── 5. HOW IT WORKS (THE 5-STEP HORIZONTAL JOURNEY) ───────────────────── */}
+      <section id="how-it-works" className="py-20 sm:py-24 bg-white relative overflow-hidden">
+        {/* Subtle background texture */}
+        <div className="absolute inset-0 bg-[radial-gradient(#0B1F4B08_1px,transparent_1px)] bg-size-[20px_20px] pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-[#F97316] bg-orange-50 px-4 py-1.5 rounded-full border border-orange-200 mb-4">
+              3-Step Sourcing Engine
+            </span>
+            <h2
+              className="text-3xl sm:text-4xl lg:text-[44px] font-extrabold text-[#0B1F4B] tracking-tight leading-tight"
               style={{ fontFamily: "Plus Jakarta Sans" }}
             >
               How MPI Solves Sourcing for Indian Startups
             </h2>
-            <p className="text-sm sm:text-base text-slate-600 mt-2">
-              Transform ambiguous requirement texts into institutional
-              specifications, competitive bids from verified Indian
-              manufacturers, and reliable delivery.
+            <p className="text-sm sm:text-base text-slate-500 mt-3 max-w-2xl mx-auto">
+              From plain-text requirement to verified MSME delivery in three intelligent steps.
             </p>
           </div>
 
-          {/* 5-Step Horizontal Stepper Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          {/* 3-Step Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
             {journeySteps.map((step, idx) => (
               <div
                 key={step.num}
                 onClick={() => setActiveJourneyStep(idx)}
-                className={`p-5 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between ${
+                className={`group relative rounded-3xl overflow-hidden transition-all duration-300 cursor-pointer ${
                   activeJourneyStep === idx
-                    ? "bg-white border-[#0B1F4B] shadow-md ring-2 ring-[#0B1F4B]/20 -translate-y-1"
-                    : "bg-white/70 border-slate-200 hover:bg-white hover:border-slate-300"
+                    ? "ring-2 ring-[#0B1F4B]/30 shadow-2xl -translate-y-2 scale-[1.02]"
+                    : "shadow-lg hover:shadow-xl hover:-translate-y-1"
                 }`}
               >
-                <div>
-                  <div className="flex items-center justify-between mb-3">
-                    <span
-                      className="text-2xl font-black text-[#0B1F4B]/30"
-                      style={{ fontFamily: "Plus Jakarta Sans" }}
-                    >
+                {/* Gradient Header Band */}
+                <div className={`bg-linear-to-r ${step.gradient} px-7 py-5 text-white relative`}>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className="text-3xl">{step.icon}</span>
+                      <div>
+                        <div className="text-[11px] font-bold uppercase tracking-widest text-white/70">
+                          Step {step.num}
+                        </div>
+                        <h3
+                          className="text-lg font-extrabold text-white leading-tight"
+                          style={{ fontFamily: "Plus Jakarta Sans" }}
+                        >
+                          {step.title}
+                        </h3>
+                      </div>
+                    </div>
+                    {/* Step number watermark */}
+                    <span className="text-5xl font-black text-white/10 select-none" style={{ fontFamily: "Plus Jakarta Sans" }}>
                       {step.num}
                     </span>
-                    <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-slate-100 text-slate-700">
-                      {step.badge}
-                    </span>
                   </div>
-                  <h3 className="text-sm font-bold text-[#0B1F4B] mb-2 leading-snug">
-                    {step.title}
-                  </h3>
-                  <p className="text-xs text-slate-600 leading-relaxed mb-4">
+                  <div className="mt-1.5 text-[11px] font-semibold text-white/80 tracking-wide">
+                    {step.subtitle}
+                  </div>
+                </div>
+
+                {/* Card body */}
+                <div className="bg-white px-7 py-6 border border-slate-200/80 border-t-0 rounded-b-3xl">
+                  <p className="text-[13px] text-slate-600 leading-relaxed mb-5">
                     {step.desc}
                   </p>
+
+                  {/* Highlight chips */}
+                  <div className="flex flex-wrap gap-2 mb-5">
+                    {step.highlights.map((h, hIdx) => (
+                      <span
+                        key={hIdx}
+                        className={`text-[11px] font-semibold px-2.5 py-1 rounded-lg border transition-colors ${
+                          step.accentColor === "deepBlue"
+                            ? "bg-blue-50/70 text-[#0B1F4B] border-blue-200/80"
+                            : step.accentColor === "orange"
+                              ? "bg-orange-50 text-[#C2410C] border-orange-200"
+                              : "bg-slate-50 text-[#0B1F4B] border-slate-200/90"
+                        }`}
+                      >
+                        {h}
+                      </span>
+                    ))}
+                  </div>
+
+                  {/* Metric footer */}
+                  <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
+                    <span
+                      className={`text-lg font-bold ${
+                        step.accentColor === "deepBlue"
+                          ? "text-[#0B1F4B]"
+                          : step.accentColor === "orange"
+                            ? "text-[#F97316]"
+                            : "text-[#0B1F4B]"
+                      }`}
+                      style={{ fontFamily: "Plus Jakarta Sans" }}
+                    >
+                      {step.metric}
+                    </span>
+                    {step.accentColor === "deepBlueOrange" && (
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-[#F97316] bg-orange-50 px-2 py-0.5 rounded-md border border-orange-200">
+                        Zero Advance Risk
+                      </span>
+                    )}
+                  </div>
                 </div>
-                <div className="pt-3 border-t border-slate-100 text-[11px] font-semibold text-[#F97316]">
-                  {step.metric}
-                </div>
+
+                {/* Connector arrow (between cards on desktop) */}
+                {idx < journeySteps.length - 1 && (
+                  <div className="hidden md:flex absolute -right-5 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white border-2 border-slate-200 shadow-md items-center justify-center text-slate-400 group-hover:text-[#F97316] group-hover:border-orange-300 transition-colors">
+                    <Icons.ArrowRight className="w-4 h-4" />
+                  </div>
+                )}
               </div>
             ))}
           </div>
 
-          <div className="mt-8 text-center">
-            <MPIButton
-              variant="outline"
-              size="md"
+          <div className="mt-12 text-center">
+            <button
+              type="button"
               onClick={() => navigate("startup.procurement")}
-              icon={<Icons.ArrowRight className="w-4 h-4" />}
+              className="inline-flex items-center gap-2.5 px-7 py-3 rounded-full font-bold text-sm bg-[#0B1F4B]/88 backdrop-blur-md border border-white/20 text-white hover:bg-[#123B7A]/94 hover:border-white/35 shadow-[inset_0_1px_1px_rgba(255,255,255,0.22)] transition-all cursor-pointer"
             >
-              Test the 5-Step Sourcing Engine in Workspace
-            </MPIButton>
+              <span>Try the 3-Step Engine in Workspace</span>
+              <Icons.ArrowRight className="w-4 h-4" />
+            </button>
           </div>
         </div>
       </section>
@@ -1069,155 +1683,197 @@ export default function Home({ navigate }: NavProps) {
         </div>
       </section>
 
-      {/* ─── 7. 7-CATEGORY MARKETPLACE EXPLORER (COMPACT, 20% REDUCED SIZE) ──────── */}
-      <section id="marketplace" className="py-16 sm:py-20 bg-[#F7F9FC]">
+      {/* ─── 7. 7-CATEGORY MARKETPLACE EXPLORER ─────────────────────────────── */}
+      <section id="marketplace" className="py-14 sm:py-16 bg-[#F7F9FC] transition-all">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
-            <div>
-              <span className="text-xs font-bold uppercase tracking-widest text-[#0B1F4B] bg-blue-100 px-3 py-1 rounded-full">
-                MPI Verified Catalog
+          {/* MPI Catalogue Trigger: Replaces the 'MPI Verified Catalog' badge */}
+          <div className="mb-4">
+            <button
+              type="button"
+              onClick={() => setIsCatalogExpanded((prev) => !prev)}
+              className="group inline-flex items-center gap-2.5 px-5 py-2 rounded-full font-bold text-xs uppercase tracking-widest bg-[#0B1F4B] hover:bg-[#123B7A] text-white shadow-sm hover:shadow-md transition-all cursor-pointer"
+            >
+              <span>MPI Catalogue</span>
+              <span className={`text-[10px] transition-transform duration-200 font-mono ${isCatalogExpanded ? "rotate-180" : ""}`}>
+                ▼
               </span>
-              <h2
-                className="text-2xl sm:text-3xl font-extrabold text-[#0B1F4B] tracking-tight mt-2"
-                style={{ fontFamily: "Plus Jakarta Sans" }}
-              >
-                7 Approved Procurement Categories
-              </h2>
-              <p className="text-xs sm:text-sm text-slate-600 mt-1">
-                Explore hundreds of vetted products and manufacturing
-                capabilities ready for quotation.
-              </p>
-            </div>
-
-            {/* Search within catalog */}
-            <div className="w-full md:w-72 relative">
-              <Icons.Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                value={marketSearchQuery}
-                onChange={(e) => setMarketSearchQuery(e.target.value)}
-                placeholder="Search solutions, products..."
-                className="w-full pl-10 pr-4 py-2 text-xs sm:text-sm bg-white border border-slate-300 rounded-xl focus:border-[#0B1F4B] focus:ring-2 focus:ring-blue-100 outline-none"
-              />
-            </div>
+            </button>
           </div>
 
-          {/* Category Filter Pills (Strictly 7 Categories) */}
-          <div className="flex flex-wrap items-center gap-1.5 mb-6">
-            <button
-              onClick={() => setSelectedMarketCategory("All")}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                selectedMarketCategory === "All"
-                  ? "bg-[#0B1F4B] text-white shadow-2xs"
-                  : "bg-white text-slate-700 border border-slate-200 hover:bg-slate-50"
-              }`}
-            >
-              All Categories ({MPI_CATALOG.length})
-            </button>
-            {CATALOG_CATEGORIES.map((cat) => {
-              const count = MPI_CATALOG.filter((s) => s.category === cat).length
-              const isActive = selectedMarketCategory === cat
-              return (
+          {/* Revealed only when MPI Catalogue button is clicked */}
+          {isCatalogExpanded ? (
+            <div className="animate-fade-in space-y-6">
+              <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                <div>
+                  <h2
+                    className="text-2xl sm:text-3xl font-extrabold text-[#0B1F4B] tracking-tight"
+                    style={{ fontFamily: "Plus Jakarta Sans" }}
+                  >
+                    7 Approved Procurement Categories
+                  </h2>
+                  <p className="text-xs sm:text-sm text-slate-600 mt-1">
+                    Explore hundreds of vetted products and manufacturing capabilities ready for quotation.
+                  </p>
+                </div>
+
+                {/* Search within catalog */}
+                <div className="w-full md:w-72 relative">
+                  <Icons.Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    value={marketSearchQuery}
+                    onChange={(e) => setMarketSearchQuery(e.target.value)}
+                    placeholder="Search solutions, products..."
+                    className="w-full pl-10 pr-4 py-2 text-xs sm:text-sm bg-white border border-slate-300 rounded-xl focus:border-[#0B1F4B] focus:ring-2 focus:ring-blue-100 outline-none shadow-2xs"
+                  />
+                </div>
+              </div>
+
+              {/* Category Filter Pills (Strictly 7 Categories) */}
+              <div className="flex flex-wrap items-center gap-1.5">
                 <button
-                  key={cat}
-                  onClick={() => setSelectedMarketCategory(cat)}
-                  className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                    isActive
+                  type="button"
+                  onClick={() => setSelectedMarketCategory("All")}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                    selectedMarketCategory === "All"
                       ? "bg-[#0B1F4B] text-white shadow-2xs"
                       : "bg-white text-slate-700 border border-slate-200 hover:bg-slate-50"
                   }`}
                 >
-                  {cat} ({count})
+                  All Categories ({MPI_CATALOG.length})
                 </button>
-              )
-            })}
-          </div>
-
-          {/* Products Grid: 20% Smaller Visual Footprint, 4–6 per Row on Large Screens */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-3.5">
-            {filteredCatalog.slice(0, 18).map((item) => (
-              <div
-                key={item.id}
-                className="bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md hover:border-slate-300 transition-all flex flex-col justify-between group h-full"
-              >
-                <div>
-                  {/* Compact Header Image */}
-                  <div className="h-24 bg-linear-to-br from-slate-100 to-slate-200 relative overflow-hidden">
-                    <img
-                      src={item.image}
-                      alt={item.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      loading="lazy"
-                      onError={(e) => {
-                        // Fail-safe SVG fallback if offline
-                        ;(e.target as HTMLElement).style.display = "none"
-                      }}
-                    />
-                    <div className="absolute top-1.5 left-1.5">
-                      <span className="text-[9px] font-bold bg-[#0B1F4B]/90 text-white px-1.5 py-0.5 rounded backdrop-blur-xs truncate max-w-30 inline-block">
-                        {item.category.split("&")[0]}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Card Content with 20% tighter spacing */}
-                  <div className="p-2.5">
-                    <div className="flex items-center gap-1 mb-1">
-                      <span className="inline-flex items-center gap-1 text-[9px] font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">
-                        <Icons.Check className="w-2.5 h-2.5" />
-                        MPI Verified
-                      </span>
-                    </div>
-                    <h4
-                      className="font-bold text-slate-900 text-xs mb-1 line-clamp-1 group-hover:text-[#0B1F4B] transition-colors"
-                      title={item.name}
+                {CATALOG_CATEGORIES.map((cat) => {
+                  const count = MPI_CATALOG.filter((s) => s.category === cat).length
+                  const isActive = selectedMarketCategory === cat
+                  return (
+                    <button
+                      key={cat}
+                      type="button"
+                      onClick={() => setSelectedMarketCategory(cat)}
+                      className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                        isActive
+                          ? "bg-[#0B1F4B] text-white shadow-2xs"
+                          : "bg-white text-slate-700 border border-slate-200 hover:bg-slate-50"
+                      }`}
                     >
-                      {item.name}
-                    </h4>
-                    <p className="text-[11px] text-slate-500 line-clamp-2 leading-tight">
-                      {item.description}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Card Action Buttons (View Details & Request Quote) */}
-                <div className="p-2.5 pt-0 border-t border-slate-100 mt-1 flex items-center justify-between gap-1 text-[11px]">
-                  <button
-                    type="button"
-                    onClick={() => setSelectedProductDetail(item)}
-                    className="text-slate-600 hover:text-slate-900 font-semibold cursor-pointer truncate py-1"
-                  >
-                    View Details
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setRequirementText(
-                        `Need sourcing quotation for ${item.name} (${item.category}) for our upcoming batch launch.`,
-                      )
-                      setSelectedCategory(item.category as CatalogCategory)
-                      navigate("startup.procurement")
-                    }}
-                    className="text-[#F97316] hover:text-[#ea580c] font-bold flex items-center gap-0.5 cursor-pointer shrink-0 py-1"
-                  >
-                    <span>Quote</span>
-                    <Icons.ArrowRight className="w-3 h-3" />
-                  </button>
-                </div>
+                      {cat} ({count})
+                    </button>
+                  )
+                })}
               </div>
-            ))}
-          </div>
 
-          {filteredCatalog.length > 18 && (
-            <div className="mt-8 text-center">
-              <MPIButton
-                variant="outline"
-                size="sm"
-                onClick={() => navigate("startup.procurement")}
+              {/* Products Grid: 20% Smaller Visual Footprint, 4–6 per Row on Large Screens */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-3.5">
+                {filteredCatalog.slice(0, 18).map((item) => (
+                  <div
+                    key={item.id}
+                    className="bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md hover:border-slate-300 transition-all flex flex-col justify-between group h-full"
+                  >
+                    <div>
+                      {/* Compact Header Image */}
+                      <div className="h-24 bg-linear-to-br from-slate-100 to-slate-200 relative overflow-hidden">
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          loading="lazy"
+                          onError={(e) => {
+                            ;(e.target as HTMLElement).style.display = "none"
+                          }}
+                        />
+                        <div className="absolute top-1.5 left-1.5">
+                          <span className="text-[9px] font-bold bg-[#0B1F4B]/90 text-white px-1.5 py-0.5 rounded backdrop-blur-xs truncate max-w-30 inline-block">
+                            {item.category.split("&")[0]}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Card Content with 20% tighter spacing */}
+                      <div className="p-2.5">
+                        <div className="flex items-center gap-1 mb-1">
+                          <span className="inline-flex items-center gap-1 text-[9px] font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">
+                            <Icons.Check className="w-2.5 h-2.5" />
+                            MPI Verified
+                          </span>
+                        </div>
+                        <h4
+                          className="font-bold text-slate-900 text-xs mb-1 line-clamp-1 group-hover:text-[#0B1F4B] transition-colors"
+                          title={item.name}
+                        >
+                          {item.name}
+                        </h4>
+                        <p className="text-[11px] text-slate-500 line-clamp-2 leading-tight">
+                          {item.description}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Card Action Buttons (View Details & Request Quote) */}
+                    <div className="p-2.5 pt-0 border-t border-slate-100 mt-1 flex items-center justify-between gap-1 text-[11px]">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedProductDetail(item)}
+                        className="text-slate-600 hover:text-slate-900 font-semibold cursor-pointer truncate py-1"
+                      >
+                        View Details
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setRequirementText(
+                            `Need sourcing quotation for ${item.name} (${item.category}) for our upcoming batch launch.`,
+                          )
+                          setSelectedCategory(item.category as CatalogCategory)
+                          navigate("startup.procurement")
+                        }}
+                        className="text-[#F97316] hover:text-[#ea580c] font-bold flex items-center gap-0.5 cursor-pointer shrink-0 py-1"
+                      >
+                        <span>Quote</span>
+                        <Icons.ArrowRight className="w-3 h-3" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {filteredCatalog.length > 18 && (
+                <div className="mt-8 text-center">
+                  <MPIButton
+                    variant="outline"
+                    size="sm"
+                    onClick={() => navigate("startup.procurement")}
+                  >
+                    View All {filteredCatalog.length} Catalog Offerings in Workspace →
+                  </MPIButton>
+                </div>
+              )}
+            </div>
+          ) : (
+            /* Collapsed Teaser Preview Card */
+            <div
+              onClick={() => setIsCatalogExpanded(true)}
+              className="bg-white rounded-2xl border-2 border-dashed border-slate-300 hover:border-[#0B1F4B] p-8 text-center cursor-pointer transition-all hover:shadow-md group"
+            >
+              <div className="w-14 h-14 rounded-2xl bg-blue-50 text-[#0B1F4B] group-hover:bg-[#0B1F4B] group-hover:text-white flex items-center justify-center mx-auto mb-3 transition-colors shadow-2xs">
+                <Icons.FolderCheck className="w-7 h-7" />
+              </div>
+              <h3 className="text-lg font-bold text-[#0B1F4B] mb-1">
+                Explore 7 Approved Procurement Categories & 75+ Vetted Offerings
+              </h3>
+              <p className="text-xs text-slate-500 max-w-md mx-auto mb-4">
+                Packaging, Rapid Prototyping, IT Services, Compliance, Marketing, Business Finance & Specialized Support.
+              </p>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setIsCatalogExpanded(true)
+                }}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#0B1F4B]/88 backdrop-blur-md border border-white/20 text-white text-xs font-bold hover:bg-[#123B7A]/94 hover:border-white/35 shadow-[inset_0_1px_1px_rgba(255,255,255,0.22)] transition-colors cursor-pointer"
               >
-                View All {filteredCatalog.length} Catalog Offerings in Workspace
-                →
-              </MPIButton>
+                <span>Open MPI Catalogue</span>
+                <Icons.ArrowRight className="w-3.5 h-3.5" />
+              </button>
             </div>
           )}
         </div>
@@ -1394,135 +2050,6 @@ export default function Home({ navigate }: NavProps) {
         </div>
       </section>
 
-      {/* ─── 9. STARTUP VS MSME DUAL GATEWAYS ─────────────────────────────────── */}
-      <section className="py-16 sm:py-20 bg-[#F7F9FC]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-2xl mx-auto mb-12">
-            <h2
-              className="text-2xl sm:text-3xl font-extrabold text-[#0B1F4B] tracking-tight"
-              style={{ fontFamily: "Plus Jakarta Sans" }}
-            >
-              Choose Your Platform Workspace
-            </h2>
-            <p className="text-sm text-slate-600 mt-2">
-              Whether you are an emerging startup seeking manufacturing or an
-              established MSME seeking high-intent purchase orders.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Startup Gateway Card */}
-            <div className="bg-white rounded-2xl border-2 border-blue-200 p-8 shadow-sm flex flex-col justify-between hover:border-[#0B1F4B] transition-all">
-              <div>
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-800 text-xs font-bold mb-4">
-                  <span>For Buyers & Founders</span>
-                </div>
-                <h3
-                  className="text-xl font-bold text-[#0B1F4B] mb-2"
-                  style={{ fontFamily: "Plus Jakarta Sans" }}
-                >
-                  Startup Procurement Command Center
-                </h3>
-                <p className="text-sm text-slate-600 leading-relaxed mb-6">
-                  Intake plain requirements, auto-generate engineering RFQs,
-                  compare verified bids side-by-side, unlock Government Schemes,
-                  and manage purchase orders.
-                </p>
-
-                <ul className="space-y-2.5 text-xs text-slate-700 mb-8 font-medium">
-                  <li className="flex items-center gap-2">
-                    <Icons.Check className="w-4 h-4 text-emerald-600" />
-                    AI specification extraction & RFQ generator
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Icons.Check className="w-4 h-4 text-emerald-600" />
-                    Multi-quote landed cost comparison matrix with Total Savings
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Icons.Check className="w-4 h-4 text-emerald-600" />
-                    10-milestone order tracking with inspection gates
-                  </li>
-                </ul>
-              </div>
-
-              <div className="space-y-2">
-                <MPIButton
-                  variant="primary"
-                  fullWidth
-                  size="lg"
-                  onClick={() => navigate("startup.home")}
-                  icon={<Icons.ArrowRight className="w-4 h-4" />}
-                >
-                  Enter as Startup
-                </MPIButton>
-                <div className="text-center">
-                  <button
-                    onClick={() => navigate("register.startup")}
-                    className="text-xs text-blue-700 font-semibold hover:underline"
-                  >
-                    Need an account? Register as Startup →
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* MSME Gateway Card */}
-            <div className="bg-white rounded-2xl border-2 border-orange-200 p-8 shadow-sm flex flex-col justify-between hover:border-[#F97316] transition-all">
-              <div>
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-50 text-[#F97316] text-xs font-bold mb-4">
-                  <span>For Suppliers & Manufacturers</span>
-                </div>
-                <h3
-                  className="text-xl font-bold text-[#0B1F4B] mb-2"
-                  style={{ fontFamily: "Plus Jakarta Sans" }}
-                >
-                  MSME Business Command Center
-                </h3>
-                <p className="text-sm text-slate-600 leading-relaxed mb-6">
-                  Complete statutory verification (Udyam, GST, ISO), list
-                  machine capacities across the 7 categories, and quote directly
-                  on verified startup RFQs.
-                </p>
-
-                <ul className="space-y-2.5 text-xs text-slate-700 mb-8 font-medium">
-                  <li className="flex items-center gap-2">
-                    <Icons.Check className="w-4 h-4 text-[#F97316]" />
-                    Real-time RFQ opportunities feed with match scores
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Icons.Check className="w-4 h-4 text-[#F97316]" />
-                    Itemized quote response builder with tooling costs
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Icons.Check className="w-4 h-4 text-[#F97316]" />
-                    Machinery capacity and statutory certification ledger
-                  </li>
-                </ul>
-              </div>
-
-              <div className="space-y-2">
-                <MPIButton
-                  variant="ai"
-                  fullWidth
-                  size="lg"
-                  onClick={() => navigate("msme.home")}
-                  icon={<Icons.ArrowRight className="w-4 h-4" />}
-                >
-                  Enter as MSME Supplier
-                </MPIButton>
-                <div className="text-center">
-                  <button
-                    onClick={() => navigate("register.msme")}
-                    className="text-xs text-[#F97316] font-semibold hover:underline"
-                  >
-                    New supplier? Register as MSME →
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* ─── 10. ENTERPRISE FOOTER ────────────────────────────────────────────── */}
       <footer className="bg-[#0B1F4B] text-white pt-14 pb-10 border-t border-[#123B7A]">
@@ -1991,6 +2518,13 @@ export default function Home({ navigate }: NavProps) {
         </div>
       )}
 
+      {/* Global Auth Modal for Login and Sign In */}
+      <AuthModal
+        isOpen={authModal.open}
+        initialMode={authModal.mode}
+        onClose={() => setAuthModal((prev) => ({ ...prev, open: false }))}
+        navigate={navigate}
+      />
     </div>
   )
 }

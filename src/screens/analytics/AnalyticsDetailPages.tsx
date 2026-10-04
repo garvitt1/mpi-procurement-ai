@@ -205,7 +205,6 @@ export function AIInsightsDetailPage({ goBack }: DetailPageProps) {
           actionButton={
             <div className="flex items-center gap-2">
               <div className="bg-emerald-50 border border-emerald-200/80 text-emerald-800 text-xs font-semibold px-3 py-1.5 rounded-full shadow-2xs flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                 <span>MPI AI Active</span>
               </div>
               <button
@@ -737,7 +736,6 @@ export function AIInsightsDetailPage({ goBack }: DetailPageProps) {
               <div>
                 <div className="flex items-center justify-between pb-3 border-b border-stone-100">
                   <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-emerald-600" />
                     <h3 className="text-sm font-bold text-stone-900">
                       Savings & Impact Measurement (Item 57)
                     </h3>

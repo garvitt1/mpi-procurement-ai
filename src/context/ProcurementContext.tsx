@@ -213,7 +213,7 @@ export interface PublicStartupQuote {
   qualityScore: number
   certifications: string[]
   quoteValidity: string
-  badges: Array<"Lowest Price" | "Best Value" | "Fastest Delivery" | "Highest Savings">
+  badges: Array<"Lowest Price" | "Best Value" | "Fastest Delivery" | "Highest Savings" | "Standard QA">
   recommendationReason: string
 }
 
@@ -896,7 +896,7 @@ const INITIAL_QUOTES: SupplierQuote[] = [
       complianceScore: 99,
     },
     recommendationReason:
-      "Best Value & Highest Savings. High quality score (98%), certified FSC paper, and eligible for ₹7,250 ZED Gold subsidy pass-through.",
+      "Good Tier: Balanced standard specification fabrication with solid quality score (98%) and certified FSC paper.",
   },
   {
     id: "QTE-002",
@@ -910,19 +910,19 @@ const INITIAL_QUOTES: SupplierQuote[] = [
       logisticsAndPackaging: 4000,
       gstAmount: 4500,
     },
-    deliveryDays: 15,
+    deliveryDays: 14,
     terms:
       "40% Advance, 60% on Bill of Lading. Includes free sample batch run.",
     schemeSubsidyApplied: 3250,
     finalLandedCost: 61750,
     scoreBreakdown: {
       priceCompetitiveness: 99,
-      qualityAssurance: 89,
+      qualityAssurance: 92,
       leadTimeFeasibility: 88,
       complianceScore: 92,
     },
     recommendationReason:
-      "Lowest Price option (₹61,750 net). Best if strict budget ceiling is under ₹62k, with 3 additional days in lead time.",
+      "Better Tier (Recommended): Optimal price-to-performance sweet spot with lowest net landed cost (₹59,280), high value yield and full statutory compliance.",
   },
   {
     id: "QTE-003",
@@ -936,7 +936,7 @@ const INITIAL_QUOTES: SupplierQuote[] = [
       logisticsAndPackaging: 3000,
       gstAmount: 6000,
     },
-    deliveryDays: 8,
+    deliveryDays: 6,
     terms: "50% Advance, 50% post-delivery 15 days credit period.",
     schemeSubsidyApplied: 4125,
     finalLandedCost: 78375,
@@ -947,7 +947,7 @@ const INITIAL_QUOTES: SupplierQuote[] = [
       complianceScore: 97,
     },
     recommendationReason:
-      "Fastest Delivery (8 business days). Digital short-run capability allows urgent launch fulfillment without quality sacrifice.",
+      "Best Tier: Premium rapid turnaround (6 business days) with dedicated project engineering and expedited fulfillment.",
   },
   {
     id: "QTE-004",
@@ -1521,7 +1521,7 @@ export const ProcurementProvider: React.FC<{ children: React.ReactNode }> = ({
   const [receivedQuotes, setReceivedQuotes] =
     useState<SupplierQuote[]>(INITIAL_QUOTES)
   const [selectedQuoteId, setSelectedQuoteId] = useState<string | null>(
-    "QTE-001",
+    "QTE-002",
   )
 
   // Milestone Lifecycle
@@ -1613,8 +1613,8 @@ export const ProcurementProvider: React.FC<{ children: React.ReactNode }> = ({
 
       // Assign badges based on metrics
       const badges: PublicStartupQuote["badges"] = []
-      if (idx === 0) badges.push("Best Value", "Highest Savings")
-      if (idx === 1) badges.push("Lowest Price")
+      if (idx === 0) badges.push("Highest Savings", "Standard QA")
+      if (idx === 1) badges.push("Lowest Price", "Best Value")
       if (idx === 2) badges.push("Fastest Delivery")
 
       return {

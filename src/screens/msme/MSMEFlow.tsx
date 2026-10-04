@@ -440,18 +440,6 @@ export default function MSMEFlow({
             </span>
           </button>
           <button
-            onClick={() => navigate("startup.home")}
-            className="w-full flex items-center justify-between text-xs text-slate-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-[#123B7A] cursor-pointer transition-colors"
-          >
-            <span className="flex items-center gap-2">
-              <span className="text-xs">🚀</span>
-              <span>Switch to Startup Hub</span>
-            </span>
-            <span className="text-[10px] bg-blue-950 text-blue-300 border border-blue-800/40 px-1.5 py-0.5 rounded">
-              Buyer
-            </span>
-          </button>
-          <button
             onClick={() => navigate("government-schemes.match")}
             className="w-full flex items-center justify-between text-xs text-slate-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-[#123B7A] cursor-pointer transition-colors"
           >
@@ -513,7 +501,7 @@ export default function MSMEFlow({
                 {currentScreen !== "msme.home" && (
                   <>
                     <span>/</span>
-                    <span className="text-[#0B1F4B] font-semibold truncate max-w-[120px] sm:max-w-[200px]">
+                    <span className="text-[#0B1F4B] font-semibold truncate max-w-30 sm:max-w-[200px]">
                       {title}
                     </span>
                   </>
@@ -538,14 +526,6 @@ export default function MSMEFlow({
             >
               <span>🏠</span>
               <span>Home</span>
-            </button>
-            <button
-              onClick={() => navigate("startup.home")}
-              className="hidden lg:flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors cursor-pointer"
-              title="Switch to Startup Buyer Hub"
-            >
-              <span>🚀</span>
-              <span>Startup Hub</span>
             </button>
 
             <button
@@ -780,7 +760,7 @@ export default function MSMEFlow({
         </div>
 
         {/* ─── REPEAT BUYER PROFILE BANNER ─────────────────────────────────── */}
-        <div className="bg-gradient-to-r from-[#FFFDF5] to-amber-50/70 rounded-2xl border-2 border-[#D9A400]/40 p-5 shadow-xs space-y-3">
+        <div className="bg-linear-to-r from-[#FFFDF5] to-amber-50/70 rounded-2xl border-2 border-[#D9A400]/40 p-5 shadow-xs space-y-3">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-[#D9A400] text-white flex items-center justify-center font-bold shrink-0 shadow-xs">
@@ -1227,7 +1207,7 @@ export default function MSMEFlow({
           </div>
 
           {/* ─── MSME AI QUOTATION ASSISTANT CARD ──────────────────────────── */}
-          <div className="bg-gradient-to-r from-blue-50/70 to-slate-50 border border-blue-200/80 rounded-2xl p-5 shadow-xs space-y-2">
+          <div className="bg-linear-to-r from-blue-50/70 to-slate-50 border border-blue-200/80 rounded-2xl p-5 shadow-xs space-y-2">
             <div className="flex items-center gap-2">
               <div className="w-6 h-6 rounded-md bg-[#F97316] text-white flex items-center justify-center shrink-0">
                 <Icons.Sparkles className="w-3.5 h-3.5" />

@@ -2,6 +2,7 @@ import React, { useState } from "react"
 import { Screen, NavProps } from "../../App"
 import { MPILogo } from "../shared"
 import { Icons } from "../design-system/MPIDesignSystem"
+import LanguageTranslatorButton from "./LanguageTranslatorButton"
 
 export interface BreadcrumbCrumb {
   label: string
@@ -193,11 +194,11 @@ export default function GlobalNavBar({
   const crumbs = getScreenBreadcrumbs(currentScreen)
   const isHomeScreen = currentScreen === "home" || currentScreen === "landing"
 
-  // Quick navigation items for core platforms
+  // Quick navigation items for core platforms (respecting role privacy between Startup & MSME)
   const navHubs: { label: string; screen: Screen; icon: string; badge?: string }[] = [
     { label: "Home", screen: "home", icon: "🏠" },
-    { label: "Startup Hub", screen: "startup.home", icon: "🚀", badge: "Buyers" },
-    { label: "MSME Portal", screen: "msme.home", icon: "🏭", badge: "Suppliers" },
+    ...(currentScreen.startsWith("msme.") ? [] : [{ label: "Startup Hub", screen: "startup.home" as Screen, icon: "🚀", badge: "Buyers" }]),
+    ...(currentScreen.startsWith("startup.") ? [] : [{ label: "MSME Portal", screen: "msme.home" as Screen, icon: "🏭", badge: "Suppliers" }]),
     { label: "Govt Schemes", screen: "government-schemes.match", icon: "📜", badge: "30 Schemes" },
     { label: "Analytics Studio", screen: "analytics.detail.ai-insights", icon: "📊" },
     { label: "Admin Portal", screen: "admin.home", icon: "🛡️" },
@@ -337,6 +338,9 @@ export default function GlobalNavBar({
               </div>
             )}
 
+            {/* Global Language Translator Button (Globe + EN) */}
+            <LanguageTranslatorButton variant={variant === "navy" ? "navy" : "default"} />
+
             {/* Quick Hub Switcher Dropdown (for Large/Medium screens) */}
             <div className="hidden sm:flex xl:hidden items-center">
               <select
@@ -364,8 +368,12 @@ export default function GlobalNavBar({
                 }`}
               >
                 <option value="home">🏠 Home Marketplace</option>
-                <option value="startup.home">🚀 Startup Hub (Buyer)</option>
-                <option value="msme.home">🏭 MSME Portal (Supplier)</option>
+                {!currentScreen.startsWith("msme.") && (
+                  <option value="startup.home">🚀 Startup Hub (Buyer)</option>
+                )}
+                {!currentScreen.startsWith("startup.") && (
+                  <option value="msme.home">🏭 MSME Portal (Supplier)</option>
+                )}
                 <option value="government-schemes.match">📜 Government Schemes (30)</option>
                 <option value="analytics.detail.ai-insights">📊 Analytics Studio</option>
                 <option value="admin.home">🛡️ Admin Portal</option>

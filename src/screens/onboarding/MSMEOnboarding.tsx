@@ -19,14 +19,23 @@ export default function MSMEOnboarding({ navigate, goBack }: NavProps) {
   const [currentStep, setCurrentStep] = useState(1)
   const totalSteps = 11
 
+  const googleUser = (() => {
+    try {
+      const raw = localStorage.getItem("mpi_active_user")
+      return raw ? JSON.parse(raw) : null
+    } catch {
+      return null
+    }
+  })()
+
   // Form State
   const [enterpriseName, setEnterpriseName] = useState(
-    msmeProfile.enterpriseName || "",
+    msmeProfile.enterpriseName || googleUser?.orgName || googleUser?.companyName || "",
   )
   const [contactPerson, setContactPerson] = useState(
-    msmeProfile.contactPerson || "",
+    msmeProfile.contactPerson || googleUser?.name || "",
   )
-  const [email, setEmail] = useState(msmeProfile.email || "")
+  const [email, setEmail] = useState(msmeProfile.email || googleUser?.email || "")
   const [phone, setPhone] = useState(msmeProfile.phone || "")
   const [city, setCity] = useState(msmeProfile.city || "Pune")
   const [state, setState] = useState(msmeProfile.state || "Maharashtra")

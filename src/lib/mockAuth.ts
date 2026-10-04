@@ -164,3 +164,42 @@ export function mockRegister(
   })
 }
 
+export interface GoogleAuthUser {
+  name: string
+  email: string
+  avatar: string
+  role?: RoleKey
+  orgName?: string
+}
+
+/**
+ * Mock Google Authentication provider with realistic profile payload.
+ */
+export function mockGoogleAuth(role?: RoleKey): Promise<{ success: boolean; user: GoogleAuthUser }> {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const email = role === "msme" ? "director@apexprecision.in" : "founder@novabio.tech"
+      const name = role === "msme" ? "Rajesh Sharma" : "Aarav Mehta"
+      const orgName = role === "msme" ? "Apex Precision Engineering" : "NovaBio Health"
+      const user: GoogleAuthUser = {
+        name,
+        email,
+        avatar: "https://lh3.googleusercontent.com/a/default-user",
+        role: role || "startup",
+        orgName,
+      }
+      try {
+        localStorage.setItem("mpi_active_user", JSON.stringify(user))
+        localStorage.setItem("mpi_user_role", role || "startup")
+        if (role === "admin") {
+          setAdminSession(true)
+        }
+      } catch {
+        // Ignore storage exceptions
+      }
+      resolve({ success: true, user })
+    }, 600)
+  })
+}
+
+

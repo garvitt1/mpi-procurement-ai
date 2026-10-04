@@ -475,21 +475,21 @@ export function MPIButton({
   ...props
 }: ButtonProps) {
   const sizeClasses = {
-    sm: "text-xs px-3 py-1.5 rounded-lg gap-1.5",
-    md: "text-sm px-4 py-2.5 rounded-xl gap-2",
-    lg: "text-base px-6 py-3.5 rounded-xl gap-2.5",
+    sm: "text-xs px-3.5 py-1.5 rounded-full gap-1.5 min-h-[34px]",
+    md: "text-sm px-5 py-2.5 rounded-full gap-2 min-h-[40px] leading-none",
+    lg: "text-base px-6 py-3 rounded-full gap-2.5 min-h-[44px] leading-none",
   }
 
   const variantClasses = {
     primary:
-      "bg-[#0B1F4B] text-white hover:bg-[#123B7A] shadow-xs active:scale-[0.99]",
-    ai: "bg-[#F97316] text-white hover:bg-[#EA580C] shadow-xs active:scale-[0.99]",
+      "bg-[#0B1F4B]/88 backdrop-blur-md border border-white/20 text-white hover:bg-[#123B7A]/92 hover:border-white/35 shadow-[inset_0_1px_1px_rgba(255,255,255,0.22)] active:scale-[0.98]",
+    ai: "bg-[#F97316]/90 backdrop-blur-md border border-white/25 text-white hover:bg-[#EA580C]/95 hover:border-white/40 shadow-[inset_0_1px_1px_rgba(255,255,255,0.25)] active:scale-[0.98]",
     outline:
-      "bg-white text-[#0B1220] border border-[#E6EAF0] hover:bg-slate-50 hover:border-slate-300 shadow-2xs",
+      "bg-slate-900/10 backdrop-blur-md text-[#0B1F4B] border border-[#0B1F4B]/20 hover:bg-[#0B1F4B]/15 hover:border-[#0B1F4B]/35 active:scale-[0.98]",
     ghost:
-      "bg-transparent text-slate-700 hover:bg-slate-100 hover:text-slate-900",
-    danger: "bg-[#D92D20] text-white hover:bg-red-700 shadow-xs",
-    savings: "bg-[#D9A400] text-white hover:bg-[#B78A00] shadow-xs",
+      "bg-transparent text-slate-700 hover:bg-slate-900/10 hover:text-slate-900 rounded-full active:scale-[0.98]",
+    danger: "bg-[#D92D20]/90 backdrop-blur-md border border-white/20 text-white hover:bg-red-700 shadow-none active:scale-[0.98]",
+    savings: "bg-[#D9A400]/90 backdrop-blur-md border border-white/20 text-white hover:bg-[#B78A00] shadow-none active:scale-[0.98]",
   }
 
   return (
@@ -743,8 +743,8 @@ export function MPIStepper({
 }) {
   return (
     <div className="w-full py-3 overflow-x-auto no-scrollbar">
-      <div className="flex items-center justify-between min-w-[560px] relative">
-        <div className="absolute top-4 left-6 right-6 h-0.5 bg-slate-200 -z-0" />
+      <div className="flex items-center justify-between min-w-140 relative">
+        <div className="absolute top-4 left-6 right-6 h-0.5 bg-slate-200 z-0" />
         {steps.map((label, idx) => {
           const isDone = idx < currentStep
           const isCurrent = idx === currentStep

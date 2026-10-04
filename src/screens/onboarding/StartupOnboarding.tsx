@@ -112,14 +112,23 @@ export default function StartupOnboarding({ navigate, goBack }: NavProps) {
   const [currentStep, setCurrentStep] = useState(1)
   const totalSteps = 9
 
-  // Form State initialized from startupProfile
+  const googleUser = (() => {
+    try {
+      const raw = localStorage.getItem("mpi_active_user")
+      return raw ? JSON.parse(raw) : null
+    } catch {
+      return null
+    }
+  })()
+
+  // Form State initialized from startupProfile or Google session
   const [founderName, setFounderName] = useState(
-    startupProfile.founderName || "",
+    startupProfile.founderName || googleUser?.name || "",
   )
   const [startupName, setStartupName] = useState(
-    startupProfile.startupName || "",
+    startupProfile.startupName || googleUser?.orgName || googleUser?.companyName || "",
   )
-  const [email, setEmail] = useState(startupProfile.email || "")
+  const [email, setEmail] = useState(startupProfile.email || googleUser?.email || "")
   const [phone, setPhone] = useState(startupProfile.phone || "")
   const [city, setCity] = useState(startupProfile.city || "Bengaluru")
   const [state, setState] = useState(startupProfile.state || "Karnataka")
