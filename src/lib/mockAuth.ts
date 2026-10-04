@@ -69,6 +69,59 @@ export function setAdminSession(authenticated: boolean): void {
   }
 }
 
+/**
+ * Auto-detect user role (startup, msme, or admin) from login ID / email.
+ */
+export function detectRoleFromLoginId(loginId: string): RoleKey {
+  const id = loginId.trim().toLowerCase()
+
+  // 1. Admin detection
+  if (id === "admin" || id.includes("admin") || id.startsWith("adm_")) {
+    return "admin"
+  }
+
+  // 2. Check if user already registered or saved in localStorage
+  try {
+    const activeUserStr = localStorage.getItem("mpi_active_user")
+    if (activeUserStr) {
+      const activeUser = JSON.parse(activeUserStr)
+      if (activeUser.email?.toLowerCase() === id && activeUser.role) {
+        return activeUser.role as RoleKey
+      }
+    }
+    const msmeReg = localStorage.getItem("mpi_registered_msme_email")
+    if (msmeReg && msmeReg.toLowerCase() === id) {
+      return "msme"
+    }
+    const startupReg = localStorage.getItem("mpi_registered_startup_email")
+    if (startupReg && startupReg.toLowerCase() === id) {
+      return "startup"
+    }
+  } catch {
+    // Ignore storage restrictions
+  }
+
+  // 3. MSME keywords or known MSME supplier domains/names
+  const msmeKeywords = [
+    "msme",
+    "supplier",
+    "vendor",
+    "mfg",
+    "factory",
+    "apex",
+    "precision",
+    "industries",
+    "packaging",
+    "director@apexprecision.in",
+  ]
+  if (msmeKeywords.some((kw) => id.includes(kw))) {
+    return "msme"
+  }
+
+  // 4. Default to Startup / Buyer
+  return "startup"
+}
+
 export function validateLoginForm(
   email: string,
   password: string,
