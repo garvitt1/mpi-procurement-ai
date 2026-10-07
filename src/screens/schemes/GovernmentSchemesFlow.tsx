@@ -574,10 +574,10 @@ export default function GovernmentSchemesFlow({
                     <MPICard
                       key={scheme.id}
                       hover
-                      className={`p-5 sm:p-6 transition-all ${
+                      className={`p-5 sm:p-6 transition-all duration-300 ${
                         isTopMatch
-                          ? "border-2 border-[#F97316] ring-2 ring-orange-100 bg-white"
-                          : "border border-slate-200 bg-white"
+                          ? "border-2 border-[#F97316] ring-2 ring-orange-200/60 shadow-lg shadow-orange-500/10 bg-white"
+                          : "border border-slate-200/90 bg-white"
                       }`}
                     >
                       {/* Top Header Row */}

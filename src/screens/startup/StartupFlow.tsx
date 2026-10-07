@@ -2716,12 +2716,12 @@ export default function StartupFlow({
 
     return renderShell(
       <div className="max-w-5xl mx-auto space-y-6">
-        {/* 7-Step Stepper Bar */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-xs overflow-x-auto">
+        {/* 7-Step Stepper Bar (Mission Control Dock) */}
+        <div className="sticky top-16 z-20 bg-white/95 backdrop-blur-xl rounded-2xl border border-slate-200/90 p-4 sm:p-5 shadow-[0_12px_32px_-8px_rgba(11,31,75,0.08)] overflow-x-auto transition-all">
           <div className="flex items-center justify-between min-w-137.5 relative">
-            <div className="absolute top-4 left-6 right-6 h-0.5 bg-slate-200 z-0" />
+            <div className="absolute top-4.5 left-6 right-6 h-1 bg-slate-100 rounded-full z-0" />
             <div
-              className="absolute top-4 left-6 h-0.5 bg-[#0B1F4B] z-0 transition-all duration-300"
+              className="absolute top-4.5 left-6 h-1 bg-gradient-to-r from-emerald-500 via-[#0B1F4B] to-[#F97316] rounded-full z-0 transition-all duration-500 ease-out shadow-xs"
               style={{ width: `${((builderStep - 1) / 6) * 100}%` }}
             />
             {steps.map((s) => {
@@ -2731,26 +2731,26 @@ export default function StartupFlow({
                 <button
                   key={s.num}
                   onClick={() => setBuilderStep(s.num)}
-                  className="relative z-10 flex flex-col items-center group cursor-pointer"
+                  className="relative z-10 flex flex-col items-center group cursor-pointer transition-transform hover:-translate-y-0.5 active:translate-y-0"
                 >
                   <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-bold transition-all ${
+                    className={`w-9 h-9 rounded-full flex items-center justify-center text-[11px] font-bold transition-all duration-300 ${
                       isCurrent
-                        ? "bg-[#0B1F4B] text-white ring-4 ring-blue-100 scale-110"
+                        ? "bg-[#0B1F4B] text-white ring-4 ring-[#F97316]/30 shadow-md shadow-[#0B1F4B]/20 scale-110"
                         : isPast
-                          ? "bg-[#123B7A] text-white"
-                          : "bg-white text-slate-500 border-2 border-slate-300"
+                          ? "bg-emerald-600 text-white ring-2 ring-emerald-200 shadow-2xs"
+                          : "bg-white text-slate-500 border-2 border-slate-200 group-hover:border-slate-400 group-hover:text-slate-700 shadow-2xs"
                     }`}
                   >
-                    {isPast ? <Icons.Check className="w-4 h-4" /> : s.display}
+                    {isPast ? <Icons.Check className="w-4 h-4 text-white" /> : s.display}
                   </div>
                   <span
-                    className={`text-[11px] font-semibold mt-1.5 whitespace-nowrap ${
+                    className={`text-[11px] font-semibold mt-2 whitespace-nowrap transition-colors ${
                       isCurrent
-                        ? "text-[#0B1F4B] font-bold"
+                        ? "text-[#0B1F4B] font-extrabold"
                         : isPast
-                          ? "text-slate-700"
-                          : "text-slate-400"
+                          ? "text-slate-700 font-medium"
+                          : "text-slate-400 group-hover:text-slate-600"
                     }`}
                   >
                     {s.name}
@@ -3954,11 +3954,11 @@ export default function StartupFlow({
             return (
               <div
                 key={q.id}
-                className={`bg-white rounded-2xl border flex flex-col justify-between overflow-hidden transition-all shadow-xs ${
+                className={`bg-white rounded-2xl border flex flex-col justify-between overflow-hidden transition-all duration-300 shadow-2xs hover:shadow-xl hover:-translate-y-1.5 ${
                   isSelected
-                    ? "border-[#0B1F4B] ring-2 ring-[#0B1F4B] shadow-md"
+                    ? "border-[#0B1F4B] ring-2 ring-[#0B1F4B] shadow-lg shadow-blue-900/10"
                     : isTopRecommended
-                      ? "border-[#F97316] ring-2 ring-orange-300/60 shadow-md"
+                      ? "border-[#F97316] ring-2 ring-orange-400/50 shadow-lg shadow-orange-500/10"
                       : "border-slate-200 hover:border-slate-300"
                 }`}
               >

@@ -627,7 +627,7 @@ export default function MSMEFlow({
             {opportunities.map((opp) => (
               <div
                 key={opp.id}
-                className="py-4 flex flex-col md:flex-row md:items-center justify-between gap-4"
+                className="p-4 rounded-xl hover:bg-slate-50/80 border border-transparent hover:border-slate-200/80 transition-all duration-200 flex flex-col md:flex-row md:items-center justify-between gap-4"
               >
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
@@ -691,7 +691,7 @@ export default function MSMEFlow({
             {machineryList.map((mch) => (
               <div
                 key={mch.id}
-                className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-2"
+                className="p-4 rounded-xl border border-slate-200/80 bg-slate-50/50 hover:bg-white hover:shadow-md hover:border-slate-300 transition-all duration-300 hover:-translate-y-0.5 space-y-2"
               >
                 <div className="flex justify-between items-start">
                   <span className="text-[10px] font-bold text-blue-700 bg-blue-50 px-1.5 py-0.2 rounded">

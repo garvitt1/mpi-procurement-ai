@@ -648,17 +648,20 @@ export function MPICard({
   savings?: boolean
   hover?: boolean
 }) {
-  let styleClass = "bg-white border border-[#E6EAF0] shadow-xs"
-  if (highlight) styleClass = "bg-white border-2 border-[#F97316]/40 shadow-sm"
+  let styleClass = "bg-white/95 backdrop-blur-xs border border-slate-200/90 shadow-2xs"
+  if (highlight)
+    styleClass =
+      "bg-white border-2 border-[#F97316]/60 shadow-md shadow-orange-500/5 ring-2 ring-orange-200/40"
   if (savings)
     styleClass =
       "bg-gradient-to-br from-white to-[#FFFDF5] border border-[#FFE799] shadow-xs"
   if (hover)
-    styleClass += " hover:shadow-md hover:border-slate-300 transition-all"
+    styleClass +=
+      " hover:shadow-xl hover:border-slate-300 hover:-translate-y-1 transition-all duration-300"
 
   return (
     <div
-      className={`rounded-2xl p-5 md:p-6 transition-all ${styleClass} ${className}`}
+      className={`rounded-2xl p-5 md:p-6 transition-all duration-300 ${styleClass} ${className}`}
     >
       {children}
     </div>
@@ -687,39 +690,46 @@ export function MPIStatCard({
   return (
     <div
       onClick={onClick}
-      className={`bg-white border border-[#E6EAF0] rounded-2xl p-5 shadow-xs transition-all ${
-        onClick ? "cursor-pointer hover:border-slate-300 hover:shadow-sm" : ""
+      className={`group relative bg-white/95 backdrop-blur-md border border-slate-200/90 rounded-2xl p-5 shadow-2xs hover:shadow-md hover:border-slate-300 transition-all duration-300 hover:-translate-y-1 ${
+        onClick ? "cursor-pointer" : ""
       }`}
     >
       <div className="flex items-center justify-between text-xs text-slate-500 mb-2">
-        <span className="font-semibold text-slate-600 uppercase tracking-wider text-[11px]">
+        <span className="font-bold text-slate-600 uppercase tracking-wider text-[10px]">
           {title}
         </span>
-        {icon && <div className="text-slate-400">{icon}</div>}
+        {icon && (
+          <div className="w-7 h-7 rounded-lg bg-slate-50 group-hover:bg-blue-50 text-slate-500 group-hover:text-[#0B1F4B] flex items-center justify-center transition-colors">
+            {icon}
+          </div>
+        )}
       </div>
       <div className="flex items-baseline justify-between gap-2">
-        <div className="text-2xl md:text-3xl font-extrabold text-[#0B1220] tracking-tight font-sans">
+        <div
+          className="text-2xl md:text-3xl font-extrabold text-[#0B1220] tracking-tight"
+          style={{ fontFamily: "Plus Jakarta Sans" }}
+        >
           {value}
         </div>
         {badge && <div>{badge}</div>}
       </div>
       {(subtitle || change) && (
-        <div className="flex items-center gap-2 mt-2 text-xs">
+        <div className="flex items-center gap-2 mt-2.5 text-xs">
           {change && (
             <span
-              className={`font-semibold flex items-center gap-0.5 ${
+              className={`font-semibold text-[11px] px-1.5 py-0.5 rounded-md flex items-center gap-0.5 ${
                 trend === "up"
-                  ? "text-[#168A5B]"
+                  ? "bg-emerald-50 text-emerald-700 border border-emerald-200/60"
                   : trend === "down"
-                    ? "text-rose-600"
-                    : "text-slate-600"
+                    ? "bg-rose-50 text-rose-700 border border-rose-200/60"
+                    : "bg-slate-100 text-slate-700"
               }`}
             >
               {trend === "up" ? "↑" : trend === "down" ? "↓" : "•"} {change}
             </span>
           )}
           {subtitle && (
-            <span className="text-slate-500 text-[11px] truncate">
+            <span className="text-slate-500 text-[11px] truncate font-medium">
               {subtitle}
             </span>
           )}
