@@ -459,8 +459,11 @@ function geminiBackendProxyPlugin(): Plugin {
           new Set([
             payload.model || 'gemini-3.1-flash-lite',
             'gemini-3.1-flash-lite',
+            'gemini-3.8-flash',
+            'gemini-2.5-flash-lite',
             'gemini-3-flash-preview',
             'gemini-flash-latest',
+            'gemini-1.5-flash',
           ].filter(Boolean))
         )
 

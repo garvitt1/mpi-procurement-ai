@@ -190,7 +190,10 @@ export function getGeminiApiKey(): string {
     const local = localStorage.getItem(STORAGE_KEY_GEMINI_KEY)
     if (local && local.trim().length > 0) return local.trim()
   }
-  return ""
+  const envKey =
+    (typeof import.meta !== "undefined" && import.meta.env && (import.meta.env.VITE_GEMINI_API_KEY || (import.meta.env as any).GEMINI_API_KEY)) ||
+    ""
+  return envKey.trim()
 }
 
 /**
@@ -260,7 +263,19 @@ async function callGeminiGenerateContent(
 
   const promise = (async () => {
     const activeModel = getGeminiModel()
-    const candidateModels = ["gemini-3.1-flash-lite", "gemini-3-flash-preview", "gemini-flash-latest", activeModel]
+    const candidateModels = Array.from(
+      new Set(
+        [
+          activeModel,
+          "gemini-3.1-flash-lite",
+          "gemini-3.8-flash",
+          "gemini-2.5-flash-lite",
+          "gemini-3-flash-preview",
+          "gemini-flash-latest",
+          "gemini-1.5-flash",
+        ].filter(Boolean)
+      )
+    )
     const clientApiKey = getGeminiApiKey()
 
     // 1. Primary: Use secure server-side / Netlify serverless proxy
@@ -351,7 +366,19 @@ async function callGeminiMultiTurnChat(
 
   const promise = (async () => {
     const activeModel = getGeminiModel()
-    const candidateModels = ["gemini-3.1-flash-lite", "gemini-3-flash-preview", "gemini-flash-latest", activeModel]
+    const candidateModels = Array.from(
+      new Set(
+        [
+          activeModel,
+          "gemini-3.1-flash-lite",
+          "gemini-3.8-flash",
+          "gemini-2.5-flash-lite",
+          "gemini-3-flash-preview",
+          "gemini-flash-latest",
+          "gemini-1.5-flash",
+        ].filter(Boolean)
+      )
+    )
     const clientApiKey = getGeminiApiKey()
 
     // Gemini API strict compliance rules:

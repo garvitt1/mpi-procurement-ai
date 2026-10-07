@@ -44,7 +44,12 @@ function getSecretApiKey(clientHeaderKey?: string, clientBodyKey?: string): stri
   if (clientBodyKey && clientBodyKey.trim().length > 5) {
     return clientBodyKey.trim()
   }
-  const envKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || process.env.VITE_GEMINI_API_KEY || ""
+  const envKey =
+    process.env.GEMINI_API_KEY ||
+    process.env.VITE_GEMINI_API_KEY ||
+    process.env.GOOGLE_API_KEY ||
+    process.env.API_KEY ||
+    ""
   return envKey.trim()
 }
 
@@ -162,8 +167,11 @@ export async function processGeminiApiRequest(params: {
       [
         payload.model,
         "gemini-3.1-flash-lite",
+        "gemini-3.8-flash",
+        "gemini-2.5-flash-lite",
         "gemini-3-flash-preview",
         "gemini-flash-latest",
+        "gemini-1.5-flash",
       ].filter((m): m is string => Boolean(m && typeof m === "string" && m.trim())),
     ),
   )
