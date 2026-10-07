@@ -495,7 +495,7 @@ export function MPIButton({
   return (
     <button
       disabled={disabled || isLoading}
-      className={`inline-flex items-center justify-center font-semibold transition-all cursor-pointer disabled:opacity-50 disabled:pointer-events-none ${
+      className={`inline-flex items-center justify-center font-semibold transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] cursor-pointer disabled:opacity-50 disabled:pointer-events-none ${
         fullWidth ? "w-full" : ""
       } ${sizeClasses[size]} ${variantClasses[variant]} ${className}`}
       {...props}

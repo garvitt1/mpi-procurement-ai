@@ -1076,66 +1076,66 @@ export default function Home({ navigate }: NavProps) {
       </section>
 
       {/* ─── 4. ECOSYSTEM METRICS STRIP ────────────────────────────────────────── */}
-      <section className="bg-white border-b border-slate-200 py-8 scroll-reveal">
+      <section className="bg-white border-b border-slate-200/90 py-10 scroll-reveal">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-            <div className="space-y-1">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            <div className="group bg-slate-50/50 hover:bg-white rounded-2xl p-5 border border-slate-200/70 hover:border-slate-300 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 text-center space-y-1.5">
               <div
-                className="text-2xl sm:text-3xl font-extrabold text-[#0B1F4B] tracking-tight"
+                className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0B1F4B] tracking-tight group-hover:scale-105 transition-transform duration-300"
                 style={{ fontFamily: "Plus Jakarta Sans" }}
               >
                 ₹48.6 Cr+
               </div>
-              <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+              <div className="text-xs font-bold text-slate-600 uppercase tracking-wider">
                 Total Sourced Volume
               </div>
-              <div className="text-[11px] text-emerald-600 font-medium">
-                Across 18 States
+              <div className="inline-flex items-center gap-1 text-[11px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md font-semibold border border-emerald-200/50">
+                <span>Across 18 States</span>
               </div>
             </div>
 
-            <div className="space-y-1">
+            <div className="group bg-slate-50/50 hover:bg-white rounded-2xl p-5 border border-slate-200/70 hover:border-slate-300 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 text-center space-y-1.5">
               <div
-                className="text-2xl sm:text-3xl font-extrabold text-[#0B1F4B] tracking-tight"
+                className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0B1F4B] tracking-tight group-hover:scale-105 transition-transform duration-300"
                 style={{ fontFamily: "Plus Jakarta Sans" }}
               >
                 1,240+
               </div>
-              <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+              <div className="text-xs font-bold text-slate-600 uppercase tracking-wider">
                 Verified MSME Suppliers
               </div>
-              <div className="text-[11px] text-blue-600 font-medium">
-                100% Udyam & GST Audited
+              <div className="inline-flex items-center gap-1 text-[11px] text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md font-semibold border border-blue-200/50">
+                <span>100% Udyam & GST Audited</span>
               </div>
             </div>
 
-            <div className="space-y-1">
+            <div className="group bg-slate-50/50 hover:bg-white rounded-2xl p-5 border border-slate-200/70 hover:border-orange-200 hover:shadow-lg hover:shadow-orange-500/5 transition-all duration-300 hover:-translate-y-1 text-center space-y-1.5">
               <div
-                className="text-2xl sm:text-3xl font-extrabold text-[#F97316] tracking-tight"
+                className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#F97316] tracking-tight group-hover:scale-105 transition-transform duration-300"
                 style={{ fontFamily: "Plus Jakarta Sans" }}
               >
                 38.4%
               </div>
-              <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+              <div className="text-xs font-bold text-slate-600 uppercase tracking-wider">
                 Average Landed Savings
               </div>
-              <div className="text-[11px] text-slate-600 font-medium">
-                Via Reverse Margin AI
+              <div className="inline-flex items-center gap-1 text-[11px] text-orange-700 bg-orange-50 px-2 py-0.5 rounded-md font-semibold border border-orange-200/50">
+                <span>Via Reverse Margin AI</span>
               </div>
             </div>
 
-            <div className="space-y-1">
+            <div className="group bg-slate-50/50 hover:bg-white rounded-2xl p-5 border border-slate-200/70 hover:border-slate-300 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 text-center space-y-1.5">
               <div
-                className="text-2xl sm:text-3xl font-extrabold text-[#0B1F4B] tracking-tight"
+                className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0B1F4B] tracking-tight group-hover:scale-105 transition-transform duration-300"
                 style={{ fontFamily: "Plus Jakarta Sans" }}
               >
                 99.4%
               </div>
-              <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+              <div className="text-xs font-bold text-slate-600 uppercase tracking-wider">
                 On-Time Delivery SLA
               </div>
-              <div className="text-[11px] text-emerald-600 font-medium">
-                Escrow-backed Milestones
+              <div className="inline-flex items-center gap-1 text-[11px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md font-semibold border border-emerald-200/50">
+                <span>Escrow-backed Milestones</span>
               </div>
             </div>
           </div>

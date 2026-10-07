@@ -220,10 +220,10 @@ export default function GlobalNavBar({
   return (
     <nav
       aria-label="Universal Site Navigation"
-      className={`w-full z-40 transition-colors border-b select-none ${
+      className={`sticky top-0 w-full z-40 transition-all duration-300 border-b select-none ${
         variant === "navy"
-          ? "bg-[#0B1F4B] text-white border-[#123B7A]"
-          : "bg-white/95 text-slate-800 border-slate-200/90 shadow-2xs backdrop-blur-md"
+          ? "bg-[#0B1F4B]/95 backdrop-blur-xl text-white border-[#123B7A] shadow-[0_4px_24px_-4px_rgba(11,31,75,0.2)]"
+          : "bg-white/90 backdrop-blur-xl text-slate-800 border-slate-200/80 shadow-[0_4px_20px_-4px_rgba(11,31,75,0.06)]"
       } ${className}`}
     >
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
