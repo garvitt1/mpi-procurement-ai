@@ -18,6 +18,7 @@ import AuthModal from "../components/auth/AuthModal"
 import LanguageTranslatorButton from "../components/navigation/LanguageTranslatorButton"
 import ProductCatalogue from "../components/catalogue/ProductCatalogue"
 import useScrollReveal from "../hooks/useScrollReveal"
+import MaterialIcon from "../components/ui/MaterialIcon"
 
 export function formatScopeDisplay(category: CatalogCategory, qty: number): string {
   if (category === "Packaging & Printing") {
@@ -755,7 +756,11 @@ export default function Home({ navigate }: NavProps) {
               </div>
 
               {/* 2. Main Conversational AI Input Box */}
-              <div className="relative rounded-2xl border border-slate-200 bg-white shadow-xs focus-within:border-[#F97316] focus-within:ring-4 focus-within:ring-orange-100/70 transition-all">
+              <div className="relative rounded-2xl border border-slate-200 bg-white shadow-xs focus-within:border-[#F97316] focus-within:ring-4 focus-within:ring-orange-100/70 transition-all overflow-hidden">
+                {/* Animated Beam Scan during live AI extraction */}
+                {isExtractingSpecs && (
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#F97316] to-transparent animate-[beam-scan_1.4s_infinite] z-20" />
+                )}
                 {/* Input area */}
                 <div className="p-4 sm:p-5">
                   <div className="flex items-start gap-3">
@@ -911,25 +916,25 @@ export default function Home({ navigate }: NavProps) {
                       title: "Rigid Skincare Boxes",
                       category: "Packaging & Printing",
                       text: "Need 500 custom rigid printed boxes for our D2C organic skincare launch by next month, budget under ₹80k with EVA foam inserts",
-                      icon: "📦",
+                      iconName: "inventory_2",
                     },
                     {
                       title: "Rapid SLS Prototyping",
                       category: "Prototyping & Product",
                       text: "Require 50 units SLS 3D printed nylon PA12 enclosure prototypes with CNC milled aluminium plates within 10 days, budget ₹65k",
-                      icon: "⚙️",
+                      iconName: "precision_manufacturing",
                     },
                     {
                       title: "Cloud ERP & Supabase",
                       category: "IT & Digital Services",
                       text: "Need an agency to set up custom ERP inventory workflow and Supabase database integration for 100 users, budget ₹1.8 Lakh",
-                      icon: "💻",
+                      iconName: "dns",
                     },
                     {
                       title: "DPIIT Seed Compliance",
                       category: "Specialized Startup",
                       text: "Need specialized startup support for DPIIT seed fund compliance, MSME incubation readiness, and go-to-market mentorship, budget ₹50k",
-                      icon: "📜",
+                      iconName: "verified_user",
                     },
                   ].map((example) => (
                     <button
@@ -939,18 +944,20 @@ export default function Home({ navigate }: NavProps) {
                         setRequirementText(example.text)
                         handleGenerateSpecs(example.text)
                       }}
-                      className="p-3.5 rounded-2xl bg-slate-50/80 hover:bg-white border border-slate-200/90 hover:border-orange-300 hover:shadow-sm text-left transition-all cursor-pointer flex flex-col justify-between group h-28"
+                      className="p-3.5 rounded-2xl bg-white/80 hover:bg-white border border-slate-200/90 hover:border-orange-300 hover:shadow-md text-left transition-all duration-200 hover:-translate-y-1 cursor-pointer flex flex-col justify-between group h-28 select-none"
                     >
                       <div>
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-base">{example.icon}</span>
-                          <span className="text-[10px] text-slate-400 font-semibold group-hover:text-[#F97316]">Use →</span>
+                        <div className="flex items-center justify-between mb-1.5">
+                          <div className="w-7 h-7 rounded-lg bg-slate-100 group-hover:bg-orange-50 text-slate-600 group-hover:text-[#F97316] flex items-center justify-center transition-colors">
+                            <MaterialIcon name={example.iconName} size={16} />
+                          </div>
+                          <span className="text-[10px] text-slate-400 font-bold group-hover:text-[#F97316] transition-colors">Use →</span>
                         </div>
-                        <p className="text-xs font-bold text-slate-800 leading-snug group-hover:text-[#F97316]">
+                        <p className="text-xs font-bold text-slate-800 leading-snug group-hover:text-[#F97316] transition-colors">
                           {example.title}
                         </p>
                       </div>
-                      <span className="text-[10px] text-slate-400 truncate font-medium">
+                      <span className="text-[10px] text-slate-400 truncate font-semibold">
                         {example.category}
                       </span>
                     </button>

@@ -29,8 +29,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       style={style}
       className={`group relative bg-white rounded-3xl border transition-all duration-300 ease-out flex flex-col justify-between overflow-hidden select-none shrink-0 ${
         isCenter
-          ? "border-slate-300 shadow-[0_20px_40px_-15px_rgba(11,31,75,0.14)] ring-2 ring-[#0B1F4B]/10"
-          : "border-slate-200/90 shadow-[0_8px_20px_-6px_rgba(11,31,75,0.06)] hover:border-slate-300 hover:shadow-[0_16px_32px_-8px_rgba(11,31,75,0.12)] hover:-translate-y-1"
+          ? "border-slate-300 shadow-[0_24px_48px_-12px_rgba(11,31,75,0.18)] ring-2 ring-[#0B1F4B]/15"
+          : "border-slate-200/90 shadow-[0_8px_24px_-6px_rgba(11,31,75,0.06)] hover:border-slate-300 hover:shadow-[0_20px_40px_-8px_rgba(11,31,75,0.14)] hover:-translate-y-1.5"
       } ${className}`}
     >
       {/* Top Media Image Container */}
@@ -48,7 +48,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             alt={product.name}
             loading="lazy"
             onError={() => setImageError(true)}
-            className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+            className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-108 will-change-transform"
           />
         )}
 

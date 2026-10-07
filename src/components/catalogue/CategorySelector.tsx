@@ -46,15 +46,15 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
               aria-controls={`panel-${cat.id}`}
               disabled={disabled}
               onClick={() => handleSelect(cat.id)}
-              className={`group relative shrink-0 text-left rounded-2xl px-4 py-3.5 transition-all duration-300 cursor-pointer snap-start select-none border ${
+              className={`group relative shrink-0 text-left rounded-2xl px-4 py-3.5 transition-all duration-200 cursor-pointer snap-start select-none border ${
                 isActive
-                  ? "bg-[#0B1F4B] border-[#0B1F4B] text-white shadow-[0_12px_24px_-8px_rgba(11,31,75,0.35)] scale-[1.01]"
-                  : "bg-white hover:bg-slate-50/80 border-slate-200 text-slate-800 hover:border-slate-300 shadow-2xs"
+                  ? "bg-[#0B1F4B] border-[#0B1F4B] text-white shadow-[0_14px_28px_-8px_rgba(11,31,75,0.4)] scale-[1.01] ring-1 ring-white/20"
+                  : "bg-white hover:bg-slate-50 border-slate-200 text-slate-800 hover:border-slate-300 hover:-translate-y-0.5 shadow-2xs hover:shadow-xs"
               } min-w-[210px] sm:min-w-[240px] max-w-[280px] flex flex-col justify-between`}
             >
               {/* Active Orange Accent Pill at Top Right */}
               {isActive && (
-                <span className="absolute top-3 right-3 w-2 h-2 rounded-full bg-[#F97316] ring-4 ring-orange-400/20 animate-pulse" />
+                <span className="absolute top-3.5 right-3.5 w-2.5 h-2.5 rounded-full bg-[#F97316] ring-4 ring-orange-400/30 animate-pulse" />
               )}
 
               <div>
