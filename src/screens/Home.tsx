@@ -46,7 +46,12 @@ export function formatScopeDisplay(category: CatalogCategory, qty: number): stri
   return qty > 0 ? `${qty.toLocaleString("en-IN")} units` : "1 Mandate"
 }
 
-export default function Home({ navigate }: NavProps) {
+export default function Home({
+  navigate,
+  goBack = () => {},
+  currentScreen = "home",
+  canGoBack = false,
+}: NavProps) {
   const {
     requirementText,
     setRequirementText,
