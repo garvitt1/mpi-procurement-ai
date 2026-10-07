@@ -1,8 +1,9 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { Screen, NavProps } from "../../App"
 import { MPILogo } from "../shared"
-import { Icons } from "../design-system/MPIDesignSystem"
+import { Icons, MPIButton } from "../design-system/MPIDesignSystem"
 import LanguageTranslatorButton from "./LanguageTranslatorButton"
+import MaterialIcon from "../ui/MaterialIcon"
 
 export interface BreadcrumbCrumb {
   label: string
@@ -191,17 +192,27 @@ export default function GlobalNavBar({
   className = "",
 }: GlobalNavBarProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [isScrolled, setIsScrolled] = useState(false)
   const crumbs = getScreenBreadcrumbs(currentScreen)
   const isHomeScreen = currentScreen === "home" || currentScreen === "landing"
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 24)
+    }
+    window.addEventListener("scroll", handleScroll, { passive: true })
+    handleScroll()
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
+
   // Quick navigation items for core platforms (respecting role privacy between Startup & MSME)
-  const navHubs: { label: string; screen: Screen; icon: string; badge?: string }[] = [
-    { label: "Home", screen: "home", icon: "🏠" },
-    ...(currentScreen.startsWith("msme.") ? [] : [{ label: "Startup Hub", screen: "startup.home" as Screen, icon: "🚀", badge: "Buyers" }]),
-    ...(currentScreen.startsWith("startup.") ? [] : [{ label: "MSME Portal", screen: "msme.home" as Screen, icon: "🏭", badge: "Suppliers" }]),
-    { label: "Govt Schemes", screen: "government-schemes.match", icon: "📜", badge: "30 Schemes" },
-    { label: "Analytics Studio", screen: "analytics.detail.ai-insights", icon: "📊" },
-    { label: "Admin Portal", screen: "admin.home", icon: "🛡️" },
+  const navHubs: { label: string; screen: Screen; iconName: string; badge?: string }[] = [
+    { label: "Home", screen: "home", iconName: "home" },
+    ...(currentScreen.startsWith("msme.") ? [] : [{ label: "Startup Hub", screen: "startup.home" as Screen, iconName: "rocket_launch", badge: "Buyers" }]),
+    ...(currentScreen.startsWith("startup.") ? [] : [{ label: "MSME Portal", screen: "msme.home" as Screen, iconName: "precision_manufacturing", badge: "Suppliers" }]),
+    { label: "Govt Schemes", screen: "government-schemes.match", iconName: "policy", badge: "30 Schemes" },
+    { label: "Analytics Studio", screen: "analytics.detail.ai-insights", iconName: "insights" },
+    { label: "Admin Portal", screen: "admin.home", iconName: "admin_panel_settings" },
   ]
 
   const isCurrentHub = (screen: Screen) => {
@@ -222,14 +233,22 @@ export default function GlobalNavBar({
       aria-label="Universal Site Navigation"
       className={`sticky top-0 w-full z-40 transition-all duration-300 border-b select-none ${
         variant === "navy"
-          ? "bg-[#0B1F4B]/95 backdrop-blur-xl text-white border-[#123B7A] shadow-[0_4px_24px_-4px_rgba(11,31,75,0.2)]"
-          : "bg-white/90 backdrop-blur-xl text-slate-800 border-slate-200/80 shadow-[0_4px_20px_-4px_rgba(11,31,75,0.06)]"
+          ? isScrolled
+            ? "bg-[#0B1F4B]/95 backdrop-blur-xl text-white border-[#123B7A] shadow-[0_12px_36px_-6px_rgba(11,31,75,0.4)]"
+            : "bg-[#0B1F4B] text-white border-transparent"
+          : isScrolled
+          ? "bg-white/92 backdrop-blur-xl text-slate-800 border-slate-200/90 shadow-[0_10px_30px_-10px_rgba(11,31,75,0.08)]"
+          : "bg-white/80 backdrop-blur-md text-slate-800 border-slate-200/50"
       } ${className}`}
     >
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-14 sm:h-16 gap-2 sm:gap-4">
+        <div
+          className={`flex items-center justify-between transition-all duration-300 gap-2 sm:gap-4 ${
+            isScrolled ? "h-14 sm:h-15" : "h-16 sm:h-18"
+          }`}
+        >
           {/* Left section: Logo + Back button + Breadcrumb Trail */}
-          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+          <div className="flex items-center gap-2 sm:gap-3.5 min-w-0">
             {/* Logo */}
             <button
               onClick={() => navigate("home")}
@@ -240,7 +259,11 @@ export default function GlobalNavBar({
             </button>
 
             {/* Separator */}
-            <div className={`h-5 w-px shrink-0 hidden sm:block ${variant === "navy" ? "bg-[#123B7A]" : "bg-slate-200"}`} />
+            <div
+              className={`h-5 w-px shrink-0 hidden sm:block ${
+                variant === "navy" ? "bg-[#123B7A]" : "bg-slate-200"
+              }`}
+            />
 
             {/* Prominent Back Button (if not on root home) */}
             {!isHomeScreen && (
@@ -249,7 +272,7 @@ export default function GlobalNavBar({
                 className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer shrink-0 border ${
                   variant === "navy"
                     ? "bg-[#123B7A]/70 hover:bg-[#123B7A] text-slate-200 hover:text-white border-blue-400/30"
-                    : "bg-slate-100 hover:bg-slate-200/90 text-slate-700 hover:text-slate-900 border-slate-200"
+                    : "bg-slate-100 hover:bg-slate-200/90 text-slate-700 hover:text-slate-900 border-slate-200 shadow-2xs hover:-translate-y-0.5"
                 }`}
                 title="Go to previous page"
               >
@@ -259,49 +282,90 @@ export default function GlobalNavBar({
               </button>
             )}
 
-            {/* Interactive Clickable Breadcrumbs */}
-            <div className="flex items-center gap-1 text-xs overflow-x-auto no-scrollbar py-1">
-              {crumbs.map((crumb, idx) => {
-                const isLast = idx === crumbs.length - 1
-                return (
-                  <React.Fragment key={idx}>
-                    {idx > 0 && (
-                      <span className={`text-[10px] shrink-0 ${variant === "navy" ? "text-slate-400" : "text-slate-400"}`}>
-                        /
-                      </span>
-                    )}
-                    {isLast ? (
-                      <span
-                        className={`font-bold truncate max-w-[140px] sm:max-w-[220px] ${
-                          variant === "navy" ? "text-orange-400" : "text-[#0B1F4B]"
-                        }`}
-                        title={crumb.label}
-                      >
-                        {crumb.label}
-                      </span>
-                    ) : (
-                      <button
-                        onClick={() => crumb.screen && navigate(crumb.screen)}
-                        className={`truncate max-w-[100px] sm:max-w-[160px] font-medium transition-colors cursor-pointer hover:underline ${
-                          variant === "navy"
-                            ? "text-slate-300 hover:text-white"
-                            : "text-slate-500 hover:text-slate-900"
-                        }`}
-                        title={`Go to ${crumb.label}`}
-                      >
-                        {crumb.label}
-                      </button>
-                    )}
-                  </React.Fragment>
-                )
-              })}
-            </div>
+            {/* Interactive Clickable Breadcrumbs (in Sub-portals) */}
+            {!isHomeScreen ? (
+              <div className="flex items-center gap-1 text-xs overflow-x-auto no-scrollbar py-1">
+                {crumbs.map((crumb, idx) => {
+                  const isLast = idx === crumbs.length - 1
+                  return (
+                    <React.Fragment key={idx}>
+                      {idx > 0 && (
+                        <span
+                          className={`text-[10px] shrink-0 ${
+                            variant === "navy" ? "text-slate-400" : "text-slate-400"
+                          }`}
+                        >
+                          /
+                        </span>
+                      )}
+                      {isLast ? (
+                        <span
+                          className={`font-bold truncate max-w-[140px] sm:max-w-[220px] ${
+                            variant === "navy" ? "text-orange-400" : "text-[#0B1F4B]"
+                          }`}
+                          title={crumb.label}
+                        >
+                          {crumb.label}
+                        </span>
+                      ) : (
+                        <button
+                          onClick={() => crumb.screen && navigate(crumb.screen)}
+                          className={`truncate max-w-[100px] sm:max-w-[160px] font-medium transition-colors cursor-pointer hover:underline ${
+                            variant === "navy"
+                              ? "text-slate-300 hover:text-white"
+                              : "text-slate-500 hover:text-slate-900"
+                          }`}
+                          title={`Go to ${crumb.label}`}
+                        >
+                          {crumb.label}
+                        </button>
+                      )}
+                    </React.Fragment>
+                  )
+                })}
+              </div>
+            ) : (
+              /* Clean Solution Anchors (on Home Screen Desktop) */
+              <div className="hidden lg:flex items-center gap-5 text-xs font-semibold text-slate-600 pl-2">
+                <a
+                  href="#marketplace"
+                  className="hover:text-[#0B1F4B] transition-colors cursor-pointer flex items-center gap-1"
+                >
+                  <span>Catalogue</span>
+                </a>
+                <a
+                  href="#how-it-works"
+                  className="hover:text-[#0B1F4B] transition-colors cursor-pointer"
+                >
+                  How It Works
+                </a>
+                <button
+                  onClick={() => navigate("startup.home")}
+                  className="hover:text-[#0B1F4B] transition-colors cursor-pointer"
+                >
+                  For Startups
+                </button>
+                <button
+                  onClick={() => navigate("msme.home")}
+                  className="hover:text-[#0B1F4B] transition-colors cursor-pointer"
+                >
+                  For MSMEs
+                </button>
+                <button
+                  onClick={() => navigate("government-schemes.match")}
+                  className="hover:text-[#0B1F4B] transition-colors cursor-pointer flex items-center gap-1 text-[#0B1F4B]"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                  <span>30 Govt Schemes</span>
+                </button>
+              </div>
+            )}
           </div>
 
-          {/* Right section: Core Hub Switcher Links & Mobile Toggle */}
-          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-            {/* Desktop Hub Links */}
-            {showQuickLinks && (
+          {/* Right section: Hub Links, Translator & Action CTA Buttons */}
+          <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+            {/* Desktop Hub Links (inside Sub-portals) */}
+            {!isHomeScreen && showQuickLinks && (
               <div className="hidden xl:flex items-center gap-1">
                 {navHubs.map((hub) => {
                   const active = isCurrentHub(hub.screen)
@@ -309,7 +373,7 @@ export default function GlobalNavBar({
                     <button
                       key={hub.screen}
                       onClick={() => navigate(hub.screen)}
-                      className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                      className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 cursor-pointer ${
                         active
                           ? variant === "navy"
                             ? "bg-[#F97316] text-white shadow-xs"
@@ -319,7 +383,7 @@ export default function GlobalNavBar({
                           : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
                       }`}
                     >
-                      <span className="text-xs">{hub.icon}</span>
+                      <MaterialIcon name={hub.iconName} size={15} />
                       <span>{hub.label}</span>
                       {hub.badge && !active && (
                         <span
@@ -341,44 +405,65 @@ export default function GlobalNavBar({
             {/* Global Language Translator Button (Globe + EN) */}
             <LanguageTranslatorButton variant={variant === "navy" ? "navy" : "default"} />
 
-            {/* Quick Hub Switcher Dropdown (for Large/Medium screens) */}
-            <div className="hidden sm:flex xl:hidden items-center">
-              <select
-                aria-label="Switch Hub"
-                value={
-                  isHomeScreen
-                    ? "home"
-                    : currentScreen.startsWith("startup.")
-                    ? "startup.home"
-                    : currentScreen.startsWith("msme.")
-                    ? "msme.home"
-                    : currentScreen.startsWith("government-schemes.")
-                    ? "government-schemes.match"
-                    : currentScreen.startsWith("analytics.")
-                    ? "analytics.detail.ai-insights"
-                    : currentScreen.startsWith("admin.")
-                    ? "admin.home"
-                    : "home"
-                }
-                onChange={(e) => navigate(e.target.value as Screen)}
-                className={`text-xs font-semibold px-2.5 py-1.5 rounded-lg border cursor-pointer focus:outline-none focus:ring-2 focus:ring-orange-400 ${
-                  variant === "navy"
-                    ? "bg-[#123B7A] text-white border-blue-400/30"
-                    : "bg-slate-100 text-slate-800 border-slate-200"
-                }`}
-              >
-                <option value="home">🏠 Home Marketplace</option>
-                {!currentScreen.startsWith("msme.") && (
-                  <option value="startup.home">🚀 Startup Hub (Buyer)</option>
-                )}
-                {!currentScreen.startsWith("startup.") && (
-                  <option value="msme.home">🏭 MSME Portal (Supplier)</option>
-                )}
-                <option value="government-schemes.match">📜 Government Schemes (30)</option>
-                <option value="analytics.detail.ai-insights">📊 Analytics Studio</option>
-                <option value="admin.home">🛡️ Admin Portal</option>
-              </select>
-            </div>
+            {/* Direct High-Intent Action CTAs */}
+            {isHomeScreen ? (
+              <div className="hidden sm:flex items-center gap-2">
+                <MPIButton
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => navigate("login.startup")}
+                >
+                  Sign In
+                </MPIButton>
+                <MPIButton
+                  variant="primary"
+                  size="sm"
+                  onClick={() => navigate("startup.procurement")}
+                  icon={<Icons.Sparkles className="w-3.5 h-3.5 text-amber-300" />}
+                >
+                  Launch Procurement
+                </MPIButton>
+              </div>
+            ) : (
+              /* Hub Switcher Dropdown for non-home pages */
+              <div className="hidden sm:flex xl:hidden items-center">
+                <select
+                  aria-label="Switch Hub"
+                  value={
+                    isHomeScreen
+                      ? "home"
+                      : currentScreen.startsWith("startup.")
+                      ? "startup.home"
+                      : currentScreen.startsWith("msme.")
+                      ? "msme.home"
+                      : currentScreen.startsWith("government-schemes.")
+                      ? "government-schemes.match"
+                      : currentScreen.startsWith("analytics.")
+                      ? "analytics.detail.ai-insights"
+                      : currentScreen.startsWith("admin.")
+                      ? "admin.home"
+                      : "home"
+                  }
+                  onChange={(e) => navigate(e.target.value as Screen)}
+                  className={`text-xs font-semibold px-2.5 py-1.5 rounded-lg border cursor-pointer focus:outline-none focus:ring-2 focus:ring-orange-400 ${
+                    variant === "navy"
+                      ? "bg-[#123B7A] text-white border-blue-400/30"
+                      : "bg-slate-100 text-slate-800 border-slate-200"
+                  }`}
+                >
+                  <option value="home">Home Marketplace</option>
+                  {!currentScreen.startsWith("msme.") && (
+                    <option value="startup.home">Startup Hub (Buyer)</option>
+                  )}
+                  {!currentScreen.startsWith("startup.") && (
+                    <option value="msme.home">MSME Portal (Supplier)</option>
+                  )}
+                  <option value="government-schemes.match">Government Schemes (30)</option>
+                  <option value="analytics.detail.ai-insights">Analytics Studio</option>
+                  <option value="admin.home">Admin Portal</option>
+                </select>
+              </div>
+            )}
 
             {/* Mobile Menu Hamburger Button */}
             <button
@@ -391,11 +476,25 @@ export default function GlobalNavBar({
               aria-label="Toggle navigation menu"
             >
               {mobileMenuOpen ? (
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
                   <path d="M18 6L6 18M6 6l12 12" />
                 </svg>
               ) : (
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
                   <path d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
               )}
@@ -407,14 +506,14 @@ export default function GlobalNavBar({
       {/* Mobile Menu Dropdown Drawer */}
       {mobileMenuOpen && (
         <div
-          className={`sm:hidden border-t px-4 py-3 space-y-1.5 ${
+          className={`sm:hidden border-t px-4 py-4 space-y-2 animate-fade-in ${
             variant === "navy"
               ? "bg-[#071534] border-[#123B7A]"
-              : "bg-slate-50 border-slate-200"
+              : "bg-white border-slate-200 shadow-xl"
           }`}
         >
           <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">
-            Switch Page or Portal
+            Navigation & Platform Portals
           </div>
           {navHubs.map((hub) => {
             const active = isCurrentHub(hub.screen)
@@ -425,26 +524,53 @@ export default function GlobalNavBar({
                   navigate(hub.screen)
                   setMobileMenuOpen(false)
                 }}
-                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold cursor-pointer ${
+                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold cursor-pointer transition-colors ${
                   active
-                    ? "bg-[#F97316] text-white"
+                    ? "bg-[#0B1F4B] text-white"
                     : variant === "navy"
                     ? "text-slate-200 hover:bg-[#123B7A]"
-                    : "text-slate-700 hover:bg-slate-200/70"
+                    : "text-slate-700 hover:bg-slate-100"
                 }`}
               >
-                <div className="flex items-center gap-2">
-                  <span>{hub.icon}</span>
+                <div className="flex items-center gap-2.5">
+                  <MaterialIcon name={hub.iconName} size={16} />
                   <span>{hub.label}</span>
                 </div>
                 {hub.badge && (
-                  <span className="text-[10px] bg-black/20 px-1.5 py-0.5 rounded text-white/90">
+                  <span className="text-[10px] bg-slate-100 text-slate-700 px-2 py-0.5 rounded-md font-bold">
                     {hub.badge}
                   </span>
                 )}
               </button>
             )
           })}
+
+          {/* Direct CTA on Mobile */}
+          <div className="pt-2 border-t border-slate-100 flex flex-col gap-2">
+            <MPIButton
+              variant="primary"
+              size="sm"
+              fullWidth
+              onClick={() => {
+                navigate("startup.procurement")
+                setMobileMenuOpen(false)
+              }}
+              icon={<Icons.Sparkles className="w-3.5 h-3.5 text-amber-300" />}
+            >
+              Launch MPI Procurement Support
+            </MPIButton>
+            <MPIButton
+              variant="outline"
+              size="sm"
+              fullWidth
+              onClick={() => {
+                navigate("login.startup")
+                setMobileMenuOpen(false)
+              }}
+            >
+              Sign In
+            </MPIButton>
+          </div>
         </div>
       )}
     </nav>

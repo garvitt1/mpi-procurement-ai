@@ -16,6 +16,7 @@ import {
 import { hasLiveAIConfigured, type ExtractedProcurementSpecs } from "../services/aiService"
 import AuthModal from "../components/auth/AuthModal"
 import LanguageTranslatorButton from "../components/navigation/LanguageTranslatorButton"
+import GlobalNavBar from "../components/navigation/GlobalNavBar"
 import ProductCatalogue from "../components/catalogue/ProductCatalogue"
 import useScrollReveal from "../hooks/useScrollReveal"
 import MaterialIcon from "../components/ui/MaterialIcon"
@@ -380,273 +381,13 @@ export default function Home({ navigate }: NavProps) {
         </div>
       </div>
 
-      {/* ─── 2. MAIN NAVIGATION ──────────────────────────────────────────────── */}
-      <nav className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-2xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between gap-4">
-          {/* Logo & Tagline */}
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => navigate("home")}
-              className="flex items-center gap-2.5 text-left group cursor-pointer"
-            >
-              <div className="w-10 h-10 rounded-xl bg-[#0B1F4B] text-white flex items-center justify-center font-bold shadow-sm group-hover:scale-105 transition-transform">
-                <svg
-                  width="22"
-                  height="22"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.4"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M4 14L8 8L12 12L16 6L20 14" />
-                  <circle cx="12" cy="4" r="1.5" fill="currentColor" />
-                </svg>
-              </div>
-              <div className="flex flex-col">
-                <span
-                  className="font-extrabold text-2xl tracking-tight text-[#0B1F4B] leading-none"
-                  style={{ fontFamily: "Plus Jakarta Sans" }}
-                >
-                  MPI
-                </span>
-                <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest mt-1 hidden sm:inline">
-                  Market Procurement Intelligence
-                </span>
-              </div>
-            </button>
-          </div>
-
-          {/* Desktop Navigation Links */}
-          <div className="hidden lg:flex items-center gap-7 text-sm font-semibold text-slate-700">
-            <a
-              href="#marketplace"
-              onClick={() => setIsCatalogExpanded(true)}
-              className="hover:text-[#0B1F4B] transition-colors"
-            >
-              MPI Catalogue
-            </a>
-            <a
-              href="#government-schemes"
-              className="hover:text-[#0B1F4B] transition-colors"
-            >
-              Government Schemes
-            </a>
-            <button
-              onClick={() => navigate("analytics.detail.ai-insights")}
-              className="hover:text-[#0B1F4B] transition-colors text-slate-600 cursor-pointer"
-            >
-              Analytics Studio
-            </button>
-          </div>
-
-          {/* CTA Buttons - Language Translator, Login & Sign In (Google Auth) & Start Procurement */}
-          <div className="hidden md:flex items-center gap-2.5">
-            {/* Language Translator Button (Matching User's Reference: Globe + EN) */}
-            <LanguageTranslatorButton variant="default" />
-
-            <button
-              onClick={() => setAuthModal({ open: true, mode: "login" })}
-              className="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-[#0B1F4B] hover:bg-slate-100 transition-all cursor-pointer"
-            >
-              Login
-            </button>
-            <button
-              onClick={() => setAuthModal({ open: true, mode: "signin" })}
-              className="group flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold text-[#0B1F4B] bg-white hover:bg-slate-50 border border-slate-200 hover:border-slate-300 shadow-2xs hover:shadow-xs transition-all cursor-pointer"
-            >
-              <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24">
-                <path
-                  fill="#4285F4"
-                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                />
-                <path
-                  fill="#34A853"
-                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                />
-                <path
-                  fill="#FBBC05"
-                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
-                />
-                <path
-                  fill="#EA4335"
-                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
-                />
-              </svg>
-              <span>Sign In</span>
-            </button>
-            <button
-              onClick={() => navigate("startup.procurement")}
-              className="group flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-white bg-linear-to-r from-[#0B1F4B] via-[#0F2D6B] to-[#123B7A] hover:from-[#0F2D6B] hover:to-[#174691] shadow-xs hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 transition-all cursor-pointer border border-blue-800/40"
-            >
-              <Icons.Sparkles className="w-3.5 h-3.5 text-amber-300 group-hover:rotate-12 transition-transform" />
-              <span>Start Procurement</span>
-            </button>
-          </div>
-
-          {/* Mobile Menu Hamburger */}
-          <div className="md:hidden flex items-center gap-2">
-            <LanguageTranslatorButton variant="default" />
-            <button
-              onClick={() => setAuthModal({ open: true, mode: "login" })}
-              className="px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50 cursor-pointer"
-            >
-              Login
-            </button>
-            <button
-              onClick={() => setAuthModal({ open: true, mode: "signin" })}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-blue-200 bg-blue-50/80 text-xs font-bold text-[#0B1F4B] cursor-pointer"
-            >
-              <svg className="w-3 h-3 shrink-0" viewBox="0 0 24 24">
-                <path
-                  fill="#4285F4"
-                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                />
-                <path
-                  fill="#34A853"
-                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                />
-                <path
-                  fill="#FBBC05"
-                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
-                />
-                <path
-                  fill="#EA4335"
-                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
-                />
-              </svg>
-              <span>Sign In</span>
-            </button>
-            <button
-              onClick={() => navigate("startup.procurement")}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#0B1F4B]/88 backdrop-blur-md border border-white/20 text-white text-xs font-bold shadow-[inset_0_1px_1px_rgba(255,255,255,0.22)] hover:bg-[#123B7A]/94 hover:border-white/35 transition-all cursor-pointer"
-            >
-              <Icons.Sparkles className="w-3 h-3 text-amber-300" />
-              <span>Start</span>
-            </button>
-            <button
-              onClick={() => setMobileMenuOpen((prev) => !prev)}
-              className="p-2 rounded-lg text-slate-700 hover:bg-slate-100 border border-slate-200"
-              aria-label="Toggle Navigation Menu"
-            >
-              {mobileMenuOpen ? (
-                <Icons.Close className="w-5 h-5" />
-              ) : (
-                <Icons.Menu className="w-5 h-5" />
-              )}
-            </button>
-          </div>
-        </div>
-
-        {/* Mobile Dropdown Menu */}
-        {mobileMenuOpen && (
-          <div className="md:hidden bg-white border-b border-slate-200 px-4 py-4 space-y-3 animate-fade-in shadow-lg">
-            <div className="flex flex-col space-y-2 text-sm font-semibold text-slate-800">
-              <a
-                href="#marketplace"
-                onClick={() => {
-                  setIsCatalogExpanded(true)
-                  setMobileMenuOpen(false)
-                }}
-                className="py-2 px-3 rounded-lg hover:bg-slate-50 flex items-center justify-between"
-              >
-                <span>MPI Catalogue</span>
-                <Icons.ArrowRight className="w-4 h-4 text-slate-400" />
-              </a>
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false)
-                  navigate("government-schemes.match")
-                }}
-                className="py-2 px-3 text-left rounded-lg hover:bg-slate-50 flex items-center justify-between cursor-pointer"
-              >
-                <div className="flex items-center gap-2">
-                  <span>📜</span>
-                  <span>Government Schemes</span>
-                </div>
-                <Icons.ArrowRight className="w-4 h-4 text-slate-400" />
-              </button>
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false)
-                  navigate("analytics.detail.ai-insights")
-                }}
-                className="py-2 px-3 text-left rounded-lg hover:bg-slate-50 flex items-center justify-between text-slate-700 cursor-pointer"
-              >
-                <div className="flex items-center gap-2">
-                  <span>📊</span>
-                  <span>Analytics Studio</span>
-                </div>
-                <Icons.ArrowRight className="w-4 h-4 text-slate-400" />
-              </button>
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false)
-                  navigate("login.admin")
-                }}
-                className="py-2 px-3 text-left rounded-lg hover:bg-slate-50 flex items-center justify-between text-slate-700 cursor-pointer"
-              >
-                <div className="flex items-center gap-2">
-                  <span>🛡️</span>
-                  <span>Admin Control Center</span>
-                </div>
-                <Icons.ArrowRight className="w-4 h-4 text-slate-400" />
-              </button>
-            </div>
-            <div className="pt-3 border-t border-slate-100 flex flex-col gap-2">
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  onClick={() => {
-                    setMobileMenuOpen(false)
-                    setAuthModal({ open: true, mode: "login" })
-                  }}
-                  className="w-full py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer text-center"
-                >
-                  Login
-                </button>
-                <button
-                  onClick={() => {
-                    setMobileMenuOpen(false)
-                    setAuthModal({ open: true, mode: "signin" })
-                  }}
-                  className="flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-blue-200 bg-blue-50/80 text-xs font-bold text-[#0B1F4B] hover:bg-blue-100 transition-colors cursor-pointer"
-                >
-                  <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24">
-                    <path
-                      fill="#4285F4"
-                      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                    />
-                    <path
-                      fill="#34A853"
-                      d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                    />
-                    <path
-                      fill="#FBBC05"
-                      d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
-                    />
-                    <path
-                      fill="#EA4335"
-                      d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
-                    />
-                  </svg>
-                  <span>Sign In</span>
-                </button>
-              </div>
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false)
-                  navigate("startup.procurement")
-                }}
-                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-linear-to-r from-[#0B1F4B] to-[#123B7A] text-white text-xs font-bold shadow-xs hover:shadow-md transition-all cursor-pointer"
-              >
-                <Icons.Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                <span>Start Procurement</span>
-              </button>
-            </div>
-          </div>
-        )}
-      </nav>
+      {/* ─── 2. GLOBAL ADAPTIVE NAVIGATION ──────────────────────────────────── */}
+      <GlobalNavBar
+        navigate={navigate}
+        goBack={goBack}
+        currentScreen={currentScreen}
+        canGoBack={canGoBack}
+      />
 
       {/* ─── 3. HERO SECTION WITH INTERACTIVE AI INTAKE SIMULATOR ──────────────── */}
       <section className="relative overflow-hidden pt-8 pb-14 lg:pt-12 lg:pb-20 bg-linear-to-b from-white via-slate-50 to-[#F7F9FC] border-b border-slate-200">
@@ -654,50 +395,29 @@ export default function Home({ navigate }: NavProps) {
         <div aria-hidden="true" className="pointer-events-none absolute -top-32 left-1/2 -translate-x-1/2 w-[800px] h-[450px] bg-gradient-to-tr from-blue-500/10 via-[#F97316]/5 to-transparent rounded-full blur-3xl animate-ambient-glow" />
 
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          {/* Top Block: Value Proposition (Centered above AI Engine) */}
-          <div className="max-w-4xl mx-auto text-center space-y-5 animate-fade-in">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-xs font-semibold text-[#0B1F4B] shadow-2xs hover:shadow-xs transition-shadow">
-              <Icons.Sparkles className="w-3.5 h-3.5 text-[#F97316]" />
-              <span>Next-Gen B2B Sourcing Infrastructure</span>
+          {/* Top Block: Value Proposition (Editorial & Authoritative) */}
+          <div className="max-w-4xl mx-auto text-center space-y-6 animate-fade-in">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50/90 border border-blue-200/80 text-xs font-bold text-[#0B1F4B] shadow-2xs hover:shadow-xs transition-all">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="tracking-wide text-[11px] sm:text-xs">DPIIT & MSME MINISTRY VERIFIED • NATIONAL SOURCING INFRASTRUCTURE</span>
             </div>
 
             <h1
-              className="text-xl sm:text-2xl md:text-3xl lg:text-[34px] xl:text-[38px] font-extrabold text-[#0B1F4B] tracking-tight leading-[1.25]"
+              className="text-2xl sm:text-3xl md:text-4xl lg:text-[42px] xl:text-[46px] font-extrabold text-[#0B1F4B] tracking-tight leading-[1.2]"
               style={{ fontFamily: "Plus Jakarta Sans" }}
             >
-              <span className="block whitespace-nowrap">
-                Your MPI Procurement Support from
-              </span>
-              <span className="block whitespace-nowrap mt-1">
-                <span className="text-[#F97316]">Plain Requirement</span> to Verified MSME Delivery.
+              The Operating System for{" "}
+              <span className="bg-gradient-to-r from-[#0B1F4B] via-[#123B7A] to-[#F97316] bg-clip-text text-transparent">
+                Intelligent Business Procurement.
               </span>
             </h1>
 
-            <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-2xl mx-auto">
-              Empowering Indian startups to source packaging, prototyping,
-              compliance, digital, and specialized services with
-              institutional-grade RFQ generation, real-time quote comparison,
-              and 100% verified MSME suppliers.
+            <p className="text-sm sm:text-base md:text-lg text-slate-600 leading-relaxed max-w-2xl mx-auto font-normal">
+              Transform plain requirement descriptions into verified factory deliveries. Empowering emerging Indian startups to source packaging, prototyping, compliance, and specialized manufacturing with programmatic RFQs, real-time quote comparison, and 100% audited MSME suppliers.
             </p>
 
-            {/* Trust Badges Bar */}
-            <div className="flex flex-wrap items-center justify-center gap-2.5 text-xs font-semibold text-slate-700">
-              <span className="inline-flex items-center gap-1.5 bg-white border border-slate-200/90 hover:border-blue-300 px-3 py-1.5 rounded-lg shadow-2xs hover:shadow-xs hover:-translate-y-0.5 transition-all duration-200 cursor-default">
-                <Icons.ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
-                Udyam Registered MSMEs
-              </span>
-              <span className="inline-flex items-center gap-1.5 bg-white border border-slate-200/90 hover:border-amber-300 px-3 py-1.5 rounded-lg shadow-2xs hover:shadow-xs hover:-translate-y-0.5 transition-all duration-200 cursor-default">
-                <Icons.Award className="w-3.5 h-3.5 text-amber-600" />
-                ZED & ISO Certified
-              </span>
-              <span className="inline-flex items-center gap-1.5 bg-blue-50/80 border border-blue-200/80 hover:border-orange-300 text-[#0B1F4B] px-3 py-1.5 rounded-lg font-bold shadow-2xs hover:shadow-xs hover:-translate-y-0.5 transition-all duration-200 cursor-default">
-                <Icons.Sparkles className="w-3.5 h-3.5 text-[#F97316]" />
-                Reverse Margin Verified
-              </span>
-            </div>
-
             {/* Direct Workspace Action Links */}
-            <div className="flex flex-wrap items-center justify-center gap-3.5 pt-1">
+            <div className="flex flex-wrap items-center justify-center gap-4 pt-1">
               <MPIButton
                 variant="primary"
                 size="lg"
@@ -713,6 +433,114 @@ export default function Home({ navigate }: NavProps) {
               >
                 Register as MSME Supplier
               </MPIButton>
+            </div>
+
+            {/* Living Procurement Network Visualizer (5-Node Flow) */}
+            <div className="pt-4 pb-1">
+              <div className="bg-white/90 backdrop-blur-md rounded-2xl border border-slate-200/90 p-4 sm:p-5 shadow-sm text-left">
+                <div className="flex items-center justify-between mb-3 border-b border-slate-100 pb-2.5">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-[#F97316] animate-ping" />
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-[#0B1F4B]">
+                      Procurement Intelligence Flow in Motion
+                    </span>
+                  </div>
+                  <span className="text-[11px] text-slate-400 font-medium hidden sm:inline">
+                    Live System Telemetry • 100% Verified
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-2.5">
+                  {/* Node 1 */}
+                  <div
+                    onClick={() => {
+                      setRequirementText(samplePrompts[0].text)
+                      setSelectedCategory(samplePrompts[0].cat)
+                    }}
+                    className="p-3 rounded-xl bg-slate-50/80 hover:bg-blue-50/50 border border-slate-200 hover:border-blue-300 transition-all cursor-pointer group hover:-translate-y-0.5"
+                  >
+                    <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 group-hover:text-blue-600">
+                      01 • Input
+                    </div>
+                    <div className="text-xs font-bold text-slate-900 mt-0.5">
+                      Plain Requirement
+                    </div>
+                    <div className="text-[11px] text-slate-500 mt-1 line-clamp-1">
+                      Text or Voice Specs
+                    </div>
+                  </div>
+
+                  {/* Node 2 */}
+                  <div
+                    onClick={() => {
+                      setRequirementText(samplePrompts[1].text)
+                      setSelectedCategory(samplePrompts[1].cat)
+                    }}
+                    className="p-3 rounded-xl bg-slate-50/80 hover:bg-orange-50/50 border border-slate-200 hover:border-orange-300 transition-all cursor-pointer group hover:-translate-y-0.5"
+                  >
+                    <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 group-hover:text-orange-600">
+                      02 • Synthesis
+                    </div>
+                    <div className="text-xs font-bold text-slate-900 mt-0.5">
+                      MPI AI Spec Engine
+                    </div>
+                    <div className="text-[11px] text-slate-500 mt-1 line-clamp-1">
+                      GSM, Tolerances, QA
+                    </div>
+                  </div>
+
+                  {/* Node 3 */}
+                  <div
+                    onClick={() => {
+                      const el = document.getElementById("marketplace")
+                      el?.scrollIntoView({ behavior: "smooth" })
+                    }}
+                    className="p-3 rounded-xl bg-slate-50/80 hover:bg-blue-50/50 border border-slate-200 hover:border-blue-300 transition-all cursor-pointer group hover:-translate-y-0.5"
+                  >
+                    <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 group-hover:text-blue-600">
+                      03 • Factory Fleet
+                    </div>
+                    <div className="text-xs font-bold text-slate-900 mt-0.5">
+                      1,240+ MSME Fleet
+                    </div>
+                    <div className="text-[11px] text-emerald-600 font-semibold mt-1 line-clamp-1">
+                      100% Udyam Audited
+                    </div>
+                  </div>
+
+                  {/* Node 4 */}
+                  <div
+                    onClick={() => navigate("startup.procurement")}
+                    className="p-3 rounded-xl bg-slate-50/80 hover:bg-amber-50/50 border border-slate-200 hover:border-amber-300 transition-all cursor-pointer group hover:-translate-y-0.5"
+                  >
+                    <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 group-hover:text-amber-600">
+                      04 • Pricing
+                    </div>
+                    <div className="text-xs font-bold text-slate-900 mt-0.5">
+                      Reverse-Margin
+                    </div>
+                    <div className="text-[11px] text-[#F97316] font-bold mt-1 line-clamp-1">
+                      -38.4% Net Savings
+                    </div>
+                  </div>
+
+                  {/* Node 5 */}
+                  <div
+                    onClick={() => navigate("startup.procurement")}
+                    className="p-3 rounded-xl bg-slate-50/80 hover:bg-emerald-50/50 border border-slate-200 hover:border-emerald-300 transition-all cursor-pointer group hover:-translate-y-0.5 col-span-2 md:col-span-1"
+                  >
+                    <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 group-hover:text-emerald-600">
+                      05 • Fulfilment
+                    </div>
+                    <div className="text-xs font-bold text-slate-900 mt-0.5">
+                      Escrow Delivery
+                    </div>
+                    <div className="text-[11px] text-emerald-700 font-medium mt-1 line-clamp-1">
+                      99.4% On-Time SLA
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -1140,6 +968,64 @@ export default function Home({ navigate }: NavProps) {
             </div>
           </div>
         </div>
+      </section>
+
+      {/* ─── 4. FLAGSHIP INTERACTIVE CATALOGUE (7-CATEGORY DISCOVERY RAIL) ───── */}
+      <section id="marketplace" className="py-14 bg-white border-b border-slate-200/90 scroll-mt-16 scroll-reveal">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest bg-blue-50 text-[#0B1F4B] border border-blue-200 mb-2.5">
+                <Icons.Sparkles className="w-3.5 h-3.5 text-[#F97316]" />
+                <span>Flagship Product & Service Discovery</span>
+              </div>
+              <h2
+                className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0B1F4B] tracking-tight"
+                style={{ fontFamily: "Plus Jakarta Sans" }}
+              >
+                7 Approved Sourcing Categories
+              </h2>
+              <p className="text-sm text-slate-600 mt-1 max-w-xl">
+                Browse 75+ vetted manufacturing lines, specialized startup services, and statutory scheme bundles with transparent reverse margins.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <span className="text-xs text-slate-500 font-semibold hidden sm:inline">
+                Drag, wheel, or click cards to inspect specs
+              </span>
+              <MPIButton
+                variant="outline"
+                size="sm"
+                onClick={() => navigate("startup.procurement")}
+                icon={<Icons.ArrowRight className="w-3.5 h-3.5" />}
+              >
+                Open Custom RFQ Builder
+              </MPIButton>
+            </div>
+          </div>
+        </div>
+
+        <ProductCatalogue
+          onQuoteProduct={(product) => {
+            setRequirementText(
+              `Need sourcing quotation for ${product.name} (${product.category}) for our upcoming batch launch.`
+            )
+            setSelectedCategory(product.category as CatalogCategory)
+            navigate("startup.procurement")
+          }}
+          onAskAI={(query, category) => {
+            if (query) setRequirementText(query)
+            if (category) setSelectedCategory(category as CatalogCategory)
+            const aiEl = document.getElementById("ai-procurement-engine")
+            if (aiEl) {
+              aiEl.scrollIntoView({ behavior: "smooth" })
+            } else {
+              navigate("startup.procurement")
+            }
+          }}
+          onExploreWorkspace={() => navigate("startup.procurement")}
+        />
       </section>
 
       {/* ─── DUAL PLATFORM WORKSPACE GATEWAYS (3D FLIPPING CARDS) ──────────────── */}
@@ -1671,84 +1557,7 @@ export default function Home({ navigate }: NavProps) {
         </div>
       </section>
 
-      {/* ─── 7. 7-CATEGORY MARKETPLACE EXPLORER ─────────────────────────────── */}
-      {/* ─── 7. 7-CATEGORY MARKETPLACE EXPLORER (PREMIUM HORIZONTAL SIDE-SCROLL EXPERIENCE) ─── */}
-      <div id="marketplace" className="scroll-mt-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-2">
-          {/* MPI Catalogue Trigger: Toggle button */}
-          <div className="flex items-center justify-between">
-            <button
-              type="button"
-              onClick={() => setIsCatalogExpanded((prev) => !prev)}
-              className="group inline-flex items-center gap-2.5 px-5 py-2 rounded-full font-bold text-xs uppercase tracking-widest bg-[#0B1F4B] hover:bg-[#123B7A] text-white shadow-sm hover:shadow-md transition-all cursor-pointer"
-            >
-              <span>MPI Catalogue</span>
-              <span
-                className={`text-[10px] transition-transform duration-200 font-mono ${
-                  isCatalogExpanded ? "rotate-180" : ""
-                }`}
-              >
-                ▼
-              </span>
-            </button>
-            <span className="text-xs text-slate-400 font-semibold hidden sm:inline">
-              7 Approved Categories • 75+ Vetted Offerings
-            </span>
-          </div>
-        </div>
 
-        {isCatalogExpanded ? (
-          <ProductCatalogue
-            onQuoteProduct={(product) => {
-              setRequirementText(
-                `Need sourcing quotation for ${product.name} (${product.category}) for our upcoming batch launch.`
-              )
-              setSelectedCategory(product.category as CatalogCategory)
-              navigate("startup.procurement")
-            }}
-            onAskAI={(query, category) => {
-              if (query) setRequirementText(query)
-              if (category) setSelectedCategory(category as CatalogCategory)
-              const aiEl = document.getElementById("ai-procurement-engine")
-              if (aiEl) {
-                aiEl.scrollIntoView({ behavior: "smooth" })
-              } else {
-                navigate("startup.procurement")
-              }
-            }}
-            onExploreWorkspace={() => navigate("startup.procurement")}
-          />
-        ) : (
-          /* Collapsed Teaser Preview Card */
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div
-              onClick={() => setIsCatalogExpanded(true)}
-              className="bg-white rounded-2xl border-2 border-dashed border-slate-300 hover:border-[#0B1F4B] p-8 text-center cursor-pointer transition-all hover:shadow-md group"
-            >
-              <div className="w-14 h-14 rounded-2xl bg-blue-50 text-[#0B1F4B] group-hover:bg-[#0B1F4B] group-hover:text-white flex items-center justify-center mx-auto mb-3 transition-colors shadow-2xs">
-                <Icons.FolderCheck className="w-7 h-7" />
-              </div>
-              <h3 className="text-lg font-bold text-[#0B1F4B] mb-1">
-                Explore 7 Approved Procurement Categories & 75+ Vetted Offerings
-              </h3>
-              <p className="text-xs text-slate-500 max-w-md mx-auto mb-4">
-                Packaging, Rapid Prototyping, IT Services, Compliance, Marketing, Business Finance & Specialized Support.
-              </p>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  setIsCatalogExpanded(true)
-                }}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#0B1F4B]/88 backdrop-blur-md border border-white/20 text-white text-xs font-bold hover:bg-[#123B7A]/94 hover:border-white/35 shadow-[inset_0_1px_1px_rgba(255,255,255,0.22)] transition-colors cursor-pointer"
-              >
-                <span>Open MPI Catalogue</span>
-                <Icons.ArrowRight className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
 
       {/* ─── 8. GOVERNMENT SCHEMES INTELLIGENCE CENTER & CALCULATOR ─────────────── */}
       <section

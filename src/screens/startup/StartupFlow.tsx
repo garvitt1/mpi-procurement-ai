@@ -15,6 +15,7 @@ import {
   MPIVerifiedBadge,
   MPIStatusBadge,
 } from "../../components/design-system/MPIDesignSystem"
+import MaterialIcon from "../../components/ui/MaterialIcon"
 import {
   BarChart,
   Bar,
@@ -2786,9 +2787,10 @@ export default function StartupFlow({
                     setTargetBudget(75000)
                     setStep1Guidance(null)
                   }}
-                  className="px-2.5 py-1 text-xs font-semibold rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 bg-white/80 hover:bg-slate-50 hover:border-slate-300 text-slate-700 shadow-2xs transition-all cursor-pointer"
                 >
-                  📦 Packaging Sample
+                  <MaterialIcon icon="inventory_2" size={14} className="text-amber-600" />
+                  <span>Packaging Sample</span>
                 </button>
                 <button
                   type="button"
@@ -2801,9 +2803,10 @@ export default function StartupFlow({
                     setTargetBudget(120000)
                     setStep1Guidance(null)
                   }}
-                  className="px-2.5 py-1 text-xs font-semibold rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 bg-white/80 hover:bg-slate-50 hover:border-slate-300 text-slate-700 shadow-2xs transition-all cursor-pointer"
                 >
-                  ⚙️ Drone CNC Sample
+                  <MaterialIcon icon="precision_manufacturing" size={14} className="text-blue-600" />
+                  <span>Drone CNC Sample</span>
                 </button>
                 <button
                   type="button"
@@ -2816,9 +2819,10 @@ export default function StartupFlow({
                     setTargetBudget(180000)
                     setStep1Guidance(null)
                   }}
-                  className="px-2.5 py-1 text-xs font-semibold rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 bg-white/80 hover:bg-slate-50 hover:border-slate-300 text-slate-700 shadow-2xs transition-all cursor-pointer"
                 >
-                  💻 Cloud IT Sample
+                  <MaterialIcon icon="dns" size={14} className="text-emerald-600" />
+                  <span>Cloud IT Sample</span>
                 </button>
                 <button
                   type="button"
@@ -2831,9 +2835,10 @@ export default function StartupFlow({
                     setTargetBudget(50000)
                     setStep1Guidance(null)
                   }}
-                  className="px-2.5 py-1 text-xs font-semibold rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 bg-white/80 hover:bg-slate-50 hover:border-slate-300 text-slate-700 shadow-2xs transition-all cursor-pointer"
                 >
-                  🌱 Startup Support Sample
+                  <MaterialIcon icon="verified_user" size={14} className="text-indigo-600" />
+                  <span>Startup Support Sample</span>
                 </button>
               </div>
             </div>

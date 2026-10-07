@@ -22,6 +22,7 @@ import {
   calculateMSMEInventoryReorderWithAI,
   MSMEInventoryReorderResult,
 } from "../../services/aiService"
+import MaterialIcon from "../../components/ui/MaterialIcon"
 
 export default function MSMEFlow({
   navigate,
@@ -432,7 +433,7 @@ export default function MSMEFlow({
             className="w-full flex items-center justify-between text-xs text-slate-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-[#123B7A] cursor-pointer transition-colors"
           >
             <span className="flex items-center gap-2">
-              <span className="text-xs">🏠</span>
+              <MaterialIcon icon="home" size={14} className="text-slate-400" />
               <span>Home Marketplace</span>
             </span>
             <span className="text-[10px] bg-blue-900 px-1.5 py-0.5 rounded text-slate-300">
@@ -444,7 +445,7 @@ export default function MSMEFlow({
             className="w-full flex items-center justify-between text-xs text-slate-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-[#123B7A] cursor-pointer transition-colors"
           >
             <span className="flex items-center gap-2">
-              <span className="text-xs">📜</span>
+              <MaterialIcon icon="policy" size={14} className="text-yellow-400" />
               <span>Government Schemes</span>
             </span>
             <span className="text-[10px] bg-yellow-950 text-yellow-300 border border-yellow-800/40 px-1.5 py-0.5 rounded">

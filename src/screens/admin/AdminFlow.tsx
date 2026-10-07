@@ -31,6 +31,7 @@ import {
   ModelFairnessReport,
   hasLiveAIConfigured,
 } from "../../services/aiService"
+import MaterialIcon from "../../components/ui/MaterialIcon"
 
 // Markdown parser for Admin Copilot rich generative text
 function parseInlineFormatting(text: string): React.ReactNode[] {
@@ -705,7 +706,7 @@ Select a quick analysis pill below or ask me any question!`,
             className="w-full flex items-center justify-between text-xs text-slate-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-[#123B7A] cursor-pointer transition-colors"
           >
             <span className="flex items-center gap-2">
-              <span className="text-xs">🏠</span>
+              <MaterialIcon icon="home" size={14} className="text-slate-400" />
               <span>Home Marketplace</span>
             </span>
             <span className="text-[10px] bg-blue-900 px-1.5 py-0.5 rounded text-slate-300">
@@ -717,7 +718,7 @@ Select a quick analysis pill below or ask me any question!`,
             className="w-full flex items-center justify-between text-xs text-slate-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-[#123B7A] cursor-pointer transition-colors"
           >
             <span className="flex items-center gap-2">
-              <span className="text-xs">🚀</span>
+              <MaterialIcon icon="rocket_launch" size={14} className="text-blue-400" />
               <span>Startup Hub</span>
             </span>
             <span className="text-[10px] bg-blue-950 text-blue-300 border border-blue-800/40 px-1.5 py-0.5 rounded">
@@ -729,7 +730,7 @@ Select a quick analysis pill below or ask me any question!`,
             className="w-full flex items-center justify-between text-xs text-slate-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-[#123B7A] cursor-pointer transition-colors"
           >
             <span className="flex items-center gap-2">
-              <span className="text-xs">🏭</span>
+              <MaterialIcon icon="precision_manufacturing" size={14} className="text-orange-400" />
               <span>MSME Portal</span>
             </span>
             <span className="text-[10px] bg-orange-950 text-orange-300 border border-orange-800/40 px-1.5 py-0.5 rounded">
