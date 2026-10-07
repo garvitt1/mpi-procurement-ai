@@ -136,14 +136,96 @@ h1, h2, h3, h4, h5, h6 {
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.85; transform: scale(0.98); }
 }
+@keyframes float-subtle {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
+@keyframes ambient-glow {
+  0%, 100% { opacity: 0.4; filter: blur(24px); }
+  50% { opacity: 0.75; filter: blur(32px); }
+}
+@keyframes beam-scan {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
 
 .animate-fade-in-up { animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 .animate-fade-in { animation: fadeIn 0.25s ease forwards; }
+.animate-float { animation: float-subtle 4s ease-in-out infinite; }
+.animate-ambient-glow { animation: ambient-glow 6s ease-in-out infinite; }
+
 .delay-100 { animation-delay: 0.05s; }
 .delay-200 { animation-delay: 0.1s; }
 .delay-300 { animation-delay: 0.15s; }
 .delay-400 { animation-delay: 0.2s; }
 .delay-500 { animation-delay: 0.25s; }
+
+/* ─── Hardware-Accelerated Scroll Reveals ────────────────────────────────── */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(24px) scale(0.98);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+.scroll-reveal.is-revealed {
+  opacity: 1;
+  transform: translateY(0px) scale(1);
+}
+.scroll-reveal-left {
+  opacity: 0;
+  transform: translateX(-32px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.scroll-reveal-left.is-revealed {
+  opacity: 1;
+  transform: translateX(0);
+}
+.scroll-reveal-right {
+  opacity: 0;
+  transform: translateX(32px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.scroll-reveal-right.is-revealed {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* ─── Seamless Browser View Transitions (Page-to-Page Morphing) ───────────── */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.24s;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ─── Apple & Linear-Tier Pro Surfaces ────────────────────────────────────── */
+.pro-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(226, 232, 240, 0.85);
+  box-shadow: 
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 8px 24px -4px rgba(15, 23, 42, 0.04);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease;
+}
+.pro-card:hover {
+  border-color: rgba(203, 213, 225, 1);
+  box-shadow: 
+    0 4px 6px rgba(15, 23, 42, 0.04),
+    0 16px 36px -8px rgba(11, 31, 75, 0.08);
+}
+
+.pro-glass-dock {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 
+    0 4px 20px -2px rgba(15, 23, 42, 0.06),
+    0 1px 3px rgba(15, 23, 42, 0.04),
+    inset 0 1px 1px rgba(255, 255, 255, 0.8);
+}
+
 
 /* Clean Modern Canvas */
 .animated-gradient {

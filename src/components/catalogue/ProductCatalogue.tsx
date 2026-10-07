@@ -109,7 +109,7 @@ export const ProductCatalogue: React.FC<ProductCatalogueProps> = ({
   return (
     <section
       id="marketplace"
-      className="relative overflow-hidden py-16 lg:py-24 bg-linear-to-b from-white via-slate-50/70 to-white border-y border-slate-200/90"
+      className="relative overflow-hidden py-16 lg:py-24 bg-linear-to-b from-white via-slate-50/70 to-white border-y border-slate-200/90 scroll-reveal"
     >
       {/* ─── SUBTLE PROCUREMENT NETWORK BACKGROUND (Low Opacity Grid & Gradients) ─── */}
       <div className="absolute inset-0 pointer-events-none opacity-[0.035] bg-[radial-gradient(#0B1F4B_1px,transparent_1px)] [background-size:24px_24px]" />

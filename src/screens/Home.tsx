@@ -17,6 +17,7 @@ import { hasLiveAIConfigured, type ExtractedProcurementSpecs } from "../services
 import AuthModal from "../components/auth/AuthModal"
 import LanguageTranslatorButton from "../components/navigation/LanguageTranslatorButton"
 import ProductCatalogue from "../components/catalogue/ProductCatalogue"
+import useScrollReveal from "../hooks/useScrollReveal"
 
 export function formatScopeDisplay(category: CatalogCategory, qty: number): string {
   if (category === "Packaging & Printing") {
@@ -60,6 +61,9 @@ export default function Home({ navigate }: NavProps) {
     selectedCategory,
     schemes,
   } = useProcurement()
+
+  // Hardware-accelerated viewport scroll animation observer
+  useScrollReveal()
 
   // Auth modal state for Login and Sign In
   const [authModal, setAuthModal] = useState<{ open: boolean; mode: "login" | "signin" }>({
@@ -645,10 +649,13 @@ export default function Home({ navigate }: NavProps) {
 
       {/* ─── 3. HERO SECTION WITH INTERACTIVE AI INTAKE SIMULATOR ──────────────── */}
       <section className="relative overflow-hidden pt-8 pb-14 lg:pt-12 lg:pb-20 bg-linear-to-b from-white via-slate-50 to-[#F7F9FC] border-b border-slate-200">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Ambient Spatial Lighting Bloom */}
+        <div aria-hidden="true" className="pointer-events-none absolute -top-32 left-1/2 -translate-x-1/2 w-[800px] h-[450px] bg-gradient-to-tr from-blue-500/10 via-[#F97316]/5 to-transparent rounded-full blur-3xl animate-ambient-glow" />
+
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           {/* Top Block: Value Proposition (Centered above AI Engine) */}
           <div className="max-w-4xl mx-auto text-center space-y-5 animate-fade-in">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-xs font-semibold text-[#0B1F4B]">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-xs font-semibold text-[#0B1F4B] shadow-2xs hover:shadow-xs transition-shadow">
               <Icons.Sparkles className="w-3.5 h-3.5 text-[#F97316]" />
               <span>Next-Gen B2B Sourcing Infrastructure</span>
             </div>
@@ -674,15 +681,15 @@ export default function Home({ navigate }: NavProps) {
 
             {/* Trust Badges Bar */}
             <div className="flex flex-wrap items-center justify-center gap-2.5 text-xs font-semibold text-slate-700">
-              <span className="inline-flex items-center gap-1.5 bg-white border border-slate-200 px-3 py-1.5 rounded-lg shadow-2xs">
+              <span className="inline-flex items-center gap-1.5 bg-white border border-slate-200/90 hover:border-blue-300 px-3 py-1.5 rounded-lg shadow-2xs hover:shadow-xs hover:-translate-y-0.5 transition-all duration-200 cursor-default">
                 <Icons.ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
                 Udyam Registered MSMEs
               </span>
-              <span className="inline-flex items-center gap-1.5 bg-white border border-slate-200 px-3 py-1.5 rounded-lg shadow-2xs">
+              <span className="inline-flex items-center gap-1.5 bg-white border border-slate-200/90 hover:border-amber-300 px-3 py-1.5 rounded-lg shadow-2xs hover:shadow-xs hover:-translate-y-0.5 transition-all duration-200 cursor-default">
                 <Icons.Award className="w-3.5 h-3.5 text-amber-600" />
                 ZED & ISO Certified
               </span>
-              <span className="inline-flex items-center gap-1.5 bg-blue-50/80 border border-blue-200/80 text-[#0B1F4B] px-3 py-1.5 rounded-lg font-bold">
+              <span className="inline-flex items-center gap-1.5 bg-blue-50/80 border border-blue-200/80 hover:border-orange-300 text-[#0B1F4B] px-3 py-1.5 rounded-lg font-bold shadow-2xs hover:shadow-xs hover:-translate-y-0.5 transition-all duration-200 cursor-default">
                 <Icons.Sparkles className="w-3.5 h-3.5 text-[#F97316]" />
                 Reverse Margin Verified
               </span>
@@ -709,8 +716,8 @@ export default function Home({ navigate }: NavProps) {
           </div>
 
           {/* Bottom Block: Next-Gen Conversational AI Engine & Voice Assistant (Horizontal Layout) */}
-          <div id="ai-procurement-engine" className="mt-10 max-w-5xl mx-auto scroll-mt-20">
-            <div className="bg-white/95 backdrop-blur-xl rounded-3xl border border-slate-200/90 p-6 sm:p-8 shadow-[0_20px_50px_rgba(11,31,75,0.08)] relative overflow-hidden">
+          <div id="ai-procurement-engine" className="mt-10 max-w-5xl mx-auto scroll-mt-20 scroll-reveal">
+            <div className="bg-white/95 backdrop-blur-xl rounded-3xl border border-slate-200/90 p-6 sm:p-8 shadow-[0_24px_60px_-12px_rgba(11,31,75,0.1)] relative overflow-hidden transition-all duration-300 hover:shadow-[0_28px_70px_-10px_rgba(11,31,75,0.14)]">
               {/* 1. Header with Glowing MPI Brand Sphere Orb */}
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 pb-5 border-b border-slate-100">
                 <div className="flex items-center gap-4 text-left">
@@ -1062,7 +1069,7 @@ export default function Home({ navigate }: NavProps) {
       </section>
 
       {/* ─── 4. ECOSYSTEM METRICS STRIP ────────────────────────────────────────── */}
-      <section className="bg-white border-b border-slate-200 py-8">
+      <section className="bg-white border-b border-slate-200 py-8 scroll-reveal">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             <div className="space-y-1">
@@ -1129,7 +1136,7 @@ export default function Home({ navigate }: NavProps) {
       </section>
 
       {/* ─── DUAL PLATFORM WORKSPACE GATEWAYS (3D FLIPPING CARDS) ──────────────── */}
-      <section className="py-20 bg-gradient-to-b from-[#0B1F4B] via-[#0E275E] to-[#0B1F4B] text-white relative overflow-hidden">
+      <section className="py-20 bg-gradient-to-b from-[#0B1F4B] via-[#0E275E] to-[#0B1F4B] text-white relative overflow-hidden scroll-reveal">
         {/* Ambient background glows */}
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -1442,7 +1449,7 @@ export default function Home({ navigate }: NavProps) {
       </section>
 
       {/* ─── 5. HOW IT WORKS (THE 5-STEP HORIZONTAL JOURNEY) ───────────────────── */}
-      <section id="how-it-works" className="py-20 sm:py-24 bg-white relative overflow-hidden">
+      <section id="how-it-works" className="py-20 sm:py-24 bg-white relative overflow-hidden scroll-reveal">
         {/* Subtle background texture */}
         <div className="absolute inset-0 bg-[radial-gradient(#0B1F4B08_1px,transparent_1px)] bg-size-[20px_20px] pointer-events-none" />
 
@@ -1571,7 +1578,7 @@ export default function Home({ navigate }: NavProps) {
       </section>
 
       {/* ─── 6. BENTO FEATURE SPOTLIGHT ───────────────────────────────────────── */}
-      <section className="py-16 sm:py-20 bg-white border-y border-slate-200">
+      <section className="py-16 sm:py-20 bg-white border-y border-slate-200 scroll-reveal">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-12">
             <span className="text-xs font-bold uppercase tracking-widest text-blue-700 bg-blue-50 px-3 py-1 rounded-full border border-blue-200">

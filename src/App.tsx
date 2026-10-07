@@ -68,7 +68,15 @@ export default function App() {
       targetScreen = "login.admin"
     }
 
-    setHistory((prev) => [...prev, targetScreen])
+    const updateState = () => {
+      setHistory((prev) => [...prev, targetScreen])
+    }
+
+    if (typeof document !== "undefined" && "startViewTransition" in document) {
+      ;(document as any).startViewTransition(updateState)
+    } else {
+      updateState()
+    }
     window.scrollTo({ top: 0, behavior: "smooth" })
 
     // Sync browser URL
@@ -86,32 +94,40 @@ export default function App() {
   }, [])
 
   const goBack = useCallback(() => {
-    setHistory((prev) => {
-      if (prev.length > 1) {
-        return prev.slice(0, -1)
-      }
-      // Intelligent fallback when user opened directly or refreshed
-      const current = prev[0] || "home"
-      if (current.startsWith("startup.") && current !== "startup.home") {
-        return ["home", "startup.home"]
-      }
-      if (current.startsWith("msme.") && current !== "msme.home") {
-        return ["home", "msme.home"]
-      }
-      if (current.startsWith("admin.") && current !== "admin.home") {
-        return ["home", "admin.home"]
-      }
-      if (current.startsWith("analytics.")) {
-        return ["home", "startup.analytics"]
-      }
-      if (current.startsWith("government-schemes.")) {
+    const updateState = () => {
+      setHistory((prev) => {
+        if (prev.length > 1) {
+          return prev.slice(0, -1)
+        }
+        // Intelligent fallback when user opened directly or refreshed
+        const current = prev[0] || "home"
+        if (current.startsWith("startup.") && current !== "startup.home") {
+          return ["home", "startup.home"]
+        }
+        if (current.startsWith("msme.") && current !== "msme.home") {
+          return ["home", "msme.home"]
+        }
+        if (current.startsWith("admin.") && current !== "admin.home") {
+          return ["home", "admin.home"]
+        }
+        if (current.startsWith("analytics.")) {
+          return ["home", "startup.analytics"]
+        }
+        if (current.startsWith("government-schemes.")) {
+          return ["home"]
+        }
+        if (current.startsWith("login.") || current.startsWith("register.") || current.includes("onboarding")) {
+          return ["home"]
+        }
         return ["home"]
-      }
-      if (current.startsWith("login.") || current.startsWith("register.") || current.includes("onboarding")) {
-        return ["home"]
-      }
-      return ["home"]
-    })
+      })
+    }
+
+    if (typeof document !== "undefined" && "startViewTransition" in document) {
+      ;(document as any).startViewTransition(updateState)
+    } else {
+      updateState()
+    }
     window.scrollTo({ top: 0, behavior: "smooth" })
   }, [])
 
