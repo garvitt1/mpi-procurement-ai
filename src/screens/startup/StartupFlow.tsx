@@ -928,21 +928,21 @@ export default function StartupFlow({
     title: string,
     subtitle?: string,
   ) => (
-    <div className="min-h-screen bg-[#F7F9FC] text-[#0B1220] flex font-sans selection:bg-[#F97316] selection:text-white">
-      {/* ─── SIDEBAR (Deep Blue #0B1F4B) ───────────────────────────────────────── */}
+    <div className="min-h-screen bg-[#F7F9FC] text-[#0B1220] flex font-sans selection:bg-[#051F16] selection:text-white">
+      {/* ─── SIDEBAR (Deep Forest #051F16) ───────────────────────────────────────── */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-[#0B1F4B] text-white flex flex-col justify-between transition-transform duration-300 lg:static lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-[#051F16] text-white flex flex-col justify-between transition-transform duration-300 border-r border-[#0A3525] lg:static lg:translate-x-0 ${
           sidebarOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full"
         }`}
       >
         <div>
           {/* Logo & Workspace header */}
-          <div className="p-5 border-b border-[#123B7A] flex items-center justify-between">
+          <div className="p-5 border-b border-[#0A3525] flex items-center justify-between">
             <button
               onClick={() => navigate("home")}
               className="flex items-center gap-2.5 text-left cursor-pointer group"
             >
-              <div className="w-8 h-8 rounded-lg bg-[#F97316] text-white flex items-center justify-center font-bold">
+              <div className="w-8 h-8 rounded-lg bg-[#0A3525] border border-emerald-800/60 text-[#A3F65C] flex items-center justify-center font-bold">
                 <svg
                   width="18"
                   height="18"
@@ -961,39 +961,39 @@ export default function StartupFlow({
                 >
                   MPI Workspace
                 </div>
-                <div className="text-[10px] text-slate-300 font-medium">
+                <div className="text-[10px] text-slate-400 font-medium">
                   Startup Procurement
                 </div>
               </div>
             </button>
             <button
               onClick={() => setSidebarOpen(false)}
-              className="lg:hidden p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-[#123B7A]"
+              className="lg:hidden p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-[#0A3525]"
             >
               <Icons.Close className="w-5 h-5" />
             </button>
           </div>
 
           {/* Startup Organization Card */}
-          <div className="p-4 mx-3 my-3 bg-[#123B7A]/60 rounded-xl border border-blue-400/20">
+          <div className="p-4 mx-3 my-3 bg-[#0A3525]/70 rounded-xl border border-emerald-900/50">
             <div className="flex items-center justify-between mb-1">
               <span className="text-xs font-bold text-white truncate">
                 TechNova Innovations
               </span>
-              <span className="text-[10px] bg-blue-500/20 text-blue-200 font-semibold px-1.5 py-0.2 rounded border border-blue-400/30">
+              <span className="text-[10px] bg-emerald-950 text-[#A3F65C] font-semibold px-1.5 py-0.2 rounded border border-emerald-800/60">
                 DPIIT Vetted
               </span>
             </div>
             <div className="text-[11px] text-slate-300">
               Procurement Budget: ₹2,00,000
             </div>
-            <div className="w-full bg-[#0B1F4B] h-1.5 rounded-full mt-2 overflow-hidden">
+            <div className="w-full bg-[#051F16] h-1.5 rounded-full mt-2 overflow-hidden border border-emerald-900/30">
               <div
-                className="bg-[#F97316] h-full rounded-full"
+                className="bg-[#A3F65C] h-full rounded-full"
                 style={{ width: "38%" }}
               />
             </div>
-            <div className="flex justify-between text-[10px] text-slate-300 mt-1">
+            <div className="flex justify-between text-[10px] text-slate-400 mt-1">
               <span>38% Committed</span>
               <span>₹1,25,000 Available</span>
             </div>
@@ -1012,8 +1012,8 @@ export default function StartupFlow({
                   }}
                   className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                     isActive
-                      ? "bg-[#F97316] text-white shadow-xs"
-                      : "text-slate-300 hover:bg-[#123B7A] hover:text-white"
+                      ? "bg-[#083A28] text-[#A3F65C] border border-emerald-700/50 shadow-xs"
+                      : "text-slate-300 hover:bg-[#0A3525] hover:text-white"
                   }`}
                 >
                   <span className="shrink-0">{item.icon}</span>
@@ -1025,28 +1025,28 @@ export default function StartupFlow({
         </div>
 
         {/* Bottom Help & Cross-Hub Links */}
-        <div className="p-3.5 border-t border-[#123B7A] space-y-1.5">
+        <div className="p-3.5 border-t border-[#0A3525] space-y-1.5">
           <button
             onClick={() => navigate("home")}
-            className="w-full flex items-center justify-between text-xs text-slate-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-[#123B7A] cursor-pointer transition-colors"
+            className="w-full flex items-center justify-between text-xs text-slate-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-[#0A3525] cursor-pointer transition-colors"
           >
             <span className="flex items-center gap-2">
               <span className="text-xs">🏠</span>
               <span>Home Marketplace</span>
             </span>
-            <span className="text-[10px] bg-blue-900 px-1.5 py-0.5 rounded text-slate-300">
+            <span className="text-[10px] bg-[#0A3525] px-1.5 py-0.5 rounded text-slate-300 border border-emerald-900/50">
               Public
             </span>
           </button>
           <button
             onClick={() => navigate("government-schemes.match")}
-            className="w-full flex items-center justify-between text-xs text-slate-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-[#123B7A] cursor-pointer transition-colors"
+            className="w-full flex items-center justify-between text-xs text-slate-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-[#0A3525] cursor-pointer transition-colors"
           >
             <span className="flex items-center gap-2">
               <span className="text-xs">📜</span>
               <span>Government Schemes</span>
             </span>
-            <span className="text-[10px] bg-yellow-950 text-yellow-300 border border-yellow-800/40 px-1.5 py-0.5 rounded">
+            <span className="text-[10px] bg-emerald-950 text-[#A3F65C] border border-emerald-800/50 px-1.5 py-0.5 rounded">
               Grants
             </span>
           </button>

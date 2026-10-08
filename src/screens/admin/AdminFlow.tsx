@@ -595,21 +595,21 @@ Select a quick analysis pill below or ask me any question!`,
     title: string,
     subtitle?: string,
   ) => (
-    <div className="min-h-screen bg-[#F7F9FC] text-[#0B1220] flex font-sans selection:bg-[#F97316] selection:text-white">
-      {/* ─── SIDEBAR (Deep Navy #0B1F4B) ───────────────────────────────────────── */}
+    <div className="min-h-screen bg-[#F7F9FC] text-[#0B1220] flex font-sans selection:bg-[#051F16] selection:text-white">
+      {/* ─── SIDEBAR (Deep Forest #051F16) ───────────────────────────────────────── */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-[#0B1F4B] text-white flex flex-col justify-between transition-transform duration-300 lg:static lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-[#051F16] text-white flex flex-col justify-between transition-transform duration-300 border-r border-[#0A3525] lg:static lg:translate-x-0 ${
           sidebarOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full"
         }`}
       >
         <div>
           {/* Header */}
-          <div className="p-5 border-b border-[#123B7A] flex items-center justify-between">
+          <div className="p-5 border-b border-[#0A3525] flex items-center justify-between">
             <button
               onClick={() => navigate("home")}
               className="flex items-center gap-2.5 text-left cursor-pointer group"
             >
-              <div className="w-8 h-8 rounded-lg bg-[#F97316] text-white flex items-center justify-center font-bold">
+              <div className="w-8 h-8 rounded-lg bg-[#0A3525] border border-emerald-800/60 text-[#A3F65C] flex items-center justify-center font-bold">
                 <svg
                   width="18"
                   height="18"
@@ -628,23 +628,23 @@ Select a quick analysis pill below or ask me any question!`,
                 >
                   MPI Governance
                 </div>
-                <div className="text-[10px] text-slate-300 font-medium">
+                <div className="text-[10px] text-slate-400 font-medium">
                   Control Center
                 </div>
               </div>
             </button>
             <button
               onClick={() => setSidebarOpen(false)}
-              className="lg:hidden p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-[#123B7A]"
+              className="lg:hidden p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-[#0A3525]"
             >
               <Icons.Close className="w-5 h-5" />
             </button>
           </div>
 
           {/* System Pulse Card */}
-          <div className="p-3.5 mx-3 my-3 bg-[#123B7A]/60 rounded-xl border border-blue-400/20">
+          <div className="p-3.5 mx-3 my-3 bg-[#0A3525]/70 rounded-xl border border-emerald-900/50">
             <div className="flex items-center gap-2 text-xs font-semibold text-white">
-              <span className="w-2 h-2 rounded-full bg-[#F97316] animate-pulse" />
+              <span className="w-2 h-2 rounded-full bg-[#A3F65C] animate-pulse" />
               <span>AI Engine & Escrow Healthy</span>
             </div>
             <div className="text-[11px] text-slate-300 mt-1">
@@ -665,8 +665,8 @@ Select a quick analysis pill below or ask me any question!`,
                   }}
                   className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                     isActive
-                      ? "bg-[#F97316] text-white shadow-xs"
-                      : "text-slate-300 hover:bg-[#123B7A] hover:text-white"
+                      ? "bg-[#083A28] text-[#A3F65C] border border-emerald-700/50 shadow-xs"
+                      : "text-slate-300 hover:bg-[#0A3525] hover:text-white"
                   }`}
                 >
                   <span className="shrink-0">{item.icon}</span>
@@ -678,8 +678,8 @@ Select a quick analysis pill below or ask me any question!`,
         </div>
 
         {/* Bottom Session Card & Home Link */}
-        <div className="p-4 border-t border-[#123B7A] space-y-2.5">
-          <div className="p-2.5 rounded-xl bg-[#071534] border border-[#14356E] flex items-center justify-between text-xs">
+        <div className="p-4 border-t border-[#0A3525] space-y-2.5">
+          <div className="p-2.5 rounded-xl bg-[#03150E] border border-emerald-950 flex items-center justify-between text-xs">
             <div>
               <div className="font-bold text-white flex items-center gap-1.5">
                 admin
@@ -703,37 +703,37 @@ Select a quick analysis pill below or ask me any question!`,
 
           <button
             onClick={() => navigate("home")}
-            className="w-full flex items-center justify-between text-xs text-slate-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-[#123B7A] cursor-pointer transition-colors"
+            className="w-full flex items-center justify-between text-xs text-slate-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-[#0A3525] cursor-pointer transition-colors"
           >
             <span className="flex items-center gap-2">
               <MaterialIcon icon="home" size={14} className="text-slate-400" />
               <span>Home Marketplace</span>
             </span>
-            <span className="text-[10px] bg-blue-900 px-1.5 py-0.5 rounded text-slate-300">
-              Public
+            <span className="text-[10px] bg-[#0A3525] px-1.5 py-0.5 rounded text-slate-300 border border-emerald-900/50">
+              Live
             </span>
           </button>
           <button
             onClick={() => navigate("startup.home")}
-            className="w-full flex items-center justify-between text-xs text-slate-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-[#123B7A] cursor-pointer transition-colors"
+            className="w-full flex items-center justify-between text-xs text-slate-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-[#0A3525] cursor-pointer transition-colors"
           >
             <span className="flex items-center gap-2">
-              <MaterialIcon icon="rocket_launch" size={14} className="text-blue-400" />
+              <MaterialIcon icon="rocket_launch" size={14} className="text-slate-400" />
               <span>Startup Hub</span>
             </span>
-            <span className="text-[10px] bg-blue-950 text-blue-300 border border-blue-800/40 px-1.5 py-0.5 rounded">
+            <span className="text-[10px] bg-[#0A3525] text-slate-300 border border-emerald-900/50 px-1.5 py-0.5 rounded">
               Buyer
             </span>
           </button>
           <button
             onClick={() => navigate("msme.home")}
-            className="w-full flex items-center justify-between text-xs text-slate-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-[#123B7A] cursor-pointer transition-colors"
+            className="w-full flex items-center justify-between text-xs text-slate-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-[#0A3525] cursor-pointer transition-colors"
           >
             <span className="flex items-center gap-2">
-              <MaterialIcon icon="precision_manufacturing" size={14} className="text-orange-400" />
+              <MaterialIcon icon="precision_manufacturing" size={14} className="text-slate-400" />
               <span>MSME Portal</span>
             </span>
-            <span className="text-[10px] bg-orange-950 text-orange-300 border border-orange-800/40 px-1.5 py-0.5 rounded">
+            <span className="text-[10px] bg-[#0A3525] text-slate-300 border border-emerald-900/50 px-1.5 py-0.5 rounded">
               Supplier
             </span>
           </button>

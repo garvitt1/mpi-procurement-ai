@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800&family=Inter:wght@300;400;500;600;700&family=Geist:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700&family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&family=Geist:wght@300;400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200');
 @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200');
 
@@ -7,6 +7,26 @@
 :root {
   --font-heading: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-editorial: 'Instrument Serif', Georgia, serif;
+  
+  /* Reference-Driven Premium Palette Tokens */
+  --bg-hero-primary: #051F16;
+  --bg-hero-secondary: #0A3525;
+  --accent-lime: #A3F65C;
+  --accent-lime-hover: #92E64B;
+  --accent-forest: #083A28;
+
+  --bg-page: #FFFFFF;
+  --bg-surface-warm: #F6F6F4;
+  --bg-surface-cool: #F2F6F8;
+  --bg-surface-card: #FFFFFF;
+
+  --text-primary: #111413;
+  --text-secondary: #5E6668;
+  --text-inverse: #FFFFFF;
+
+  --border-light: #EAECEF;
+  --border-subtle: #DCE2E6;
   
   /* MPI Official Brand Color Tokens */
   --mpi-white: #FFFFFF;
@@ -159,6 +179,10 @@ h1, h2, h3, h4, h5, h6 {
 .delay-300 { animation-delay: 0.15s; }
 .delay-400 { animation-delay: 0.2s; }
 .delay-500 { animation-delay: 0.25s; }
+
+.font-editorial {
+  font-family: var(--font-editorial);
+}
 
 /* ─── Hardware-Accelerated Scroll Reveals ────────────────────────────────── */
 .scroll-reveal {

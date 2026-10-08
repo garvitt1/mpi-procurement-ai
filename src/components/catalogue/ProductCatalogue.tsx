@@ -120,17 +120,20 @@ export const ProductCatalogue: React.FC<ProductCatalogueProps> = ({
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
           <div className="space-y-3 max-w-2xl">
             {/* Pill Badge */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200/80 text-xs font-bold text-[#0B1F4B]">
-              <MaterialIcon name="inventory_2" size={15} className="text-[#F97316]" />
-              <span>PRODUCT & SERVICE CATALOGUE</span>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-xs font-semibold text-slate-800">
+              <MaterialIcon name="inventory_2" size={15} className="text-[#051F16]" />
+              <span className="font-mono text-[11px] uppercase tracking-wider">Product & Service Catalogue</span>
             </div>
 
             {/* Headline */}
             <h2
-              className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0B1F4B] tracking-tight leading-tight"
+              className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#051F16] tracking-tight leading-tight"
               style={{ fontFamily: "Plus Jakarta Sans" }}
             >
-              Everything Your Startup Needs to Build, Operate & Scale.
+              Everything your business needs to{" "}
+              <span className="font-editorial italic font-normal text-[#083A28]">
+                build, operate & scale.
+              </span>
             </h2>
 
             {/* Description */}

@@ -29,8 +29,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       style={style}
       className={`group relative bg-white rounded-3xl border transition-all duration-300 ease-out flex flex-col justify-between overflow-hidden select-none shrink-0 ${
         isCenter
-          ? "border-slate-300 shadow-[0_24px_48px_-12px_rgba(11,31,75,0.18)] ring-2 ring-[#0B1F4B]/15"
-          : "border-slate-200/90 shadow-[0_8px_24px_-6px_rgba(11,31,75,0.06)] hover:border-slate-300 hover:shadow-[0_20px_40px_-8px_rgba(11,31,75,0.14)] hover:-translate-y-1.5"
+          ? "border-[#051F16] shadow-[0_20px_40px_-10px_rgba(5,31,22,0.12)] ring-1 ring-[#051F16]/20"
+          : "border-slate-200/90 shadow-[0_4px_16px_-4px_rgba(0,0,0,0.04)] hover:border-slate-300 hover:shadow-[0_16px_32px_-8px_rgba(0,0,0,0.08)] hover:-translate-y-1"
       } ${className}`}
     >
       {/* Top Media Image Container */}
@@ -48,7 +48,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             alt={product.name}
             loading="lazy"
             onError={() => setImageError(true)}
-            className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-108 will-change-transform"
+            className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 will-change-transform"
           />
         )}
 
@@ -57,13 +57,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
         {/* Top Badges */}
         <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2 pointer-events-none">
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-white/95 backdrop-blur-md text-[#0B1F4B] shadow-2xs border border-white/40">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-white/95 backdrop-blur-md text-[#051F16] shadow-2xs border border-white/40">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
             MPI Verified
           </span>
 
           {product.badge && (
-            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#F97316]/90 backdrop-blur-md text-white shadow-2xs">
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#051F16]/90 backdrop-blur-md text-[#A3F65C] shadow-2xs border border-[#A3F65C]/20">
               {product.badge}
             </span>
           )}
@@ -85,8 +85,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         <div>
           {/* Supplier Trust Badge */}
           <div className="flex items-center gap-1.5 mb-2">
-            <span className="w-4 h-4 rounded-full bg-blue-50 text-blue-700 flex items-center justify-center shrink-0">
-              <MaterialIcon name="verified_user" size={12} className="text-blue-700" />
+            <span className="w-4 h-4 rounded-full bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0">
+              <MaterialIcon name="verified_user" size={12} className="text-emerald-700" />
             </span>
             <span className="text-[11px] font-bold text-slate-700">
               {product.supplierBadge}
@@ -98,7 +98,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
           {/* Product Title */}
           <h3
-            className="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight line-clamp-1 group-hover:text-[#0B1F4B] transition-colors mb-1.5"
+            className="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight line-clamp-1 group-hover:text-[#051F16] transition-colors mb-1.5"
             style={{ fontFamily: "Plus Jakarta Sans" }}
             title={product.name}
           >
@@ -111,7 +111,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           </p>
 
           {/* Key Attributes Box */}
-          <div className="grid grid-cols-2 gap-2 p-2.5 rounded-2xl bg-[#F7F9FC] border border-slate-200/80 mb-4 text-[11px]">
+          <div className="grid grid-cols-2 gap-2 p-2.5 rounded-2xl bg-[#F6F6F4] border border-slate-200/80 mb-4 text-[11px]">
             <div>
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
                 Standard MOQ
@@ -139,7 +139,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               e.stopPropagation()
               onViewDetails(product)
             }}
-            className="text-xs font-bold text-slate-700 hover:text-[#0B1F4B] hover:underline flex items-center gap-1 cursor-pointer py-1.5 px-1"
+            className="text-xs font-bold text-slate-700 hover:text-[#051F16] hover:underline flex items-center gap-1 cursor-pointer py-1.5 px-1"
           >
             <span>View Details</span>
             <MaterialIcon name="arrow_forward" size={14} />
@@ -151,10 +151,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               e.stopPropagation()
               onRequestQuote(product)
             }}
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#0B1F4B] hover:bg-[#F97316] text-white text-xs font-bold shadow-2xs hover:shadow-sm transition-all duration-200 cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#051F16] hover:bg-[#083A28] text-white text-xs font-bold shadow-2xs hover:shadow-xs transition-all duration-200 cursor-pointer"
           >
             <span>Request Quote</span>
-            <MaterialIcon name="bolt" size={14} className="text-orange-300 group-hover:text-white" />
+            <MaterialIcon name="bolt" size={14} className="text-[#A3F65C]" />
           </button>
         </div>
       </div>

@@ -232,10 +232,10 @@ export default function Home({
   return (
     <div className="min-h-screen bg-[#FAFAFC] text-slate-900 flex flex-col font-sans selection:bg-[#0B1F4B] selection:text-white antialiased">
       {/* ─── STATUTORY TRUST STRIP ────────────────────────────────────────── */}
-      <div className="bg-[#0B1F4B] text-white text-xs py-2 px-4 border-b border-[#123B7A]/60">
+      <div className="bg-[#051F16] text-white text-xs py-2 px-4 border-b border-[#0A3525]">
         <div className="max-w-7xl mx-auto flex items-center justify-between text-[11px] sm:text-xs">
           <div className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="w-1.5 h-1.5 rounded-full bg-[#A3F65C] animate-pulse" />
             <span className="font-semibold text-slate-200">
               NATIONAL PROCUREMENT NETWORK
             </span>
@@ -251,7 +251,7 @@ export default function Home({
             >
               <Icons.Search className="w-3.5 h-3.5" />
               <span className="hidden md:inline">Quick Search</span>
-              <kbd className="hidden md:inline bg-[#123B7A] px-1.5 py-0.5 rounded text-[10px] text-slate-300 border border-slate-700">
+              <kbd className="hidden md:inline bg-[#0A3525] px-1.5 py-0.5 rounded text-[10px] text-slate-300 border border-emerald-900/40">
                 ⌘K
               </kbd>
             </button>
@@ -278,25 +278,25 @@ export default function Home({
         {/* Ambient Spatial Lighting - Restrained, Clean, Delicate */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 w-[1000px] h-[550px] bg-gradient-to-b from-blue-100/60 via-amber-50/30 to-transparent rounded-full blur-3xl opacity-70"
+          className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 w-[1000px] h-[550px] bg-gradient-to-b from-emerald-100/40 via-amber-50/20 to-transparent rounded-full blur-3xl opacity-70"
         />
 
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           {/* Eyebrow & Editorial Headline */}
           <div className="max-w-4xl mx-auto text-center space-y-6">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-100/90 border border-slate-200 text-xs font-semibold text-slate-800 shadow-2xs hover:bg-slate-100 transition-all">
-              <span className="w-2 h-2 rounded-full bg-[#F97316]" />
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-100 border border-slate-200/80 text-xs font-semibold text-slate-800 shadow-2xs">
+              <span className="w-2 h-2 rounded-full bg-[#A3F65C] ring-2 ring-emerald-600/30" />
               <span className="font-mono text-[11px] tracking-wider uppercase text-slate-700">
                 AI-Powered Procurement Intelligence
               </span>
             </div>
 
             <h1
-              className="text-4xl sm:text-5xl md:text-6xl lg:text-[72px] font-extrabold text-[#0B1F4B] tracking-tight leading-[1.08]"
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-[76px] font-extrabold text-[#051F16] tracking-tight leading-[1.04]"
               style={{ fontFamily: "Plus Jakarta Sans" }}
             >
               Procurement, <br className="hidden sm:inline" />
-              <span className="bg-gradient-to-r from-[#0B1F4B] via-[#1E3A8A] to-[#F97316] bg-clip-text text-transparent">
+              <span className="font-editorial italic font-normal text-[#083A28]">
                 made intelligent.
               </span>
             </h1>
@@ -312,15 +312,15 @@ export default function Home({
               <button
                 type="button"
                 onClick={() => navigate("startup.procurement")}
-                className="group inline-flex items-center gap-2.5 px-6 py-3.5 text-sm font-bold rounded-xl bg-[#0B1F4B] hover:bg-[#123B7A] active:bg-[#0B1F4B] text-white shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer"
+                className="group inline-flex items-center gap-2.5 px-6 py-3.5 text-sm font-bold rounded-xl bg-[#051F16] hover:bg-[#083A28] active:bg-[#051F16] text-white shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer"
               >
                 <span>Start with MPI</span>
-                <Icons.ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                <Icons.ArrowRight className="w-4 h-4 text-[#A3F65C] group-hover:translate-x-1 transition-transform" />
               </button>
 
               <a
                 href="#marketplace"
-                className="inline-flex items-center gap-2 px-6 py-3.5 text-sm font-semibold rounded-xl bg-white hover:bg-slate-50 text-slate-800 border border-slate-200/90 shadow-2xs hover:border-slate-300 transition-all cursor-pointer"
+                className="inline-flex items-center gap-2 px-6 py-3.5 text-sm font-semibold rounded-xl bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 shadow-2xs hover:border-slate-300 transition-all cursor-pointer"
               >
                 <span>Explore Catalogue</span>
                 <MaterialIcon name="arrow_downward" size={15} className="text-slate-400" />
@@ -330,17 +330,17 @@ export default function Home({
             {/* Credibility Micro-line */}
             <div className="pt-2 flex items-center justify-center gap-6 text-xs text-slate-500 font-medium">
               <span className="flex items-center gap-1.5">
-                <MaterialIcon name="verified" size={14} className="text-emerald-600" />
+                <MaterialIcon name="verified" size={14} className="text-emerald-700" />
                 <span>1,240+ Verified MSME Factories</span>
               </span>
               <span className="hidden sm:inline text-slate-300">•</span>
               <span className="hidden sm:flex items-center gap-1.5">
-                <MaterialIcon name="policy" size={14} className="text-[#F97316]" />
+                <MaterialIcon name="policy" size={14} className="text-emerald-700" />
                 <span>DPIIT & ZED Certified</span>
               </span>
               <span className="hidden sm:inline text-slate-300">•</span>
               <span className="flex items-center gap-1.5">
-                <MaterialIcon name="lock" size={14} className="text-blue-600" />
+                <MaterialIcon name="lock" size={14} className="text-[#051F16]" />
                 <span>100% Milestone Escrow</span>
               </span>
             </div>
@@ -378,7 +378,7 @@ export default function Home({
                 <div className="bg-slate-50/80 rounded-2xl p-4 sm:p-5 border border-slate-200/90 space-y-3">
                   <div className="flex items-center justify-between text-xs font-semibold text-slate-700">
                     <div className="flex items-center gap-2">
-                      <MaterialIcon name="terminal" size={16} className="text-[#0B1F4B]" />
+                      <MaterialIcon name="terminal" size={16} className="text-[#051F16]" />
                       <span>Natural Language Sourcing Requirement</span>
                     </div>
                     <span className="text-[11px] text-slate-500">
@@ -395,13 +395,13 @@ export default function Home({
                         onClick={() => handleSelectHeroPrompt(idx)}
                         className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                           heroPromptIndex === idx
-                            ? "bg-[#0B1F4B] text-white shadow-2xs"
+                            ? "bg-[#051F16] text-white shadow-2xs"
                             : "bg-white text-slate-700 border border-slate-200 hover:border-slate-300 hover:bg-slate-100/60"
                         }`}
                       >
                         <span>{prompt.label}</span>
                         {heroPromptIndex === idx && (
-                          <MaterialIcon name="check" size={13} className="text-amber-400" />
+                          <MaterialIcon name="check" size={13} className="text-[#A3F65C]" />
                         )}
                       </button>
                     ))}
@@ -416,9 +416,9 @@ export default function Home({
                       <button
                         type="button"
                         onClick={() => navigate("startup.procurement")}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg bg-[#0B1F4B] hover:bg-[#123B7A] text-white cursor-pointer shadow-2xs"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg bg-[#051F16] hover:bg-[#083A28] text-white cursor-pointer shadow-2xs"
                       >
-                        <MaterialIcon name="auto_awesome" size={14} className="text-amber-300" />
+                        <MaterialIcon name="auto_awesome" size={14} className="text-[#A3F65C]" />
                         <span>Run Full RFQ</span>
                       </button>
                     </div>
@@ -430,10 +430,10 @@ export default function Home({
                   {/* Panel 1: AI Technical Spec Synthesis */}
                   <div className="bg-white rounded-xl p-4 sm:p-5 border border-slate-200/90 shadow-2xs space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-[11px] font-bold uppercase tracking-wider text-blue-900 bg-blue-50 px-2.5 py-0.5 rounded border border-blue-100">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-950 bg-emerald-50 px-2.5 py-0.5 rounded border border-emerald-200/60">
                         1. Spec Synthesis
                       </span>
-                      <span className="text-xs font-bold text-emerald-600">
+                      <span className="text-xs font-bold text-emerald-700">
                         98% Confidence
                       </span>
                     </div>
@@ -459,7 +459,7 @@ export default function Home({
                       </div>
                       <div className="flex justify-between py-1">
                         <span className="text-slate-500">Target Budget</span>
-                        <span className="font-bold text-[#0B1F4B]">
+                        <span className="font-bold text-[#051F16]">
                           ₹{currentHeroPrompt.budget.toLocaleString("en-IN")}
                         </span>
                       </div>
@@ -483,7 +483,7 @@ export default function Home({
                           {currentHeroPrompt.factory}
                         </div>
                         <div className="text-[11px] text-slate-500 flex items-center gap-1.5 mt-0.5">
-                          <span className="text-amber-600 font-bold">★ ZED Gold</span>
+                          <span className="text-amber-700 font-bold">★ ZED Gold</span>
                           <span>•</span>
                           <span>ISO 9001:2015</span>
                         </div>
@@ -507,10 +507,10 @@ export default function Home({
                   {/* Panel 3: Reverse-Margin Cost & Savings */}
                   <div className="bg-white rounded-xl p-4 sm:p-5 border border-slate-200/90 shadow-2xs space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-[11px] font-bold uppercase tracking-wider text-orange-900 bg-orange-50 px-2.5 py-0.5 rounded border border-orange-100">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-900 bg-emerald-50 px-2.5 py-0.5 rounded border border-emerald-100">
                         3. Value & Savings
                       </span>
-                      <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">
+                      <span className="text-xs font-bold text-emerald-800 bg-emerald-100/60 px-2 py-0.5 rounded">
                         -{currentHeroPrompt.savings} Cost
                       </span>
                     </div>
@@ -537,20 +537,20 @@ export default function Home({
                 </div>
 
                 {/* Bottom Milestone Ribbon */}
-                <div className="bg-slate-900 text-white rounded-xl p-3 sm:p-4 flex flex-wrap items-center justify-between gap-3 text-xs">
+                <div className="bg-[#051F16] text-white rounded-xl p-3 sm:p-4 flex flex-wrap items-center justify-between gap-3 text-xs border border-[#0A3525]">
                   <div className="flex items-center gap-3">
-                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
-                    <span className="font-semibold">
+                    <span className="w-2 h-2 rounded-full bg-[#A3F65C] animate-pulse" />
+                    <span className="font-semibold text-slate-200">
                       Milestone SLA Protection: 30% Mobilization Escrow → QA Drop Test Passed → Final 70% Released
                     </span>
                   </div>
                   <button
                     type="button"
                     onClick={() => navigate("startup.procurement")}
-                    className="inline-flex items-center gap-1.5 font-bold text-amber-400 hover:text-amber-300 cursor-pointer text-xs"
+                    className="inline-flex items-center gap-1.5 font-bold text-[#A3F65C] hover:text-[#92E64B] cursor-pointer text-xs"
                   >
                     <span>Launch in Workspace</span>
-                    <Icons.ArrowRight className="w-3.5 h-3.5" />
+                    <Icons.ArrowRight className="w-3.5 h-3.5 text-[#A3F65C]" />
                   </button>
                 </div>
               </div>
@@ -571,7 +571,7 @@ export default function Home({
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 divide-y sm:divide-y-0 sm:divide-x divide-slate-200/80">
             <div className="text-center pt-4 sm:pt-0">
               <div
-                className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#0B1F4B] tracking-tight"
+                className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#051F16] tracking-tight"
                 style={{ fontFamily: "Plus Jakarta Sans" }}
               >
                 1,240+
@@ -586,7 +586,7 @@ export default function Home({
 
             <div className="text-center pt-4 sm:pt-0 sm:pl-6">
               <div
-                className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#0B1F4B] tracking-tight"
+                className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#051F16] tracking-tight"
                 style={{ fontFamily: "Plus Jakarta Sans" }}
               >
                 75+
@@ -601,7 +601,7 @@ export default function Home({
 
             <div className="text-center pt-4 sm:pt-0 sm:pl-6">
               <div
-                className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#0B1F4B] tracking-tight"
+                className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#051F16] tracking-tight"
                 style={{ fontFamily: "Plus Jakarta Sans" }}
               >
                 7
@@ -616,7 +616,7 @@ export default function Home({
 
             <div className="text-center pt-4 sm:pt-0 sm:pl-6">
               <div
-                className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-emerald-600 tracking-tight"
+                className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-emerald-700 tracking-tight"
                 style={{ fontFamily: "Plus Jakarta Sans" }}
               >
                 18–32%
@@ -635,15 +635,18 @@ export default function Home({
       {/* ─── 5. CORE VALUE EDITORIAL SECTION ───────────────────────────────── */}
       <section id="solutions" className="py-20 lg:py-28 bg-[#FAFAFC] scroll-reveal">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
-          <span className="font-mono text-xs font-semibold uppercase tracking-widest text-[#F97316]">
+          <span className="font-mono text-xs font-semibold uppercase tracking-widest text-emerald-800">
             The Procurement Bottleneck
           </span>
 
           <h2
-            className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#0B1F4B] tracking-tight leading-tight"
+            className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#051F16] tracking-tight leading-tight"
             style={{ fontFamily: "Plus Jakarta Sans" }}
           >
-            "Procurement shouldn't feel fragmented."
+            "Procurement shouldn't feel{" "}
+            <span className="font-editorial italic font-normal text-[#083A28]">
+              fragmented.
+            </span>"
           </h2>
 
           <p className="text-base sm:text-lg text-slate-600 leading-relaxed font-normal">
@@ -659,7 +662,7 @@ export default function Home({
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-14">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-2xs hover:shadow-xs transition-shadow space-y-3">
-              <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#0B1F4B] flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-emerald-50 text-[#051F16] flex items-center justify-center">
                 <MaterialIcon name="psychology" size={20} />
               </div>
               <h3 className="font-bold text-slate-900 text-base">
@@ -685,7 +688,7 @@ export default function Home({
             </div>
 
             <div className="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-2xs hover:shadow-xs transition-shadow space-y-3">
-              <div className="w-10 h-10 rounded-xl bg-orange-50 text-[#F97316] flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-800 flex items-center justify-center">
                 <MaterialIcon name="savings" size={20} />
               </div>
               <h3 className="font-bold text-slate-900 text-base">
@@ -698,7 +701,7 @@ export default function Home({
             </div>
 
             <div className="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-2xs hover:shadow-xs transition-shadow space-y-3">
-              <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-700 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-slate-100 text-[#051F16] flex items-center justify-center">
                 <MaterialIcon name="security" size={20} />
               </div>
               <h3 className="font-bold text-slate-900 text-base">
@@ -719,14 +722,17 @@ export default function Home({
           {/* Chapter A: Intelligent Discovery */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-4">
-              <span className="font-mono text-xs font-semibold uppercase tracking-widest text-[#F97316]">
+              <span className="font-mono text-xs font-semibold uppercase tracking-widest text-emerald-800">
                 Intelligent Discovery
               </span>
               <h2
-                className="text-3xl sm:text-4xl font-extrabold text-[#0B1F4B] tracking-tight leading-tight"
+                className="text-3xl sm:text-4xl font-extrabold text-[#051F16] tracking-tight leading-tight"
                 style={{ fontFamily: "Plus Jakarta Sans" }}
               >
-                Tell MPI what you need in plain English.
+                Tell MPI what you need in{" "}
+                <span className="font-editorial italic font-normal text-[#083A28]">
+                  plain English.
+                </span>
               </h2>
               <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
                 No complex engineering jargon required. Whether you need custom
@@ -738,10 +744,10 @@ export default function Home({
                 <button
                   type="button"
                   onClick={() => navigate("startup.procurement")}
-                  className="group inline-flex items-center gap-2 text-xs font-bold text-[#0B1F4B] hover:text-[#123B7A] cursor-pointer"
+                  className="group inline-flex items-center gap-2 text-xs font-bold text-[#051F16] hover:text-[#083A28] cursor-pointer"
                 >
                   <span>Experience Natural Language Intake</span>
-                  <Icons.ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                  <Icons.ArrowRight className="w-3.5 h-3.5 text-[#051F16] group-hover:translate-x-1 transition-transform" />
                 </button>
               </div>
             </div>
@@ -750,13 +756,13 @@ export default function Home({
             <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200 shadow-2xs space-y-4">
               <div className="flex items-center justify-between text-xs font-mono text-slate-500 border-b border-slate-200 pb-3">
                 <span>INPUT: Raw Natural Language Prompt</span>
-                <span className="text-emerald-600 font-bold">● AI PARSER READY</span>
+                <span className="text-emerald-700 font-bold">● AI PARSER READY</span>
               </div>
               <div className="p-4 bg-white rounded-xl border border-slate-200 text-xs sm:text-sm text-slate-800 leading-relaxed font-medium">
                 "Looking for 500 units rigid cardboard packaging boxes with gold foil logo stamping and custom black EVA foam inserts for perfume launch next month."
               </div>
-              <div className="p-4 bg-[#0B1F4B] text-white rounded-xl text-xs space-y-2 font-mono">
-                <div className="text-amber-300 font-bold">OUTPUT: Institutional RFQ BOM</div>
+              <div className="p-4 bg-[#051F16] text-white rounded-xl text-xs space-y-2 font-mono border border-[#0A3525]">
+                <div className="text-[#A3F65C] font-bold">OUTPUT: Institutional RFQ BOM</div>
                 <div className="text-slate-300 text-[11px] space-y-1">
                   <div>• Material: 1200 GSM Kappa Board + 157 GSM Art Paper</div>
                   <div>• Finish: Matte Lamination + Micro Spot UV Gold Foil</div>
@@ -773,14 +779,14 @@ export default function Home({
             <div className="order-2 lg:order-1 bg-slate-50 rounded-2xl p-6 border border-slate-200 shadow-2xs space-y-4">
               <div className="flex items-center justify-between text-xs font-mono text-slate-500 border-b border-slate-200 pb-3">
                 <span>FACTORY DOSSIER #MCH-4819</span>
-                <span className="text-blue-700 font-bold">100% STATUTORY AUDITED</span>
+                <span className="text-emerald-800 font-bold">100% STATUTORY AUDITED</span>
               </div>
               <div className="bg-white rounded-xl p-4 border border-slate-200 space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="font-bold text-slate-900 text-sm">
                     Apex Precision Packaging Ltd.
                   </div>
-                  <span className="text-[10px] bg-amber-50 text-amber-800 font-bold px-2 py-0.5 rounded border border-amber-200">
+                  <span className="text-[10px] bg-emerald-50 text-emerald-800 font-bold px-2 py-0.5 rounded border border-emerald-200">
                     ZED Gold Pass
                   </span>
                 </div>
@@ -792,20 +798,23 @@ export default function Home({
                 </div>
                 <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
                   <span className="text-slate-500">Live Heidelberg Press Capacity:</span>
-                  <span className="font-bold text-emerald-600">68% Utilized (32% Open)</span>
+                  <span className="font-bold text-emerald-700">68% Utilized (32% Open)</span>
                 </div>
               </div>
             </div>
 
             <div className="order-1 lg:order-2 space-y-4">
-              <span className="font-mono text-xs font-semibold uppercase tracking-widest text-[#F97316]">
+              <span className="font-mono text-xs font-semibold uppercase tracking-widest text-emerald-800">
                 Verified Marketplace
               </span>
               <h2
-                className="text-3xl sm:text-4xl font-extrabold text-[#0B1F4B] tracking-tight leading-tight"
+                className="text-3xl sm:text-4xl font-extrabold text-[#051F16] tracking-tight leading-tight"
                 style={{ fontFamily: "Plus Jakarta Sans" }}
               >
-                Know exactly who you are buying from.
+                Know exactly who you are{" "}
+                <span className="font-editorial italic font-normal text-[#083A28]">
+                  buying from.
+                </span>
               </h2>
               <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
                 Zero phantom brokers or fictitious trading houses. Every factory
@@ -816,10 +825,10 @@ export default function Home({
                 <button
                   type="button"
                   onClick={() => navigate("msme.home")}
-                  className="group inline-flex items-center gap-2 text-xs font-bold text-[#0B1F4B] hover:text-[#123B7A] cursor-pointer"
+                  className="group inline-flex items-center gap-2 text-xs font-bold text-[#051F16] hover:text-[#083A28] cursor-pointer"
                 >
                   <span>Inspect Verified Supplier Standards</span>
-                  <Icons.ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                  <Icons.ArrowRight className="w-3.5 h-3.5 text-[#051F16] group-hover:translate-x-1 transition-transform" />
                 </button>
               </div>
             </div>
@@ -828,14 +837,17 @@ export default function Home({
           {/* Chapter C: Smart Comparison */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-4">
-              <span className="font-mono text-xs font-semibold uppercase tracking-widest text-[#F97316]">
+              <span className="font-mono text-xs font-semibold uppercase tracking-widest text-emerald-800">
                 Smart Comparison
               </span>
               <h2
-                className="text-3xl sm:text-4xl font-extrabold text-[#0B1F4B] tracking-tight leading-tight"
+                className="text-3xl sm:text-4xl font-extrabold text-[#051F16] tracking-tight leading-tight"
                 style={{ fontFamily: "Plus Jakarta Sans" }}
               >
-                Compare bids before you commit a single Rupee.
+                Compare bids before you commit a{" "}
+                <span className="font-editorial italic font-normal text-[#083A28]">
+                  single Rupee.
+                </span>
               </h2>
               <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
                 Side-by-side factory bid analysis normalized across tooling fees,
@@ -846,10 +858,10 @@ export default function Home({
                 <button
                   type="button"
                   onClick={() => navigate("startup.procurement")}
-                  className="group inline-flex items-center gap-2 text-xs font-bold text-[#0B1F4B] hover:text-[#123B7A] cursor-pointer"
+                  className="group inline-flex items-center gap-2 text-xs font-bold text-[#051F16] hover:text-[#083A28] cursor-pointer"
                 >
                   <span>View Side-by-Side Bidding Engine</span>
-                  <Icons.ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                  <Icons.ArrowRight className="w-3.5 h-3.5 text-[#051F16] group-hover:translate-x-1 transition-transform" />
                 </button>
               </div>
             </div>
@@ -858,7 +870,7 @@ export default function Home({
             <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200 shadow-2xs space-y-3">
               <div className="flex items-center justify-between text-xs font-mono text-slate-500 border-b border-slate-200 pb-3">
                 <span>COMPARATIVE BID ANALYSIS</span>
-                <span className="text-emerald-600 font-bold">3 ACTIVE FACTORY OFFERS</span>
+                <span className="text-emerald-700 font-bold">3 ACTIVE FACTORY OFFERS</span>
               </div>
               <div className="space-y-2 text-xs">
                 <div className="p-3 bg-white rounded-xl border border-slate-200 flex items-center justify-between">
@@ -923,21 +935,24 @@ export default function Home({
                   <span className="font-semibold text-slate-800">₹10,170</span>
                 </div>
                 <div className="flex justify-between pt-1 text-sm">
-                  <span className="font-bold text-[#0B1F4B]">Net Landed Factory Invoice:</span>
+                  <span className="font-bold text-[#051F16]">Net Landed Factory Invoice:</span>
                   <span className="font-extrabold text-emerald-700">₹66,670</span>
                 </div>
               </div>
             </div>
 
             <div className="order-1 lg:order-2 space-y-4">
-              <span className="font-mono text-xs font-semibold uppercase tracking-widest text-[#F97316]">
+              <span className="font-mono text-xs font-semibold uppercase tracking-widest text-emerald-800">
                 Savings Intelligence
               </span>
               <h2
-                className="text-3xl sm:text-4xl font-extrabold text-[#0B1F4B] tracking-tight leading-tight"
+                className="text-3xl sm:text-4xl font-extrabold text-[#051F16] tracking-tight leading-tight"
                 style={{ fontFamily: "Plus Jakarta Sans" }}
               >
-                See the value MPI creates on every procurement cycle.
+                See the value MPI creates on{" "}
+                <span className="font-editorial italic font-normal text-[#083A28]">
+                  every procurement cycle.
+                </span>
               </h2>
               <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
                 By bypassing layer upon layer of sales reps and broker fees, you
@@ -948,10 +963,10 @@ export default function Home({
                 <button
                   type="button"
                   onClick={() => navigate("startup.procurement")}
-                  className="group inline-flex items-center gap-2 text-xs font-bold text-[#0B1F4B] hover:text-[#123B7A] cursor-pointer"
+                  className="group inline-flex items-center gap-2 text-xs font-bold text-[#051F16] hover:text-[#083A28] cursor-pointer"
                 >
                   <span>Explore Direct Sourcing Savings</span>
-                  <Icons.ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                  <Icons.ArrowRight className="w-3.5 h-3.5 text-[#051F16] group-hover:translate-x-1 transition-transform" />
                 </button>
               </div>
             </div>
@@ -979,15 +994,18 @@ export default function Home({
       {/* ─── 8. PARTNER / ECOSYSTEM VISUALIZATION SECTION ──────────────────── */}
       <section className="py-20 bg-white border-y border-slate-200/80 scroll-reveal">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
-          <span className="font-mono text-xs font-semibold uppercase tracking-widest text-[#F97316]">
+          <span className="font-mono text-xs font-semibold uppercase tracking-widest text-emerald-800">
             The Connected Ecosystem
           </span>
 
           <h2
-            className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#0B1F4B] tracking-tight leading-tight"
+            className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#051F16] tracking-tight leading-tight"
             style={{ fontFamily: "Plus Jakarta Sans" }}
           >
-            MPI unites India's manufacturing grid.
+            MPI unites India's{" "}
+            <span className="font-editorial italic font-normal text-[#083A28]">
+              manufacturing grid.
+            </span>
           </h2>
 
           <p className="text-sm sm:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed">
@@ -999,11 +1017,11 @@ export default function Home({
           <div className="mt-12 p-8 sm:p-12 bg-slate-50/70 rounded-3xl border border-slate-200 relative overflow-hidden">
             {/* Center Node */}
             <div className="flex flex-col items-center justify-center">
-              <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl bg-[#0B1F4B] text-white flex flex-col items-center justify-center shadow-xl border-4 border-white z-10">
+              <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl bg-[#051F16] text-white flex flex-col items-center justify-center shadow-xl border-4 border-white z-10">
                 <span className="text-xl sm:text-2xl font-black tracking-tight" style={{ fontFamily: "Plus Jakarta Sans" }}>
                   MPI
                 </span>
-                <span className="text-[9px] text-amber-400 uppercase tracking-widest font-bold mt-0.5">
+                <span className="text-[9px] text-[#A3F65C] uppercase tracking-widest font-bold mt-0.5">
                   Core Engine
                 </span>
               </div>
@@ -1013,7 +1031,7 @@ export default function Home({
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mt-8 max-w-4xl mx-auto">
               <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs text-left space-y-1">
                 <div className="flex items-center gap-2 font-bold text-slate-900 text-xs">
-                  <MaterialIcon name="rocket_launch" size={16} className="text-blue-600" />
+                  <MaterialIcon name="rocket_launch" size={16} className="text-emerald-700" />
                   <span>Startups & D2C Brands</span>
                 </div>
                 <div className="text-[11px] text-slate-500">
@@ -1023,7 +1041,7 @@ export default function Home({
 
               <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs text-left space-y-1">
                 <div className="flex items-center gap-2 font-bold text-slate-900 text-xs">
-                  <MaterialIcon name="precision_manufacturing" size={16} className="text-[#F97316]" />
+                  <MaterialIcon name="precision_manufacturing" size={16} className="text-emerald-700" />
                   <span>MSME Factory Fleet</span>
                 </div>
                 <div className="text-[11px] text-slate-500">
@@ -1033,7 +1051,7 @@ export default function Home({
 
               <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs text-left space-y-1">
                 <div className="flex items-center gap-2 font-bold text-slate-900 text-xs">
-                  <MaterialIcon name="policy" size={16} className="text-amber-600" />
+                  <MaterialIcon name="policy" size={16} className="text-emerald-700" />
                   <span>Govt Grant Frameworks</span>
                 </div>
                 <div className="text-[11px] text-slate-500">
@@ -1043,7 +1061,7 @@ export default function Home({
 
               <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs text-left space-y-1">
                 <div className="flex items-center gap-2 font-bold text-slate-900 text-xs">
-                  <MaterialIcon name="lock" size={16} className="text-emerald-600" />
+                  <MaterialIcon name="lock" size={16} className="text-[#051F16]" />
                   <span>Milestone Escrow Banking</span>
                 </div>
                 <div className="text-[11px] text-slate-500">
@@ -1053,7 +1071,7 @@ export default function Home({
 
               <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs text-left space-y-1">
                 <div className="flex items-center gap-2 font-bold text-slate-900 text-xs">
-                  <MaterialIcon name="fact_check" size={16} className="text-indigo-600" />
+                  <MaterialIcon name="fact_check" size={16} className="text-emerald-700" />
                   <span>Quality Inspection Labs</span>
                 </div>
                 <div className="text-[11px] text-slate-500">
@@ -1079,14 +1097,17 @@ export default function Home({
       <section className="py-20 bg-[#FAFAFC] scroll-reveal">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto text-center space-y-4 mb-14">
-            <span className="font-mono text-xs font-semibold uppercase tracking-widest text-[#F97316]">
+            <span className="font-mono text-xs font-semibold uppercase tracking-widest text-emerald-800">
               Workflow Consolidation
             </span>
             <h2
-              className="text-3xl sm:text-4xl font-extrabold text-[#0B1F4B] tracking-tight leading-tight"
+              className="text-3xl sm:text-4xl font-extrabold text-[#051F16] tracking-tight leading-tight"
               style={{ fontFamily: "Plus Jakarta Sans" }}
             >
-              Everything your procurement workflow needs, connected in one place.
+              Everything your procurement workflow needs,{" "}
+              <span className="font-editorial italic font-normal text-[#083A28]">
+                connected in one place.
+              </span>
             </h2>
             <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-normal">
               From requirement drafting to statutory tax invoices, manage your entire
@@ -1096,7 +1117,7 @@ export default function Home({
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-2.5">
-              <span className="text-xs font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded">
+              <span className="text-xs font-bold text-[#051F16] bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">
                 01 • Instant RFQ Dispatch
               </span>
               <h3 className="font-bold text-slate-900 text-sm">
@@ -1109,7 +1130,7 @@ export default function Home({
             </div>
 
             <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-2.5">
-              <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
+              <span className="text-xs font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">
                 02 • Capacity Matching
               </span>
               <h3 className="font-bold text-slate-900 text-sm">
@@ -1122,7 +1143,7 @@ export default function Home({
             </div>
 
             <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-2.5">
-              <span className="text-xs font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded">
+              <span className="text-xs font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">
                 03 • Subsidy Automation
               </span>
               <h3 className="font-bold text-slate-900 text-sm">
@@ -1135,7 +1156,7 @@ export default function Home({
             </div>
 
             <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-2.5">
-              <span className="text-xs font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded">
+              <span className="text-xs font-bold text-[#051F16] bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
                 04 • Single Escrow Ledger
               </span>
               <h3 className="font-bold text-slate-900 text-sm">
@@ -1154,21 +1175,24 @@ export default function Home({
       <section className="py-20 bg-white border-y border-slate-200/80 scroll-reveal">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center space-y-4 mb-14">
-            <span className="font-mono text-xs font-semibold uppercase tracking-widest text-[#F97316]">
+            <span className="font-mono text-xs font-semibold uppercase tracking-widest text-emerald-800">
               Real Ecosystem Feedback
             </span>
             <h2
-              className="text-3xl sm:text-4xl font-extrabold text-[#0B1F4B] tracking-tight leading-tight"
+              className="text-3xl sm:text-4xl font-extrabold text-[#051F16] tracking-tight leading-tight"
               style={{ fontFamily: "Plus Jakarta Sans" }}
             >
-              Trusted by emerging founders and Tier-1 manufacturers.
+              Trusted by emerging founders and{" "}
+              <span className="font-editorial italic font-normal text-[#083A28]">
+                Tier-1 manufacturers.
+              </span>
             </h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="bg-slate-50/70 p-6 rounded-2xl border border-slate-200/90 shadow-2xs space-y-4 flex flex-col justify-between">
               <div className="space-y-3">
-                <div className="flex text-amber-400 text-xs">★★★★★</div>
+                <div className="flex text-emerald-600 text-xs">★★★★★</div>
                 <p className="text-xs sm:text-sm text-slate-700 leading-relaxed italic">
                   "We needed 2,000 custom rigid printed boxes for our D2C organic launch.
                   MPI parsed our requirements in minutes, matched us with a ZED Gold factory
@@ -1183,7 +1207,7 @@ export default function Home({
 
             <div className="bg-slate-50/70 p-6 rounded-2xl border border-slate-200/90 shadow-2xs space-y-4 flex flex-col justify-between">
               <div className="space-y-3">
-                <div className="flex text-amber-400 text-xs">★★★★★</div>
+                <div className="flex text-emerald-600 text-xs">★★★★★</div>
                 <p className="text-xs sm:text-sm text-slate-700 leading-relaxed italic">
                   "Sourcing 5-axis CNC machining with ±0.02mm tolerance for aeronautical
                   6061 aluminum without an 8-month lead time was a nightmare. MPI connected
@@ -1198,7 +1222,7 @@ export default function Home({
 
             <div className="bg-slate-50/70 p-6 rounded-2xl border border-slate-200/90 shadow-2xs space-y-4 flex flex-col justify-between">
               <div className="space-y-3">
-                <div className="flex text-amber-400 text-xs">★★★★★</div>
+                <div className="flex text-emerald-600 text-xs">★★★★★</div>
                 <p className="text-xs sm:text-sm text-slate-700 leading-relaxed italic">
                   "Our 6-color offset presses had 30% idle time between major export cycles.
                   MPI connects us to serious startups with structured technical specs and
@@ -1219,14 +1243,17 @@ export default function Home({
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
             <div className="lg:col-span-5 space-y-4">
-              <span className="font-mono text-xs font-semibold uppercase tracking-widest text-[#F97316]">
+              <span className="font-mono text-xs font-semibold uppercase tracking-widest text-emerald-800">
                 Government Schemes Intelligence
               </span>
               <h2
-                className="text-3xl font-extrabold text-[#0B1F4B] tracking-tight leading-tight"
+                className="text-3xl font-extrabold text-[#051F16] tracking-tight leading-tight"
                 style={{ fontFamily: "Plus Jakarta Sans" }}
               >
-                Government Subsidies & Sourcing Grants.
+                Government Subsidies &{" "}
+                <span className="font-editorial italic font-normal text-[#083A28]">
+                  Sourcing Grants.
+                </span>
               </h2>
               <p className="text-sm text-slate-600 leading-relaxed">
                 Indian startups sourcing through certified MSMEs are eligible for statutory
@@ -1237,10 +1264,10 @@ export default function Home({
                 <button
                   type="button"
                   onClick={() => navigate("government-schemes.match")}
-                  className="inline-flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-lg bg-[#0B1F4B] hover:bg-[#123B7A] text-white cursor-pointer shadow-2xs"
+                  className="inline-flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-lg bg-[#051F16] hover:bg-[#083A28] text-white cursor-pointer shadow-2xs"
                 >
                   <span>Match My Business Schemes</span>
-                  <Icons.ArrowRight className="w-3.5 h-3.5" />
+                  <Icons.ArrowRight className="w-3.5 h-3.5 text-[#A3F65C]" />
                 </button>
                 <button
                   type="button"
@@ -1253,10 +1280,10 @@ export default function Home({
             </div>
 
             {/* Interactive Calculator */}
-            <div className="lg:col-span-7 bg-[#0B1F4B] text-white p-6 sm:p-8 rounded-2xl shadow-xl border border-[#123B7A] space-y-6">
-              <div className="flex items-center justify-between border-b border-[#123B7A] pb-3">
+            <div className="lg:col-span-7 bg-[#051F16] text-white p-6 sm:p-8 rounded-2xl shadow-xl border border-[#0A3525] space-y-6">
+              <div className="flex items-center justify-between border-b border-[#0A3525] pb-3">
                 <div className="font-bold text-sm text-white flex items-center gap-2">
-                  <MaterialIcon name="calculate" size={18} className="text-amber-400" />
+                  <MaterialIcon name="calculate" size={18} className="text-[#A3F65C]" />
                   <span>Interactive Grant Estimator</span>
                 </div>
                 <span className="text-[11px] font-mono text-slate-300">
@@ -1268,7 +1295,7 @@ export default function Home({
                 <div>
                   <div className="flex justify-between text-xs font-medium text-slate-300 mb-2">
                     <span>Estimated Sourcing Budget:</span>
-                    <span className="font-bold text-amber-300 text-sm">
+                    <span className="font-bold text-[#A3F65C] text-sm">
                       ₹{calcBudget.toLocaleString("en-IN")}
                     </span>
                   </div>
@@ -1279,16 +1306,16 @@ export default function Home({
                     step={10000}
                     value={calcBudget}
                     onChange={(e) => setCalcBudget(Number(e.target.value))}
-                    className="w-full accent-[#F97316] cursor-pointer"
+                    className="w-full accent-[#A3F65C] cursor-pointer"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-3 pt-2 text-xs">
-                  <div className="bg-[#123B7A]/60 p-3.5 rounded-xl border border-blue-400/20">
+                  <div className="bg-[#0A3525]/80 p-3.5 rounded-xl border border-emerald-900/40">
                     <span className="text-slate-400 block text-[10px] uppercase font-bold">
                       Potential Govt Grant
                     </span>
-                    <span className="text-lg font-extrabold text-amber-300">
+                    <span className="text-lg font-extrabold text-[#A3F65C]">
                       ₹{calculatedSchemeBenefit.amount.toLocaleString("en-IN")}
                     </span>
                     <span className="text-[10px] text-slate-300 block mt-0.5">
@@ -1296,11 +1323,11 @@ export default function Home({
                     </span>
                   </div>
 
-                  <div className="bg-[#123B7A]/60 p-3.5 rounded-xl border border-blue-400/20">
+                  <div className="bg-[#0A3525]/80 p-3.5 rounded-xl border border-emerald-900/40">
                     <span className="text-slate-400 block text-[10px] uppercase font-bold">
                       Net Startup Landed Outlay
                     </span>
-                    <span className="text-lg font-extrabold text-emerald-400">
+                    <span className="text-lg font-extrabold text-white">
                       ₹{calculatedSchemeBenefit.netCost.toLocaleString("en-IN")}
                     </span>
                     <span className="text-[10px] text-slate-300 block mt-0.5">
@@ -1318,14 +1345,17 @@ export default function Home({
       <section className="py-20 bg-white border-y border-slate-200/80 scroll-reveal">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           <div className="text-center space-y-4">
-            <span className="font-mono text-xs font-semibold uppercase tracking-widest text-[#F97316]">
+            <span className="font-mono text-xs font-semibold uppercase tracking-widest text-emerald-800">
               Frequently Asked Questions
             </span>
             <h2
-              className="text-3xl sm:text-4xl font-extrabold text-[#0B1F4B] tracking-tight leading-tight"
+              className="text-3xl sm:text-4xl font-extrabold text-[#051F16] tracking-tight leading-tight"
               style={{ fontFamily: "Plus Jakarta Sans" }}
             >
-              Everything you need to know about MPI.
+              Everything you need to know{" "}
+              <span className="font-editorial italic font-normal text-[#083A28]">
+                about MPI.
+              </span>
             </h2>
           </div>
 
@@ -1362,15 +1392,15 @@ export default function Home({
       </section>
 
       {/* ─── 13. HIGH-CONVERSION FINAL CALL TO ACTION ──────────────────────── */}
-      <section className="py-20 lg:py-28 bg-[#0B1F4B] text-white relative overflow-hidden">
+      <section className="py-24 lg:py-32 bg-[#051F16] text-white relative overflow-hidden">
         {/* Soft Ambient Background Glow */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute -bottom-32 left-1/2 -translate-x-1/2 w-[800px] h-[350px] bg-gradient-to-t from-orange-500/10 via-blue-500/10 to-transparent rounded-full blur-3xl"
+          className="pointer-events-none absolute -bottom-32 left-1/2 -translate-x-1/2 w-[800px] h-[350px] bg-gradient-to-t from-emerald-500/20 via-[#A3F65C]/10 to-transparent rounded-full blur-3xl"
         />
 
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6 relative z-10">
-          <span className="font-mono text-xs uppercase tracking-widest text-amber-400 font-bold">
+          <span className="font-mono text-xs uppercase tracking-widest text-[#A3F65C] font-bold">
             Start Your Procurement Journey
           </span>
 
@@ -1378,7 +1408,10 @@ export default function Home({
             className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight"
             style={{ fontFamily: "Plus Jakarta Sans" }}
           >
-            Ready to make your procurement intelligent?
+            Ready to make your procurement{" "}
+            <span className="font-editorial italic font-normal text-[#A3F65C]">
+              intelligent?
+            </span>
           </h2>
 
           <p className="text-base sm:text-lg text-slate-300 max-w-2xl mx-auto leading-relaxed font-normal">
@@ -1390,16 +1423,16 @@ export default function Home({
             <button
               type="button"
               onClick={() => navigate("startup.procurement")}
-              className="group inline-flex items-center gap-2.5 px-6 py-3.5 text-sm font-bold rounded-xl bg-[#F97316] hover:bg-[#EA580C] active:bg-[#F97316] text-white shadow-lg hover:shadow-xl transition-all cursor-pointer"
+              className="group inline-flex items-center gap-2.5 px-7 py-4 text-sm font-bold rounded-xl bg-[#A3F65C] hover:bg-[#92E64B] active:bg-[#A3F65C] text-[#051F16] shadow-lg hover:shadow-xl transition-all cursor-pointer"
             >
               <span>Start with MPI</span>
-              <Icons.ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              <Icons.ArrowRight className="w-4 h-4 text-[#051F16] group-hover:translate-x-1 transition-transform" />
             </button>
 
             <button
               type="button"
               onClick={() => navigate("register.msme")}
-              className="px-6 py-3.5 text-sm font-semibold rounded-xl bg-transparent hover:bg-white/10 text-white border border-white/20 transition-all cursor-pointer"
+              className="px-7 py-4 text-sm font-semibold rounded-xl bg-transparent hover:bg-white/10 text-white border border-white/20 transition-all cursor-pointer"
             >
               Register as MSME Supplier
             </button>
@@ -1413,7 +1446,7 @@ export default function Home({
           <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
             {/* Col 1: Brand Info */}
             <div className="col-span-2 space-y-3">
-              <div className="font-extrabold text-lg text-[#0B1F4B]" style={{ fontFamily: "Plus Jakarta Sans" }}>
+              <div className="font-extrabold text-lg text-[#051F16]" style={{ fontFamily: "Plus Jakarta Sans" }}>
                 MPI — Market Procurement Intelligence
               </div>
               <p className="text-slate-500 leading-relaxed text-xs max-w-sm">
@@ -1432,22 +1465,22 @@ export default function Home({
               </div>
               <ul className="space-y-2">
                 <li>
-                  <a href="#marketplace" className="hover:text-[#0B1F4B] transition-colors">
+                  <a href="#marketplace" className="hover:text-[#051F16] transition-colors">
                     Catalogue
                   </a>
                 </li>
                 <li>
-                  <button onClick={() => navigate("startup.home")} className="hover:text-[#0B1F4B] transition-colors cursor-pointer">
+                  <button onClick={() => navigate("startup.home")} className="hover:text-[#051F16] transition-colors cursor-pointer">
                     Startup Hub
                   </button>
                 </li>
                 <li>
-                  <button onClick={() => navigate("msme.home")} className="hover:text-[#0B1F4B] transition-colors cursor-pointer">
+                  <button onClick={() => navigate("msme.home")} className="hover:text-[#051F16] transition-colors cursor-pointer">
                     MSME Portal
                   </button>
                 </li>
                 <li>
-                  <button onClick={() => navigate("government-schemes.match")} className="hover:text-[#0B1F4B] transition-colors cursor-pointer">
+                  <button onClick={() => navigate("government-schemes.match")} className="hover:text-[#051F16] transition-colors cursor-pointer">
                     Govt Schemes (30)
                   </button>
                 </li>
@@ -1461,22 +1494,22 @@ export default function Home({
               </div>
               <ul className="space-y-2">
                 <li>
-                  <button onClick={() => { setSelectedCategory("Packaging & Printing"); navigate("startup.procurement") }} className="hover:text-[#0B1F4B] transition-colors cursor-pointer">
+                  <button onClick={() => { setSelectedCategory("Packaging & Printing"); navigate("startup.procurement") }} className="hover:text-[#051F16] transition-colors cursor-pointer">
                     Packaging Materials
                   </button>
                 </li>
                 <li>
-                  <button onClick={() => { setSelectedCategory("Prototyping & Product Development"); navigate("startup.procurement") }} className="hover:text-[#0B1F4B] transition-colors cursor-pointer">
+                  <button onClick={() => { setSelectedCategory("Prototyping & Product Development"); navigate("startup.procurement") }} className="hover:text-[#051F16] transition-colors cursor-pointer">
                     CNC & 3D Prototyping
                   </button>
                 </li>
                 <li>
-                  <button onClick={() => { setSelectedCategory("IT & Digital Services"); navigate("startup.procurement") }} className="hover:text-[#0B1F4B] transition-colors cursor-pointer">
+                  <button onClick={() => { setSelectedCategory("IT & Digital Services"); navigate("startup.procurement") }} className="hover:text-[#051F16] transition-colors cursor-pointer">
                     IT & Digital Systems
                   </button>
                 </li>
                 <li>
-                  <button onClick={() => { setSelectedCategory("Compliance & Legal Support"); navigate("startup.procurement") }} className="hover:text-[#0B1F4B] transition-colors cursor-pointer">
+                  <button onClick={() => { setSelectedCategory("Compliance & Legal Support"); navigate("startup.procurement") }} className="hover:text-[#051F16] transition-colors cursor-pointer">
                     Compliance & Audits
                   </button>
                 </li>
@@ -1490,22 +1523,22 @@ export default function Home({
               </div>
               <ul className="space-y-2">
                 <li>
-                  <button onClick={() => navigate("login.admin")} className="hover:text-[#0B1F4B] transition-colors cursor-pointer">
+                  <button onClick={() => navigate("login.admin")} className="hover:text-[#051F16] transition-colors cursor-pointer">
                     Admin Portal
                   </button>
                 </li>
                 <li>
-                  <button onClick={() => navigate("analytics.detail.ai-insights")} className="hover:text-[#0B1F4B] transition-colors cursor-pointer">
+                  <button onClick={() => navigate("analytics.detail.ai-insights")} className="hover:text-[#051F16] transition-colors cursor-pointer">
                     Analytics Studio
                   </button>
                 </li>
                 <li>
-                  <button onClick={() => navigate("analytics.support")} className="hover:text-[#0B1F4B] transition-colors cursor-pointer">
+                  <button onClick={() => navigate("analytics.support")} className="hover:text-[#051F16] transition-colors cursor-pointer">
                     Support Desk
                   </button>
                 </li>
                 <li>
-                  <button onClick={() => navigate("login.startup")} className="hover:text-[#0B1F4B] transition-colors cursor-pointer">
+                  <button onClick={() => navigate("login.startup")} className="hover:text-[#051F16] transition-colors cursor-pointer">
                     Sign In
                   </button>
                 </li>

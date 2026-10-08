@@ -482,14 +482,14 @@ export function MPIButton({
 
   const variantClasses = {
     primary:
-      "bg-[#0B1F4B]/88 backdrop-blur-md border border-white/20 text-white hover:bg-[#123B7A]/92 hover:border-white/35 shadow-[inset_0_1px_1px_rgba(255,255,255,0.22)] active:scale-[0.98]",
-    ai: "bg-[#F97316]/90 backdrop-blur-md border border-white/25 text-white hover:bg-[#EA580C]/95 hover:border-white/40 shadow-[inset_0_1px_1px_rgba(255,255,255,0.25)] active:scale-[0.98]",
+      "bg-[#051F16] text-white hover:bg-[#083A28] active:bg-[#051F16] border border-[#0A3525] shadow-xs active:scale-[0.98]",
+    ai: "bg-[#051F16] text-[#A3F65C] hover:bg-[#083A28] active:bg-[#051F16] border border-emerald-900/60 shadow-xs active:scale-[0.98]",
     outline:
-      "bg-slate-900/10 backdrop-blur-md text-[#0B1F4B] border border-[#0B1F4B]/20 hover:bg-[#0B1F4B]/15 hover:border-[#0B1F4B]/35 active:scale-[0.98]",
+      "bg-white text-[#051F16] border border-slate-200 hover:bg-slate-50 hover:border-slate-300 active:scale-[0.98]",
     ghost:
-      "bg-transparent text-slate-700 hover:bg-slate-900/10 hover:text-slate-900 rounded-full active:scale-[0.98]",
-    danger: "bg-[#D92D20]/90 backdrop-blur-md border border-white/20 text-white hover:bg-red-700 shadow-none active:scale-[0.98]",
-    savings: "bg-[#D9A400]/90 backdrop-blur-md border border-white/20 text-white hover:bg-[#B78A00] shadow-none active:scale-[0.98]",
+      "bg-transparent text-slate-700 hover:bg-slate-100 hover:text-slate-900 rounded-full active:scale-[0.98]",
+    danger: "bg-[#D92D20] text-white hover:bg-red-700 shadow-none active:scale-[0.98]",
+    savings: "bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100/70 shadow-none active:scale-[0.98]",
   }
 
   return (
@@ -648,16 +648,16 @@ export function MPICard({
   savings?: boolean
   hover?: boolean
 }) {
-  let styleClass = "bg-white/95 backdrop-blur-xs border border-slate-200/90 shadow-2xs"
+  let styleClass = "bg-white border border-slate-200/90 shadow-2xs"
   if (highlight)
     styleClass =
-      "bg-white border-2 border-[#F97316]/60 shadow-md shadow-orange-500/5 ring-2 ring-orange-200/40"
+      "bg-white border-2 border-[#051F16] shadow-md ring-2 ring-emerald-100"
   if (savings)
     styleClass =
-      "bg-gradient-to-br from-white to-[#FFFDF5] border border-[#FFE799] shadow-xs"
+      "bg-emerald-50/40 border border-emerald-200/80 shadow-xs"
   if (hover)
     styleClass +=
-      " hover:shadow-xl hover:border-slate-300 hover:-translate-y-1 transition-all duration-300"
+      " hover:shadow-lg hover:border-slate-300 hover:-translate-y-0.5 transition-all duration-300"
 
   return (
     <div
@@ -690,7 +690,7 @@ export function MPIStatCard({
   return (
     <div
       onClick={onClick}
-      className={`group relative bg-white/95 backdrop-blur-md border border-slate-200/90 rounded-2xl p-5 shadow-2xs hover:shadow-md hover:border-slate-300 transition-all duration-300 hover:-translate-y-1 ${
+      className={`group relative bg-white border border-slate-200/90 rounded-2xl p-5 shadow-2xs hover:shadow-md hover:border-slate-300 transition-all duration-300 hover:-translate-y-0.5 ${
         onClick ? "cursor-pointer" : ""
       }`}
     >
@@ -699,14 +699,14 @@ export function MPIStatCard({
           {title}
         </span>
         {icon && (
-          <div className="w-7 h-7 rounded-lg bg-slate-50 group-hover:bg-blue-50 text-slate-500 group-hover:text-[#0B1F4B] flex items-center justify-center transition-colors">
+          <div className="w-7 h-7 rounded-lg bg-slate-50 group-hover:bg-emerald-50 text-slate-500 group-hover:text-[#051F16] flex items-center justify-center transition-colors">
             {icon}
           </div>
         )}
       </div>
       <div className="flex items-baseline justify-between gap-2">
         <div
-          className="text-2xl md:text-3xl font-extrabold text-[#0B1220] tracking-tight"
+          className="text-2xl md:text-3xl font-extrabold text-[#051F16] tracking-tight"
           style={{ fontFamily: "Plus Jakarta Sans" }}
         >
           {value}
@@ -770,9 +770,9 @@ export function MPIStepper({
               <div
                 className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all shadow-xs ${
                   isDone
-                    ? "bg-[#168A5B] text-white"
+                    ? "bg-emerald-700 text-white"
                     : isCurrent
-                      ? "bg-[#0B1F4B] text-white ring-4 ring-blue-100"
+                      ? "bg-[#051F16] text-white ring-4 ring-emerald-100"
                       : "bg-white border-2 border-slate-300 text-slate-500"
                 }`}
               >
@@ -785,7 +785,7 @@ export function MPIStepper({
               <span
                 className={`text-xs font-medium max-w-[90px] text-center ${
                   isCurrent
-                    ? "text-[#0B1F4B] font-bold"
+                    ? "text-[#051F16] font-bold"
                     : isDone
                       ? "text-slate-700"
                       : "text-slate-400"
