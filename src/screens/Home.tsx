@@ -5,7 +5,6 @@ import {
   MPI_CATALOG,
   CATALOG_CATEGORIES,
   CatalogCategory,
-  CatalogService,
   searchCatalog,
 } from "../lib/mpiCatalog"
 import {
@@ -15,7 +14,6 @@ import {
 } from "../components/design-system/MPIDesignSystem"
 import { hasLiveAIConfigured, type ExtractedProcurementSpecs } from "../services/aiService"
 import AuthModal from "../components/auth/AuthModal"
-import LanguageTranslatorButton from "../components/navigation/LanguageTranslatorButton"
 import GlobalNavBar from "../components/navigation/GlobalNavBar"
 import ProductCatalogue from "../components/catalogue/ProductCatalogue"
 import useScrollReveal from "../hooks/useScrollReveal"
@@ -62,14 +60,10 @@ export default function Home({
     targetBudget,
     aiConfidenceScore,
     runAIExtraction,
-    publicStartupSuppliers,
-    isExtractingSpecs,
-    specifications,
-    selectedCategory,
     schemes,
   } = useProcurement()
 
-  // Hardware-accelerated viewport scroll animation observer
+  // Viewport scroll reveal observer
   useScrollReveal()
 
   // Auth modal state for Login and Sign In
@@ -78,94 +72,84 @@ export default function Home({
     mode: "login",
   })
 
-  const openSignInModal = (role: "startup" | "msme" | "admin" = "startup") => {
-    void role
-    setAuthModal({ open: true, mode: "signin" })
-  }
-
-  // Mobile menu state
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-
-  // Command palette & search modal
+  // Command palette & search modal (⌘K)
   const [showSearchModal, setShowSearchModal] = useState(false)
   const [paletteQuery, setPaletteQuery] = useState("")
 
-  // AI Intake prompt simulator state
-  const [activePromptIndex, setActivePromptIndex] = useState(0)
-  const [hasSimulatedExtraction, setHasSimulatedExtraction] = useState(false)
-  const [extractionResult, setExtractionResult] = useState<ExtractedProcurementSpecs | null>(null)
+  // Product detail modal state for quick views
+  const [selectedProductDetail, setSelectedProductDetail] = useState<any | null>(null)
 
-  // Voice Assistant states
-  const [isVoiceRecording, setIsVoiceRecording] = useState(false)
-  const [voiceTranscript, setVoiceTranscript] = useState("")
-  const [voiceStatusText, setVoiceStatusText] = useState("")
-  const [audioLevel, setAudioLevel] = useState(0)
+  // Government schemes detail modal state
+  const [showSchemeDetailModal, setShowSchemeDetailModal] = useState(false)
 
-  // AI writing style & citation toggles
-  const [selectedWritingStyle, setSelectedWritingStyle] = useState<"Default" | "Institutional" | "Technical" | "Lean Startup">("Institutional")
-  const [showStyleDropdown, setShowStyleDropdown] = useState(false)
-  const [enableCitation, setEnableCitation] = useState(true)
+  // Interactive AI hero showcase state
+  const [activeHeroTab, setActiveHeroTab] = useState<"spec" | "suppliers" | "comparison" | "escrow">("spec")
+  const [heroPromptIndex, setHeroPromptIndex] = useState(0)
+  const [isSynthesizingHero, setIsSynthesizingHero] = useState(false)
+  const [heroExtractionResult, setHeroExtractionResult] = useState<ExtractedProcurementSpecs | null>(null)
 
+  // Government scheme interactive calculator state
+  const [calcBudget, setCalcBudget] = useState(120000)
+  const [calcCategory, setCalcCategory] = useState<CatalogCategory>("Packaging & Printing")
 
-  // Marketplace explorer state
-  const [selectedMarketCategory, setSelectedMarketCategory] =
-    useState<string>("All")
-  const [marketSearchQuery, setMarketSearchQuery] = useState("")
+  // FAQ Accordion State (open question index)
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0)
 
-  // Product detail modal state
-  const [selectedProductDetail, setSelectedProductDetail] =
-    useState<CatalogService | null>(null)
-
-  // Government Schemes Calculator state
-  const [calcBudget, setCalcBudget] = useState<number>(150000)
-  const [calcCategory, setCalcCategory] = useState<CatalogCategory>(
-    "Packaging & Printing",
-  )
-  const [showSchemeDetailModal, setShowSchemeDetailModal] =
-    useState<boolean>(false)
-  // Interactive 5-Step Journey active index
-  const [activeJourneyStep, setActiveJourneyStep] = useState(0)
-
-  // Platform Workspace 3D Flip Card state
-  const [isStartupCardFlipped, setIsStartupCardFlipped] = useState(false)
-  const [isMsmeCardFlipped, setIsMsmeCardFlipped] = useState(false)
-
-  // MPI Catalogue expandable section state
-  const [isCatalogExpanded, setIsCatalogExpanded] = useState(true)
-
-  // Sample prompt chips
-  const samplePrompts = [
+  // Reference Prompt Presets for Instant UI Interaction
+  const heroSamplePrompts = [
     {
-      label: "Rigid Skincare Boxes",
+      label: "Custom Rigid Cartons",
       text: "Need 500 custom rigid printed boxes for our D2C organic skincare launch by next month, budget under ₹80k with EVA foam inserts",
       cat: "Packaging & Printing" as CatalogCategory,
       qty: 500,
       budget: 75000,
+      leadTime: "12 Days",
+      tolerance: "±0.5 mm",
+      material: "1200 GSM Kappa Board with Matte Lamination",
+      savings: "28%",
+      factory: "Apex Precision Packaging (Bengaluru)",
     },
     {
-      label: "Rapid SLS 3D Prototyping",
-      text: "Require 50 units SLS 3D printed nylon PA12 enclosure prototypes with CNC milled aluminium plates within 10 days, budget ₹65k",
+      label: "5-Axis CNC Drone Arm",
+      text: "Looking for 5-axis CNC machining for 20 sets of 6061-T6 aluminum drone arm chassis with ±0.05mm tolerance and black anodizing, budget ₹1.2 Lakh",
       cat: "Prototyping & Product Development" as CatalogCategory,
-      qty: 50,
-      budget: 65000,
+      qty: 20,
+      budget: 120000,
+      leadTime: "10 Days",
+      tolerance: "±0.05 mm",
+      material: "Aero-Grade 6061-T6 Aluminum (Black Anodized)",
+      savings: "32%",
+      factory: "Bharat Precision Tooling (Peenya, KA)",
     },
     {
-      label: "Startup Scale & Incubation",
+      label: "Cloud ERP & Supabase",
+      text: "Need full-stack development team for custom ERP inventory workflow with Supabase PostgreSQL and Next.js 15, budget ₹1.8 Lakh",
+      cat: "IT & Digital Services" as CatalogCategory,
+      qty: 1,
+      budget: 180000,
+      leadTime: "21 Days",
+      tolerance: "SOC 2 Type II",
+      material: "Next.js 15 + Supabase PostgreSQL Enterprise",
+      savings: "24%",
+      factory: "Zenith Digital Systems (Pune, MH)",
+    },
+    {
+      label: "DPIIT Seed Fund Incubation",
       text: "Need specialized startup support for DPIIT seed fund compliance, MSME incubation readiness, and go-to-market mentorship, budget ₹50k",
       cat: "Specialized Startup Support" as CatalogCategory,
       qty: 1,
       budget: 50000,
-    },
-    {
-      label: "Next.js & Cloud ERP Setup",
-      text: "Need an agency to set up custom ERP inventory workflow and Supabase database integration for 100 users, budget ₹1.8 Lakh",
-      cat: "IT & Digital Services" as CatalogCategory,
-      qty: 1,
-      budget: 180000,
+      leadTime: "14 Days",
+      tolerance: "Statutory 100%",
+      material: "Startup India SISFS Mandate + ZED Audit File",
+      savings: "35%",
+      factory: "Bharat Innovation Foundry (New Delhi)",
     },
   ]
 
-  // Keyboard shortcut for Command Palette (⌘K or Ctrl+K)
+  const currentHeroPrompt = heroSamplePrompts[heroPromptIndex]
+
+  // Keyboard shortcut for Command Palette (⌘K)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
@@ -182,11 +166,6 @@ export default function Home({
     return () => window.removeEventListener("keydown", handleKeyDown)
   }, [])
 
-  // Filter catalog items
-  const filteredCatalog = useMemo(() => {
-    return searchCatalog(MPI_CATALOG, marketSearchQuery, selectedMarketCategory)
-  }, [marketSearchQuery, selectedMarketCategory])
-
   // Command palette results
   const paletteResults = useMemo(() => {
     if (!paletteQuery.trim()) {
@@ -195,114 +174,28 @@ export default function Home({
     return searchCatalog(MPI_CATALOG, paletteQuery, "All").slice(0, 8)
   }, [paletteQuery])
 
-  // Handle AI spec generation in hero
-  const handleGenerateSpecs = async (textToExtract?: string) => {
-    const text = typeof textToExtract === "string" ? textToExtract : requirementText
-    const res = await runAIExtraction(text)
-    setExtractionResult(res)
-    setHasSimulatedExtraction(true)
-  }
-
-  // Voice Assistant: Web Speech API Recognition + Interactive Fallback
-  const toggleVoiceRecording = () => {
-    if (isVoiceRecording) {
-      setIsVoiceRecording(false)
-      setVoiceStatusText("Voice recording stopped.")
-      return
-    }
-
-    const SpeechRecognition =
-      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
-
-    if (!SpeechRecognition) {
-      // Graceful fallback simulation if browser doesn't have webkitSpeechRecognition
-      setIsVoiceRecording(true)
-      setVoiceStatusText("Listening to your voice requirement...")
-      const sampleVoiceText =
-        "Require 2000 units food-grade biodegradable paper pouches with zip lock for specialty tea packaging, delivery in 14 days, budget 45000"
-      
-      let charIdx = 0
-      const interval = setInterval(() => {
-        charIdx += 8
-        const currentSlice = sampleVoiceText.slice(0, charIdx)
-        setRequirementText(currentSlice)
-        setAudioLevel(Math.random() * 80 + 20)
-        if (charIdx >= sampleVoiceText.length) {
-          clearInterval(interval)
-          setIsVoiceRecording(false)
-          setVoiceStatusText("Voice requirement captured successfully!")
-          setAudioLevel(0)
-          handleGenerateSpecs(sampleVoiceText)
-        }
-      }, 150)
-      return
-    }
-
-    try {
-      const recognition = new SpeechRecognition()
-      recognition.continuous = false
-      recognition.interimResults = true
-      recognition.lang = "en-IN"
-
-      recognition.onstart = () => {
-        setIsVoiceRecording(true)
-        setVoiceStatusText("Listening... Speak your procurement requirement now.")
-      }
-
-      recognition.onresult = (event: any) => {
-        let transcript = ""
-        for (let i = event.resultIndex; i < event.results.length; ++i) {
-          transcript += event.results[i][0].transcript
-        }
-        if (transcript) {
-          setRequirementText(transcript)
-          setVoiceTranscript(transcript)
-        }
-      }
-
-      recognition.onerror = (event: any) => {
-        console.warn("Speech recognition error:", event.error)
-        setIsVoiceRecording(false)
-        setVoiceStatusText(`Voice input: ${event.error || "Unable to access microphone"}`)
-      }
-
-      recognition.onend = () => {
-        setIsVoiceRecording(false)
-        setVoiceStatusText("Voice captured. Analyzing requirement...")
-        if (requirementText.trim().length > 5) {
-          handleGenerateSpecs()
-        }
-      }
-
-      recognition.start()
-    } catch (e) {
-      console.error("Speech recognition could not be started", e)
-      setIsVoiceRecording(false)
-      setVoiceStatusText("Could not access microphone.")
-    }
-  }
-
-  // Select sample prompt chip
-  const handleSelectPromptChip = (index: number) => {
-    setActivePromptIndex(index)
-    const item = samplePrompts[index]
+  // Handle switching hero prompt chip
+  const handleSelectHeroPrompt = async (index: number) => {
+    setHeroPromptIndex(index)
+    const item = heroSamplePrompts[index]
     setRequirementText(item.text)
     setSelectedCategory(item.cat)
     setQuantity(item.qty)
     setTargetBudget(item.budget)
-    setExtractionResult(null)
-    setHasSimulatedExtraction(false)
+
+    setIsSynthesizingHero(true)
+    try {
+      const res = await runAIExtraction(item.text)
+      setHeroExtractionResult(res)
+    } finally {
+      setIsSynthesizingHero(false)
+    }
   }
 
-  // Launch into Startup Workspace
-  const handleContinueToStartupWorkspace = () => {
-    navigate("startup.procurement")
-  }
-
-  // Calculate potential scheme assistance
+  // Scheme assistance calculation
   const calculatedSchemeBenefit = useMemo(() => {
-    let rate = 0.6 // default 60%
-    if (calcCategory === "Compliance & Legal Support") rate = 0.8 // ZED up to 80%
+    let rate = 0.6 // 60%
+    if (calcCategory === "Compliance & Legal Support") rate = 0.8
     if (calcCategory === "Prototyping & Product Development") rate = 0.7
     const est = Math.round(calcBudget * rate)
     return {
@@ -312,57 +205,43 @@ export default function Home({
     }
   }, [calcBudget, calcCategory])
 
-  const journeySteps = [
+  // FAQ Items
+  const faqItems = [
     {
-      num: "01",
-      title: "Describe & Specify",
-      subtitle: "Plain Language → Institutional RFQ",
-      desc: "Type your sourcing requirement in plain English. MPI AI instantly extracts manufacturing tolerances, material grades, quantities, and delivery constraints into a structured, institutional-grade RFQ specification.",
-      metric: "99.2% Spec Completeness",
-      highlights: ["Natural language intake", "Auto-extracted BOMs & tolerances", "< 60 seconds to initiate"],
-      icon: "📝",
-      gradient: "from-[#0B1F4B] to-[#162D63]",
-      accentColor: "deepBlue",
+      q: "How does MPI verify MSME factories and eliminate middleman fraud?",
+      a: "Every factory on MPI undergoes mandatory verification against government databases (Udyam statutory registration, live GSTIN return filings, and ZED Gold/Bronze certifications). Physical machinery capacity, historical batch defect rates, and factory floor telemetry are audited before any manufacturer can bid on client RFQs.",
     },
     {
-      num: "02",
-      title: "Match & Compare",
-      subtitle: "Verified MSMEs → Transparent Landed Costs",
-      desc: "Our engine cross-checks Udyam registration, machine capacity, and ISO certifications to surface vetted suppliers, then delivers itemized quotes with full cost transparency across tooling, fabrication, logistics, GST, and subsidies.",
-      metric: "Avg 38% Landed Savings",
-      highlights: ["1,240+ audited MSME suppliers", "Reverse margin cost breakdown", "Zero hidden fees"],
-      icon: "🔍",
-      gradient: "from-[#F97316] to-[#EA580C]",
-      accentColor: "orange",
+      q: "Can early-stage startups with low order quantities (low MOQs) use MPI?",
+      a: "Yes. Traditional manufacturing agents reject small batches or impose punitive tooling surcharges. MPI pools non-confidential capacity demand across regional industrial clusters (e.g., Peenya, Okhla, Coimbatore), matching early-stage founders with idle machine hours for batches as small as 50–500 units.",
     },
     {
-      num: "03",
-      title: "Order & Deliver",
-      subtitle: "Escrow PO → QC-Gated Milestone Release",
-      desc: "Digitally generate Purchase Orders, track 10 order milestones with QC inspection gates, and release payment only upon certified passes. Fully escrow-backed for zero advance risk.",
-      metric: "10-Milestone Protection",
-      highlights: ["Digital PO generation", "Escrow-backed milestones", "Certified QC gate sign-offs"],
-      icon: "🚀",
-      gradient: "from-[#0B1F4B] via-[#123B7A] to-[#F97316]",
-      accentColor: "deepBlueOrange",
+      q: "How does the milestone escrow payment system protect my capital?",
+      a: "Payments are held securely in a tripartite escrow account. Zero full advances are disbursed to suppliers upfront. Typically, 30% is mobilized for raw materials upon technical drawing approval, with the remaining 70% released only after third-party lab inspection reports and dispatch bills of lading are verified.",
+    },
+    {
+      q: "What government subsidies can my startup claim through MPI?",
+      a: "Startups sourcing through DPIIT & MSME-registered manufacturers are eligible for up to 80% subsidy on tooling, CAD prototyping, and quality certifications under ZED, Design Clinic, and the Startup India Seed Fund Scheme (SISFS). MPI automatically flags grant-eligible items in your RFQ.",
+    },
+    {
+      q: "How does the AI requirement synthesis work?",
+      a: "When you type a plain-language requirement (e.g., 'Need 500 rigid boxes with foam inserts'), our Gemini-powered engine parses your prompt into engineering-grade parameters: GSM paper weights, dimensional tolerances, material grades, bill of materials (BOM), and production lead times.",
     },
   ]
 
   return (
-    <div className="min-h-screen bg-[#F7F9FC] text-[#0B1220] flex flex-col font-sans selection:bg-[#F97316] selection:text-white">
-      {/* ─── 1. TOP ANNOUNCEMENT BANNER ────────────────────────────────────────── */}
-      <div className="bg-[#0B1F4B] text-white text-xs py-2 px-4 border-b border-[#123B7A] flex items-center justify-between">
-        <div className="max-w-7xl mx-auto w-full flex items-center justify-between text-[11px] sm:text-xs">
+    <div className="min-h-screen bg-[#FAFAFC] text-slate-900 flex flex-col font-sans selection:bg-[#0B1F4B] selection:text-white antialiased">
+      {/* ─── STATUTORY TRUST STRIP ────────────────────────────────────────── */}
+      <div className="bg-[#0B1F4B] text-white text-xs py-2 px-4 border-b border-[#123B7A]/60">
+        <div className="max-w-7xl mx-auto flex items-center justify-between text-[11px] sm:text-xs">
           <div className="flex items-center gap-2">
-            <span className="bg-[#F97316] text-white font-bold px-2 py-0.5 rounded-full text-[10px] uppercase tracking-wider">
-              MSME Bharat
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="font-semibold text-slate-200">
+              NATIONAL PROCUREMENT NETWORK
             </span>
-            <span className="text-slate-200 hidden sm:inline">
-              Empowering Indian Startups with DPIIT & MSME Ministry Verified
-              Sourcing Hub.
-            </span>
-            <span className="text-slate-200 sm:hidden">
-              MPI Procurement Support for Startups.
+            <span className="text-slate-400 hidden sm:inline">•</span>
+            <span className="text-slate-300 hidden sm:inline">
+              DPIIT & Ministry of MSME Verified Factory Sourcing Infrastructure
             </span>
           </div>
           <div className="flex items-center gap-4 text-slate-300">
@@ -386,7 +265,7 @@ export default function Home({
         </div>
       </div>
 
-      {/* ─── 2. GLOBAL ADAPTIVE NAVIGATION ──────────────────────────────────── */}
+      {/* ─── 1. GLOBAL MINIMAL NAVIGATION ──────────────────────────────────── */}
       <GlobalNavBar
         navigate={navigate}
         goBack={goBack}
@@ -394,1676 +273,1260 @@ export default function Home({
         canGoBack={canGoBack}
       />
 
-      {/* ─── 3. HERO SECTION WITH INTERACTIVE AI INTAKE SIMULATOR ──────────────── */}
-      <section className="relative overflow-hidden pt-8 pb-14 lg:pt-12 lg:pb-20 bg-linear-to-b from-white via-slate-50 to-[#F7F9FC] border-b border-slate-200">
-        {/* Ambient Spatial Lighting Bloom */}
-        <div aria-hidden="true" className="pointer-events-none absolute -top-32 left-1/2 -translate-x-1/2 w-[800px] h-[450px] bg-gradient-to-tr from-blue-500/10 via-[#F97316]/5 to-transparent rounded-full blur-3xl animate-ambient-glow" />
+      {/* ─── 2. HERO SECTION (REFERENCE REIMAGINATION) ─────────────────────── */}
+      <section className="relative pt-16 pb-20 lg:pt-24 lg:pb-32 overflow-hidden bg-gradient-to-b from-white via-[#F8FAFC] to-[#F1F5F9]">
+        {/* Ambient Spatial Lighting - Restrained, Clean, Delicate */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 w-[1000px] h-[550px] bg-gradient-to-b from-blue-100/60 via-amber-50/30 to-transparent rounded-full blur-3xl opacity-70"
+        />
 
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          {/* Top Block: Value Proposition (Editorial & Authoritative) */}
-          <div className="max-w-4xl mx-auto text-center space-y-6 animate-fade-in">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50/90 border border-blue-200/80 text-xs font-bold text-[#0B1F4B] shadow-2xs hover:shadow-xs transition-all">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="tracking-wide text-[11px] sm:text-xs">DPIIT & MSME MINISTRY VERIFIED • NATIONAL SOURCING INFRASTRUCTURE</span>
+          {/* Eyebrow & Editorial Headline */}
+          <div className="max-w-4xl mx-auto text-center space-y-6">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-100/90 border border-slate-200 text-xs font-semibold text-slate-800 shadow-2xs hover:bg-slate-100 transition-all">
+              <span className="w-2 h-2 rounded-full bg-[#F97316]" />
+              <span className="font-mono text-[11px] tracking-wider uppercase text-slate-700">
+                AI-Powered Procurement Intelligence
+              </span>
             </div>
 
             <h1
-              className="text-2xl sm:text-3xl md:text-4xl lg:text-[42px] xl:text-[46px] font-extrabold text-[#0B1F4B] tracking-tight leading-[1.2]"
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-[72px] font-extrabold text-[#0B1F4B] tracking-tight leading-[1.08]"
               style={{ fontFamily: "Plus Jakarta Sans" }}
             >
-              The Operating System for{" "}
-              <span className="bg-gradient-to-r from-[#0B1F4B] via-[#123B7A] to-[#F97316] bg-clip-text text-transparent">
-                Intelligent Business Procurement.
+              Procurement, <br className="hidden sm:inline" />
+              <span className="bg-gradient-to-r from-[#0B1F4B] via-[#1E3A8A] to-[#F97316] bg-clip-text text-transparent">
+                made intelligent.
               </span>
             </h1>
 
-            <p className="text-sm sm:text-base md:text-lg text-slate-600 leading-relaxed max-w-2xl mx-auto font-normal">
-              Transform plain requirement descriptions into verified factory deliveries. Empowering emerging Indian startups to source packaging, prototyping, compliance, and specialized manufacturing with programmatic RFQs, real-time quote comparison, and 100% audited MSME suppliers.
+            <p className="text-base sm:text-lg md:text-xl text-slate-600 max-w-2xl mx-auto font-normal leading-relaxed">
+              AI-powered procurement intelligence that helps businesses discover,
+              compare, verify and procure products and services with greater
+              speed, visibility and savings.
             </p>
 
-            {/* Direct Workspace Action Links */}
-            <div className="flex flex-wrap items-center justify-center gap-4 pt-1">
-              <MPIButton
-                variant="primary"
-                size="lg"
+            {/* Primary & Secondary Action Buttons */}
+            <div className="flex flex-wrap items-center justify-center gap-3.5 pt-2">
+              <button
+                type="button"
                 onClick={() => navigate("startup.procurement")}
-                icon={<Icons.ArrowRight className="w-4 h-4" />}
+                className="group inline-flex items-center gap-2.5 px-6 py-3.5 text-sm font-bold rounded-xl bg-[#0B1F4B] hover:bg-[#123B7A] active:bg-[#0B1F4B] text-white shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer"
               >
-                Launch MPI Procurement Support
-              </MPIButton>
-              <MPIButton
-                variant="outline"
-                size="lg"
-                onClick={() => navigate("register.msme")}
+                <span>Start with MPI</span>
+                <Icons.ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </button>
+
+              <a
+                href="#marketplace"
+                className="inline-flex items-center gap-2 px-6 py-3.5 text-sm font-semibold rounded-xl bg-white hover:bg-slate-50 text-slate-800 border border-slate-200/90 shadow-2xs hover:border-slate-300 transition-all cursor-pointer"
               >
-                Register as MSME Supplier
-              </MPIButton>
+                <span>Explore Catalogue</span>
+                <MaterialIcon name="arrow_downward" size={15} className="text-slate-400" />
+              </a>
             </div>
 
-            {/* Living Procurement Network Visualizer (5-Node Flow) */}
-            <div className="pt-4 pb-1">
-              <div className="bg-white/90 backdrop-blur-md rounded-2xl border border-slate-200/90 p-4 sm:p-5 shadow-sm text-left">
-                <div className="flex items-center justify-between mb-3 border-b border-slate-100 pb-2.5">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-[#F97316] animate-ping" />
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-[#0B1F4B]">
-                      Procurement Intelligence Flow in Motion
-                    </span>
+            {/* Credibility Micro-line */}
+            <div className="pt-2 flex items-center justify-center gap-6 text-xs text-slate-500 font-medium">
+              <span className="flex items-center gap-1.5">
+                <MaterialIcon name="verified" size={14} className="text-emerald-600" />
+                <span>1,240+ Verified MSME Factories</span>
+              </span>
+              <span className="hidden sm:inline text-slate-300">•</span>
+              <span className="hidden sm:flex items-center gap-1.5">
+                <MaterialIcon name="policy" size={14} className="text-[#F97316]" />
+                <span>DPIIT & ZED Certified</span>
+              </span>
+              <span className="hidden sm:inline text-slate-300">•</span>
+              <span className="flex items-center gap-1.5">
+                <MaterialIcon name="lock" size={14} className="text-blue-600" />
+                <span>100% Milestone Escrow</span>
+              </span>
+            </div>
+          </div>
+
+          {/* ─── 3. REAL MPI PRODUCT PREVIEW (HERO ARTWORK CENTERPIECE) ──────── */}
+          <div className="mt-14 lg:mt-18 relative">
+            {/* Outer Product Frame */}
+            <div className="relative mx-auto rounded-2xl sm:rounded-3xl border border-slate-200/80 bg-white shadow-[0_20px_60px_-15px_rgba(11,31,75,0.12)] overflow-hidden">
+              {/* Product Window Header Bar */}
+              <div className="px-4 sm:px-6 py-3.5 bg-slate-50/90 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3 text-xs">
+                <div className="flex items-center gap-2.5">
+                  <div className="flex gap-1.5">
+                    <span className="w-3 h-3 rounded-full bg-slate-300" />
+                    <span className="w-3 h-3 rounded-full bg-slate-300" />
+                    <span className="w-3 h-3 rounded-full bg-slate-300" />
                   </div>
-                  <span className="text-[11px] text-slate-400 font-medium hidden sm:inline">
-                    Live System Telemetry • 100% Verified
+                  <span className="h-4 w-px bg-slate-200 mx-1" />
+                  <span className="font-mono text-[11px] font-semibold text-slate-600">
+                    app.mpi.gov.in / procurement-os
                   </span>
                 </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-2.5">
-                  {/* Node 1 */}
-                  <div
-                    onClick={() => {
-                      setRequirementText(samplePrompts[0].text)
-                      setSelectedCategory(samplePrompts[0].cat)
-                    }}
-                    className="p-3 rounded-xl bg-slate-50/80 hover:bg-blue-50/50 border border-slate-200 hover:border-blue-300 transition-all cursor-pointer group hover:-translate-y-0.5"
-                  >
-                    <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 group-hover:text-blue-600">
-                      01 • Input
-                    </div>
-                    <div className="text-xs font-bold text-slate-900 mt-0.5">
-                      Plain Requirement
-                    </div>
-                    <div className="text-[11px] text-slate-500 mt-1 line-clamp-1">
-                      Text or Voice Specs
-                    </div>
-                  </div>
-
-                  {/* Node 2 */}
-                  <div
-                    onClick={() => {
-                      setRequirementText(samplePrompts[1].text)
-                      setSelectedCategory(samplePrompts[1].cat)
-                    }}
-                    className="p-3 rounded-xl bg-slate-50/80 hover:bg-orange-50/50 border border-slate-200 hover:border-orange-300 transition-all cursor-pointer group hover:-translate-y-0.5"
-                  >
-                    <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 group-hover:text-orange-600">
-                      02 • Synthesis
-                    </div>
-                    <div className="text-xs font-bold text-slate-900 mt-0.5">
-                      MPI AI Spec Engine
-                    </div>
-                    <div className="text-[11px] text-slate-500 mt-1 line-clamp-1">
-                      GSM, Tolerances, QA
-                    </div>
-                  </div>
-
-                  {/* Node 3 */}
-                  <div
-                    onClick={() => {
-                      const el = document.getElementById("marketplace")
-                      el?.scrollIntoView({ behavior: "smooth" })
-                    }}
-                    className="p-3 rounded-xl bg-slate-50/80 hover:bg-blue-50/50 border border-slate-200 hover:border-blue-300 transition-all cursor-pointer group hover:-translate-y-0.5"
-                  >
-                    <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 group-hover:text-blue-600">
-                      03 • Factory Fleet
-                    </div>
-                    <div className="text-xs font-bold text-slate-900 mt-0.5">
-                      1,240+ MSME Fleet
-                    </div>
-                    <div className="text-[11px] text-emerald-600 font-semibold mt-1 line-clamp-1">
-                      100% Udyam Audited
-                    </div>
-                  </div>
-
-                  {/* Node 4 */}
-                  <div
-                    onClick={() => navigate("startup.procurement")}
-                    className="p-3 rounded-xl bg-slate-50/80 hover:bg-amber-50/50 border border-slate-200 hover:border-amber-300 transition-all cursor-pointer group hover:-translate-y-0.5"
-                  >
-                    <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 group-hover:text-amber-600">
-                      04 • Pricing
-                    </div>
-                    <div className="text-xs font-bold text-slate-900 mt-0.5">
-                      Reverse-Margin
-                    </div>
-                    <div className="text-[11px] text-[#F97316] font-bold mt-1 line-clamp-1">
-                      -38.4% Net Savings
-                    </div>
-                  </div>
-
-                  {/* Node 5 */}
-                  <div
-                    onClick={() => navigate("startup.procurement")}
-                    className="p-3 rounded-xl bg-slate-50/80 hover:bg-emerald-50/50 border border-slate-200 hover:border-emerald-300 transition-all cursor-pointer group hover:-translate-y-0.5 col-span-2 md:col-span-1"
-                  >
-                    <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 group-hover:text-emerald-600">
-                      05 • Fulfilment
-                    </div>
-                    <div className="text-xs font-bold text-slate-900 mt-0.5">
-                      Escrow Delivery
-                    </div>
-                    <div className="text-[11px] text-emerald-700 font-medium mt-1 line-clamp-1">
-                      99.4% On-Time SLA
-                    </div>
+                <div className="flex items-center gap-3">
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200 font-medium text-[11px]">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <span>Engine Active • 1,240 Factories Connected</span>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
 
-          {/* Bottom Block: Next-Gen Conversational AI Engine & Voice Assistant (Horizontal Layout) */}
-          <div id="ai-procurement-engine" className="mt-10 max-w-5xl mx-auto scroll-mt-20 scroll-reveal">
-            <div className="bg-white/95 backdrop-blur-xl rounded-3xl border border-slate-200/90 p-6 sm:p-8 shadow-[0_24px_60px_-12px_rgba(11,31,75,0.1)] relative overflow-hidden transition-all duration-300 hover:shadow-[0_28px_70px_-10px_rgba(11,31,75,0.14)]">
-              {/* 1. Header with Glowing MPI Brand Sphere Orb */}
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 pb-5 border-b border-slate-100">
-                <div className="flex items-center gap-4 text-left">
-                  {/* MPI Glowing Sphere Orb */}
-                  <div className="relative group cursor-pointer shrink-0" onClick={toggleVoiceRecording}>
-                    <div className="w-13 h-13 rounded-full bg-linear-to-tr from-[#0B1F4B] via-[#123B7A] to-[#F97316] shadow-[0_0_30px_rgba(249,115,22,0.4)] flex items-center justify-center transition-transform hover:scale-105 active:scale-95 animate-pulse">
-                      <div className="w-8 h-8 rounded-full bg-white/25 backdrop-blur-xs flex items-center justify-center">
-                        <Icons.Sparkles className="w-4.5 h-4.5 text-white" />
-                      </div>
-                    </div>
-                    {isVoiceRecording && (
-                      <span className="absolute inset-0 rounded-full border-2 border-orange-400 animate-ping opacity-75 pointer-events-none" />
-                    )}
-                  </div>
-                  <div>
-                    <h3
-                      className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight"
-                      style={{ fontFamily: "Plus Jakarta Sans" }}
-                    >
-                      Good Afternoon, Founder
-                    </h3>
-                    <div
-                      className="text-sm sm:text-base font-bold text-slate-600 mt-0.5"
-                      style={{ fontFamily: "Plus Jakarta Sans" }}
-                    >
-                      What's on <span className="bg-linear-to-r from-[#0B1F4B] via-[#123B7A] to-[#F97316] bg-clip-text text-transparent">your procurement mind?</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="hidden sm:flex items-center gap-2 text-xs font-semibold text-slate-500 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-200">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  <span>Interactive RFQ Engine • Voice & Specs</span>
-                </div>
-              </div>
-
-              {/* 2. Main Conversational AI Input Box */}
-              <div className="relative rounded-2xl border border-slate-200 bg-white shadow-xs focus-within:border-[#F97316] focus-within:ring-4 focus-within:ring-orange-100/70 transition-all overflow-hidden">
-                {/* Animated Beam Scan during live AI extraction */}
-                {isExtractingSpecs && (
-                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#F97316] to-transparent animate-[beam-scan_1.4s_infinite] z-20" />
-                )}
-                {/* Input area */}
-                <div className="p-4 sm:p-5">
-                  <div className="flex items-start gap-3">
-                    <Icons.Sparkles className="w-4 h-4 text-[#F97316] shrink-0 mt-1" />
-                    <textarea
-                      rows={2}
-                      value={requirementText}
-                      onChange={(e) => {
-                        setRequirementText(e.target.value)
-                        setHasSimulatedExtraction(false)
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" && !e.shiftKey && requirementText.trim()) {
-                          e.preventDefault()
-                          handleGenerateSpecs()
-                        }
-                      }}
-                      placeholder="Ask AI a question or describe your procurement requirement (quantity, material, tolerances, target budget)..."
-                      className="w-full text-xs sm:text-sm text-slate-800 placeholder:text-slate-400 bg-transparent border-0 outline-none resize-none font-medium leading-relaxed"
-                    />
-                  </div>
-                </div>
-
-                {/* Voice recording live indicator strip if active */}
-                {isVoiceRecording && (
-                  <div className="mx-4 mb-2 p-2.5 rounded-xl bg-orange-50 border border-orange-200 text-orange-900 flex items-center justify-between text-xs animate-fade-in">
+              {/* Product Interface Body */}
+              <div className="p-4 sm:p-6 lg:p-8 space-y-6">
+                {/* Real Requirement Intake Bar */}
+                <div className="bg-slate-50/80 rounded-2xl p-4 sm:p-5 border border-slate-200/90 space-y-3">
+                  <div className="flex items-center justify-between text-xs font-semibold text-slate-700">
                     <div className="flex items-center gap-2">
-                      <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping" />
-                      <span className="font-semibold">Recording voice requirement... Speak clearly.</span>
+                      <MaterialIcon name="terminal" size={16} className="text-[#0B1F4B]" />
+                      <span>Natural Language Sourcing Requirement</span>
                     </div>
-                    <button
-                      type="button"
-                      onClick={toggleVoiceRecording}
-                      className="px-2.5 py-1 rounded-md bg-[#F97316] text-white font-bold hover:bg-orange-600 text-[11px] cursor-pointer"
-                    >
-                      Stop & Send
-                    </button>
+                    <span className="text-[11px] text-slate-500">
+                      Click any sample below to simulate:
+                    </span>
                   </div>
-                )}
 
-                {/* Bottom Controls Bar: Attach, Writing Styles, Voice Mic, Citation, Send Button */}
-                <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 bg-slate-50/60 rounded-b-2xl border-t border-slate-100">
-                  <div className="flex items-center gap-2">
-                    {/* Attach button */}
-                    <button
-                      type="button"
-                      onClick={() => navigate("startup.procurement")}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-semibold shadow-2xs transition-all cursor-pointer"
-                      title="Attach CAD drawings, die-lines, or technical RFQ documents"
-                    >
-                      <svg className="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-                      </svg>
-                      <span>Attach</span>
-                    </button>
-
-                    {/* Writing Styles Selector */}
-                    <div className="relative">
+                  {/* Sample Prompt Pills */}
+                  <div className="flex flex-wrap gap-2">
+                    {heroSamplePrompts.map((prompt, idx) => (
                       <button
+                        key={prompt.label}
                         type="button"
-                        onClick={() => setShowStyleDropdown((prev) => !prev)}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-semibold shadow-2xs transition-all cursor-pointer"
-                      >
-                        <span>{selectedWritingStyle}</span>
-                        <span className="text-[10px] text-slate-400">▼</span>
-                      </button>
-                      {showStyleDropdown && (
-                        <div className="absolute left-0 bottom-full mb-1 w-40 bg-white rounded-xl shadow-lg border border-slate-200 py-1.5 z-30 animate-fade-in text-xs font-medium">
-                          {(["Institutional", "Technical", "Lean Startup", "Default"] as const).map((st) => (
-                            <button
-                              key={st}
-                              type="button"
-                              onClick={() => {
-                                setSelectedWritingStyle(st)
-                                setShowStyleDropdown(false)
-                              }}
-                              className={`w-full text-left px-3 py-1.5 hover:bg-slate-50 cursor-pointer ${
-                                selectedWritingStyle === st ? "text-[#F97316] font-bold bg-orange-50" : "text-slate-700"
-                              }`}
-                            >
-                              {st}
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Interactive Voice Assistant Mic Button */}
-                    <button
-                      type="button"
-                      onClick={toggleVoiceRecording}
-                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-2xs ${
-                        isVoiceRecording
-                          ? "bg-red-500 text-white animate-pulse"
-                          : "bg-white border border-slate-200 text-slate-700 hover:border-orange-400 hover:text-[#F97316]"
-                      }`}
-                      title="Record requirement via Voice Assistant"
-                    >
-                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-                      </svg>
-                      <span>{isVoiceRecording ? "Listening..." : "Voice"}</span>
-                    </button>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    {/* Citation / Schemes Toggle Switch */}
-                    <button
-                      type="button"
-                      onClick={() => setEnableCitation((prev) => !prev)}
-                      className="inline-flex items-center gap-2 cursor-pointer select-none text-xs text-slate-600 font-medium"
-                    >
-                      <div
-                        className={`w-8 h-4.5 rounded-full transition-colors relative flex items-center px-0.5 ${
-                          enableCitation ? "bg-[#0B1F4B]" : "bg-slate-300"
+                        onClick={() => handleSelectHeroPrompt(idx)}
+                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                          heroPromptIndex === idx
+                            ? "bg-[#0B1F4B] text-white shadow-2xs"
+                            : "bg-white text-slate-700 border border-slate-200 hover:border-slate-300 hover:bg-slate-100/60"
                         }`}
                       >
-                        <div
-                          className={`w-3.5 h-3.5 rounded-full bg-white transition-transform ${
-                            enableCitation ? "translate-x-3.5" : "translate-x-0"
-                          }`}
-                        />
-                      </div>
-                      <span className="text-[11px] font-semibold text-slate-600">Citation</span>
-                    </button>
+                        <span>{prompt.label}</span>
+                        {heroPromptIndex === idx && (
+                          <MaterialIcon name="check" size={13} className="text-amber-400" />
+                        )}
+                      </button>
+                    ))}
+                  </div>
 
-                    {/* Submit / Send Arrow Button */}
-                    <button
-                      type="button"
-                      disabled={isExtractingSpecs || !requirementText.trim()}
-                      onClick={() => handleGenerateSpecs()}
-                      className="w-8 h-8 rounded-xl bg-slate-900 hover:bg-[#F97316] disabled:bg-slate-300 text-white flex items-center justify-center transition-all cursor-pointer disabled:cursor-not-allowed shadow-xs"
-                      title="Send requirement to AI Spec Engine"
-                    >
-                      {isExtractingSpecs ? (
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      ) : (
-                        <Icons.ArrowRight className="w-4 h-4 -rotate-90" />
-                      )}
-                    </button>
+                  {/* Interactive Textarea View */}
+                  <div className="relative">
+                    <div className="w-full p-3.5 bg-white border border-slate-200 rounded-xl text-xs sm:text-sm font-medium text-slate-800 leading-relaxed shadow-2xs">
+                      {currentHeroPrompt.text}
+                    </div>
+                    <div className="absolute right-3 bottom-3 flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => navigate("startup.procurement")}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg bg-[#0B1F4B] hover:bg-[#123B7A] text-white cursor-pointer shadow-2xs"
+                      >
+                        <MaterialIcon name="auto_awesome" size={14} className="text-amber-300" />
+                        <span>Run Full RFQ</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* 3. "GET STARTED WITH AN EXAMPLE BELOW" 4 CARDS (Horizontal 4-column layout) */}
-              <div className="mt-6">
-                <div className="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-widest text-slate-400 mb-3 text-left">
-                  Get started with an example below:
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                  {[
-                    {
-                      title: "Rigid Skincare Boxes",
-                      category: "Packaging & Printing",
-                      text: "Need 500 custom rigid printed boxes for our D2C organic skincare launch by next month, budget under ₹80k with EVA foam inserts",
-                      iconName: "inventory_2",
-                    },
-                    {
-                      title: "Rapid SLS Prototyping",
-                      category: "Prototyping & Product",
-                      text: "Require 50 units SLS 3D printed nylon PA12 enclosure prototypes with CNC milled aluminium plates within 10 days, budget ₹65k",
-                      iconName: "precision_manufacturing",
-                    },
-                    {
-                      title: "Cloud ERP & Supabase",
-                      category: "IT & Digital Services",
-                      text: "Need an agency to set up custom ERP inventory workflow and Supabase database integration for 100 users, budget ₹1.8 Lakh",
-                      iconName: "dns",
-                    },
-                    {
-                      title: "DPIIT Seed Compliance",
-                      category: "Specialized Startup",
-                      text: "Need specialized startup support for DPIIT seed fund compliance, MSME incubation readiness, and go-to-market mentorship, budget ₹50k",
-                      iconName: "verified_user",
-                    },
-                  ].map((example) => (
-                    <button
-                      key={example.title}
-                      type="button"
-                      onClick={() => {
-                        setRequirementText(example.text)
-                        handleGenerateSpecs(example.text)
-                      }}
-                      className="p-3.5 rounded-2xl bg-white/80 hover:bg-white border border-slate-200/90 hover:border-orange-300 hover:shadow-md text-left transition-all duration-200 hover:-translate-y-1 cursor-pointer flex flex-col justify-between group h-28 select-none"
-                    >
-                      <div>
-                        <div className="flex items-center justify-between mb-1.5">
-                          <div className="w-7 h-7 rounded-lg bg-slate-100 group-hover:bg-orange-50 text-slate-600 group-hover:text-[#F97316] flex items-center justify-center transition-colors">
-                            <MaterialIcon name={example.iconName} size={16} />
-                          </div>
-                          <span className="text-[10px] text-slate-400 font-bold group-hover:text-[#F97316] transition-colors">Use →</span>
-                        </div>
-                        <p className="text-xs font-bold text-slate-800 leading-snug group-hover:text-[#F97316] transition-colors">
-                          {example.title}
-                        </p>
-                      </div>
-                      <span className="text-[10px] text-slate-400 truncate font-semibold">
-                        {example.category}
+                {/* Dashboard Multi-Panel Split (Synthesized Output) */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {/* Panel 1: AI Technical Spec Synthesis */}
+                  <div className="bg-white rounded-xl p-4 sm:p-5 border border-slate-200/90 shadow-2xs space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-blue-900 bg-blue-50 px-2.5 py-0.5 rounded border border-blue-100">
+                        1. Spec Synthesis
                       </span>
-                    </button>
-                  ))}
+                      <span className="text-xs font-bold text-emerald-600">
+                        98% Confidence
+                      </span>
+                    </div>
+
+                    <div className="space-y-2 text-xs">
+                      <div className="flex justify-between py-1 border-b border-slate-100">
+                        <span className="text-slate-500">Material Grade</span>
+                        <span className="font-semibold text-slate-800 truncate max-w-[150px]">
+                          {currentHeroPrompt.material}
+                        </span>
+                      </div>
+                      <div className="flex justify-between py-1 border-b border-slate-100">
+                        <span className="text-slate-500">Tolerance Spec</span>
+                        <span className="font-semibold font-mono text-slate-800">
+                          {currentHeroPrompt.tolerance}
+                        </span>
+                      </div>
+                      <div className="flex justify-between py-1 border-b border-slate-100">
+                        <span className="text-slate-500">Target Batch</span>
+                        <span className="font-semibold text-slate-800">
+                          {currentHeroPrompt.qty} units
+                        </span>
+                      </div>
+                      <div className="flex justify-between py-1">
+                        <span className="text-slate-500">Target Budget</span>
+                        <span className="font-bold text-[#0B1F4B]">
+                          ₹{currentHeroPrompt.budget.toLocaleString("en-IN")}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Panel 2: Verified MSME Supplier Match */}
+                  <div className="bg-white rounded-xl p-4 sm:p-5 border border-slate-200/90 shadow-2xs space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-900 bg-emerald-50 px-2.5 py-0.5 rounded border border-emerald-100">
+                        2. Factory Match
+                      </span>
+                      <span className="text-xs font-bold text-slate-500">
+                        Tier-1 Vetted
+                      </span>
+                    </div>
+
+                    <div className="space-y-2 text-xs">
+                      <div>
+                        <div className="font-bold text-slate-900 truncate">
+                          {currentHeroPrompt.factory}
+                        </div>
+                        <div className="text-[11px] text-slate-500 flex items-center gap-1.5 mt-0.5">
+                          <span className="text-amber-600 font-bold">★ ZED Gold</span>
+                          <span>•</span>
+                          <span>ISO 9001:2015</span>
+                        </div>
+                      </div>
+
+                      <div className="pt-1.5 space-y-1.5 text-xs bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                        <div className="flex justify-between">
+                          <span className="text-slate-500">Capacity Status:</span>
+                          <span className="font-semibold text-emerald-700">Immediate Slot</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-slate-500">Production Turnaround:</span>
+                          <span className="font-semibold text-slate-800">
+                            {currentHeroPrompt.leadTime}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Panel 3: Reverse-Margin Cost & Savings */}
+                  <div className="bg-white rounded-xl p-4 sm:p-5 border border-slate-200/90 shadow-2xs space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-orange-900 bg-orange-50 px-2.5 py-0.5 rounded border border-orange-100">
+                        3. Value & Savings
+                      </span>
+                      <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">
+                        -{currentHeroPrompt.savings} Cost
+                      </span>
+                    </div>
+
+                    <div className="space-y-2 text-xs">
+                      <div className="flex justify-between py-1 border-b border-slate-100 text-slate-500">
+                        <span>Traditional Broker Price</span>
+                        <span className="line-through text-slate-400">
+                          ₹{Math.round(currentHeroPrompt.budget * 1.35).toLocaleString("en-IN")}
+                        </span>
+                      </div>
+                      <div className="flex justify-between py-1 border-b border-slate-100">
+                        <span className="font-semibold text-slate-700">MPI Direct Factory Price</span>
+                        <span className="font-bold text-emerald-700">
+                          ₹{currentHeroPrompt.budget.toLocaleString("en-IN")}
+                        </span>
+                      </div>
+                      <div className="flex justify-between py-1">
+                        <span className="text-slate-500">Escrow Milestone Gate</span>
+                        <span className="font-semibold text-slate-800">30% Advance Protected</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Bottom Milestone Ribbon */}
+                <div className="bg-slate-900 text-white rounded-xl p-3 sm:p-4 flex flex-wrap items-center justify-between gap-3 text-xs">
+                  <div className="flex items-center gap-3">
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
+                    <span className="font-semibold">
+                      Milestone SLA Protection: 30% Mobilization Escrow → QA Drop Test Passed → Final 70% Released
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => navigate("startup.procurement")}
+                    className="inline-flex items-center gap-1.5 font-bold text-amber-400 hover:text-amber-300 cursor-pointer text-xs"
+                  >
+                    <span>Launch in Workspace</span>
+                    <Icons.ArrowRight className="w-3.5 h-3.5" />
+                  </button>
                 </div>
               </div>
-
-              {/* 4. Live Extraction Output Preview (if generated) */}
-              {hasSimulatedExtraction && extractionResult && (
-                <div className="mt-6 pt-5 border-t border-slate-200 space-y-3 animate-fade-in bg-slate-50/90 p-5 rounded-2xl text-left">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <span className="text-xs font-bold text-[#0B1F4B] flex items-center gap-1.5">
-                      <Icons.Check className="w-4 h-4 text-emerald-600" />
-                      AI Extraction Succeeded ({aiConfidenceScore || 96}% Confidence)
-                    </span>
-                    <span className="text-[11px] bg-orange-100 text-orange-900 font-semibold px-2.5 py-0.5 rounded-full">
-                      {selectedCategory}
-                    </span>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-                    <div className="bg-white p-3 rounded-xl border border-slate-200">
-                      <div className="text-[10px] text-slate-400 uppercase font-bold">Category</div>
-                      <div className="font-semibold text-slate-800 truncate" title={selectedCategory}>
-                        {selectedCategory}
-                      </div>
-                    </div>
-                    <div className="bg-white p-3 rounded-xl border border-slate-200">
-                      <div className="text-[10px] text-slate-400 uppercase font-bold">Qty / Scope</div>
-                      <div className="font-semibold text-slate-800 truncate" title={formatScopeDisplay(selectedCategory, quantity)}>
-                        {formatScopeDisplay(selectedCategory, quantity)}
-                      </div>
-                    </div>
-                    <div className="bg-white p-3 rounded-xl border border-slate-200">
-                      <div className="text-[10px] text-slate-400 uppercase font-bold">Est. Savings</div>
-                      <div className="font-semibold text-emerald-600 truncate">
-                        ₹{Math.max(1500, Math.round(targetBudget * 0.24)).toLocaleString("en-IN")} (24%)
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="bg-white p-3 rounded-xl border border-slate-200 text-xs">
-                    <div className="text-[10px] font-bold text-slate-500 uppercase mb-1.5">
-                      Auto-Extracted Technical Specs:
-                    </div>
-                    <ul className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-slate-700 text-[11px]">
-                      {specifications.slice(0, 3).map((spec, i) => (
-                        <li key={i} className="flex items-start gap-1.5">
-                          <span className="text-[#F97316] font-bold">•</span>
-                          <span className="truncate">{spec}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <div className="pt-2 flex flex-wrap items-center justify-between gap-3">
-                    <span className="text-[11px] text-slate-500">
-                      Structured RFQ ready for verified MSME bidding.
-                    </span>
-                    <MPIButton
-                      variant="primary"
-                      size="sm"
-                      onClick={handleContinueToStartupWorkspace}
-                      icon={<Icons.ArrowRight className="w-3.5 h-3.5" />}
-                    >
-                      Refine in Workspace
-                    </MPIButton>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* ─── PROMINENT GOVERNMENT SCHEMES CALLOUT (Under MPI AI Engine) ──────── */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10">
-          <div className="bg-linear-to-r from-[#0B1F4B] to-[#123B7A] rounded-2xl p-6 text-white shadow-xl border border-blue-400/20 flex flex-col md:flex-row md:items-center justify-between gap-5">
-            <div className="space-y-1.5">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-[10px] font-extrabold uppercase tracking-widest bg-[#F97316] text-white px-2.5 py-0.5 rounded-full">
-                  Government Schemes Intelligence
-                </span>
-                <span className="text-xs text-[#FFF7D6] font-semibold">
-                  All Government Schemes · Up to 80% Reimbursement
-                </span>
-              </div>
-              <h3
-                className="text-lg sm:text-xl font-extrabold text-white"
-                style={{ fontFamily: "Plus Jakarta Sans" }}
-              >
-                Find Central Government Schemes Fitted to Your Business
-              </h3>
-              <p className="text-xs text-slate-300 max-w-2xl leading-relaxed">
-                Unlock statutory subsidies across DC-MSME, DPIIT, MeitY, BIRAC,
-                and SIDBI for packaging tooling, 3D prototyping, quality
-                testing, and working capital.
-              </p>
-            </div>
-            <div className="flex flex-wrap items-center gap-3 shrink-0">
-              <MPIButton
-                variant="primary"
-                size="md"
-                onClick={() => navigate("government-schemes.match" as Screen)}
-              >
-                Find Schemes for My Business →
-              </MPIButton>
-              <button
-                onClick={() => navigate("government-schemes.browse" as Screen)}
-                className="text-xs font-bold text-white hover:text-[#FFF7D6] underline underline-offset-4 cursor-pointer px-2"
-              >
-                Browse All Schemes
-              </button>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ─── 4. ECOSYSTEM METRICS STRIP ────────────────────────────────────────── */}
-      <section className="bg-white border-b border-slate-200/90 py-10 scroll-reveal">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-            <div className="group bg-slate-50/50 hover:bg-white rounded-2xl p-5 border border-slate-200/70 hover:border-slate-300 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 text-center space-y-1.5">
-              <div
-                className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0B1F4B] tracking-tight group-hover:scale-105 transition-transform duration-300"
-                style={{ fontFamily: "Plus Jakarta Sans" }}
-              >
-                ₹48.6 Cr+
-              </div>
-              <div className="text-xs font-bold text-slate-600 uppercase tracking-wider">
-                Total Sourced Volume
-              </div>
-              <div className="inline-flex items-center gap-1 text-[11px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md font-semibold border border-emerald-200/50">
-                <span>Across 18 States</span>
-              </div>
-            </div>
+      {/* ─── 4. CREDIBILITY & METRICS BAND ─────────────────────────────────── */}
+      <section className="bg-white border-y border-slate-200/80 py-12 lg:py-16 scroll-reveal">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-8">
+            <span className="font-mono text-xs uppercase tracking-widest text-slate-400 font-semibold">
+              Powering Institutional Sourcing Across India
+            </span>
+          </div>
 
-            <div className="group bg-slate-50/50 hover:bg-white rounded-2xl p-5 border border-slate-200/70 hover:border-slate-300 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 text-center space-y-1.5">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 divide-y sm:divide-y-0 sm:divide-x divide-slate-200/80">
+            <div className="text-center pt-4 sm:pt-0">
               <div
-                className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0B1F4B] tracking-tight group-hover:scale-105 transition-transform duration-300"
+                className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#0B1F4B] tracking-tight"
                 style={{ fontFamily: "Plus Jakarta Sans" }}
               >
                 1,240+
               </div>
-              <div className="text-xs font-bold text-slate-600 uppercase tracking-wider">
+              <div className="text-xs sm:text-sm text-slate-600 font-medium mt-1">
                 Verified MSME Suppliers
               </div>
-              <div className="inline-flex items-center gap-1 text-[11px] text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md font-semibold border border-blue-200/50">
-                <span>100% Udyam & GST Audited</span>
+              <div className="text-[11px] text-slate-400 mt-0.5">
+                Across 28 Industrial Hubs
               </div>
             </div>
 
-            <div className="group bg-slate-50/50 hover:bg-white rounded-2xl p-5 border border-slate-200/70 hover:border-orange-200 hover:shadow-lg hover:shadow-orange-500/5 transition-all duration-300 hover:-translate-y-1 text-center space-y-1.5">
+            <div className="text-center pt-4 sm:pt-0 sm:pl-6">
               <div
-                className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#F97316] tracking-tight group-hover:scale-105 transition-transform duration-300"
+                className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#0B1F4B] tracking-tight"
                 style={{ fontFamily: "Plus Jakarta Sans" }}
               >
-                38.4%
+                75+
               </div>
-              <div className="text-xs font-bold text-slate-600 uppercase tracking-wider">
-                Average Landed Savings
+              <div className="text-xs sm:text-sm text-slate-600 font-medium mt-1">
+                Procure-Ready Offerings
               </div>
-              <div className="inline-flex items-center gap-1 text-[11px] text-orange-700 bg-orange-50 px-2 py-0.5 rounded-md font-semibold border border-orange-200/50">
-                <span>Via Reverse Margin AI</span>
+              <div className="text-[11px] text-slate-400 mt-0.5">
+                With Instant RFQ Synthesis
               </div>
             </div>
 
-            <div className="group bg-slate-50/50 hover:bg-white rounded-2xl p-5 border border-slate-200/70 hover:border-slate-300 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 text-center space-y-1.5">
+            <div className="text-center pt-4 sm:pt-0 sm:pl-6">
               <div
-                className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0B1F4B] tracking-tight group-hover:scale-105 transition-transform duration-300"
+                className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#0B1F4B] tracking-tight"
                 style={{ fontFamily: "Plus Jakarta Sans" }}
               >
-                99.4%
+                7
               </div>
-              <div className="text-xs font-bold text-slate-600 uppercase tracking-wider">
-                On-Time Delivery SLA
+              <div className="text-xs sm:text-sm text-slate-600 font-medium mt-1">
+                Core Procurement Verticals
               </div>
-              <div className="inline-flex items-center gap-1 text-[11px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md font-semibold border border-emerald-200/50">
-                <span>Escrow-backed Milestones</span>
+              <div className="text-[11px] text-slate-400 mt-0.5">
+                Packaging to Precision CNC
+              </div>
+            </div>
+
+            <div className="text-center pt-4 sm:pt-0 sm:pl-6">
+              <div
+                className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-emerald-600 tracking-tight"
+                style={{ fontFamily: "Plus Jakarta Sans" }}
+              >
+                18–32%
+              </div>
+              <div className="text-xs sm:text-sm text-slate-600 font-medium mt-1">
+                Direct Cost Reduction
+              </div>
+              <div className="text-[11px] text-slate-400 mt-0.5">
+                Via Factory Reverse Margins
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ─── 4. FLAGSHIP INTERACTIVE CATALOGUE (7-CATEGORY DISCOVERY RAIL) ───── */}
-      <section id="marketplace" className="py-14 bg-white border-b border-slate-200/90 scroll-mt-16 scroll-reveal">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-            <div>
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest bg-blue-50 text-[#0B1F4B] border border-blue-200 mb-2.5">
-                <Icons.Sparkles className="w-3.5 h-3.5 text-[#F97316]" />
-                <span>Flagship Product & Service Discovery</span>
+      {/* ─── 5. CORE VALUE EDITORIAL SECTION ───────────────────────────────── */}
+      <section id="solutions" className="py-20 lg:py-28 bg-[#FAFAFC] scroll-reveal">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
+          <span className="font-mono text-xs font-semibold uppercase tracking-widest text-[#F97316]">
+            The Procurement Bottleneck
+          </span>
+
+          <h2
+            className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#0B1F4B] tracking-tight leading-tight"
+            style={{ fontFamily: "Plus Jakarta Sans" }}
+          >
+            "Procurement shouldn't feel fragmented."
+          </h2>
+
+          <p className="text-base sm:text-lg text-slate-600 leading-relaxed font-normal">
+            Founders and enterprise procurement heads lose 6 to 8 weeks navigating
+            opaque broker fees, mismatched technical drawings, unverified factory
+            claims, and delivery defaults. MPI replaces middlemen with an intelligent,
+            verifiable operating system connecting real Indian factories directly
+            to high-growth businesses.
+          </p>
+        </div>
+
+        {/* 4 Core Value Pillar Cards */}
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-14">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-2xs hover:shadow-xs transition-shadow space-y-3">
+              <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#0B1F4B] flex items-center justify-center">
+                <MaterialIcon name="psychology" size={20} />
               </div>
-              <h2
-                className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0B1F4B] tracking-tight"
-                style={{ fontFamily: "Plus Jakarta Sans" }}
-              >
-                7 Approved Sourcing Categories
-              </h2>
-              <p className="text-sm text-slate-600 mt-1 max-w-xl">
-                Browse 75+ vetted manufacturing lines, specialized startup services, and statutory scheme bundles with transparent reverse margins.
+              <h3 className="font-bold text-slate-900 text-base">
+                AI Spec Synthesis
+              </h3>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Describe requirements in conversational English. MPI AI constructs
+                manufacturing-ready bills of materials, GSM tolerances, and constraints.
               </p>
             </div>
 
-            <div className="flex items-center gap-3">
-              <span className="text-xs text-slate-500 font-semibold hidden sm:inline">
-                Drag, wheel, or click cards to inspect specs
+            <div className="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-2xs hover:shadow-xs transition-shadow space-y-3">
+              <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center">
+                <MaterialIcon name="verified" size={20} />
+              </div>
+              <h3 className="font-bold text-slate-900 text-base">
+                100% Audited MSMEs
+              </h3>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Direct access to Tier-1 Indian manufacturers certified under ZED Gold,
+                ISO 9001, and Udyam with verified machine idle capacity.
+              </p>
+            </div>
+
+            <div className="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-2xs hover:shadow-xs transition-shadow space-y-3">
+              <div className="w-10 h-10 rounded-xl bg-orange-50 text-[#F97316] flex items-center justify-center">
+                <MaterialIcon name="savings" size={20} />
+              </div>
+              <h3 className="font-bold text-slate-900 text-base">
+                Reverse-Margin Pricing
+              </h3>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Transparent factory-floor cost breakdowns across tooling, unit production,
+                GST, and logistics with zero hidden middleman markups.
+              </p>
+            </div>
+
+            <div className="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-2xs hover:shadow-xs transition-shadow space-y-3">
+              <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-700 flex items-center justify-center">
+                <MaterialIcon name="security" size={20} />
+              </div>
+              <h3 className="font-bold text-slate-900 text-base">
+                Escrow Milestone SLAs
+              </h3>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Zero advance capital risk. Procurement funds remain locked in escrow
+                and disburse only upon certified QA inspection pass.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── 6. EDITORIAL PRODUCT STORYTELLING (ALTERNATING 2-COL) ─────────── */}
+      <section id="how-it-works" className="py-20 bg-white border-t border-slate-200/80 space-y-24 scroll-reveal">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-24">
+          {/* Chapter A: Intelligent Discovery */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="space-y-4">
+              <span className="font-mono text-xs font-semibold uppercase tracking-widest text-[#F97316]">
+                Intelligent Discovery
               </span>
-              <MPIButton
-                variant="outline"
-                size="sm"
-                onClick={() => navigate("startup.procurement")}
-                icon={<Icons.ArrowRight className="w-3.5 h-3.5" />}
+              <h2
+                className="text-3xl sm:text-4xl font-extrabold text-[#0B1F4B] tracking-tight leading-tight"
+                style={{ fontFamily: "Plus Jakarta Sans" }}
               >
-                Open Custom RFQ Builder
-              </MPIButton>
+                Tell MPI what you need in plain English.
+              </h2>
+              <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
+                No complex engineering jargon required. Whether you need custom
+                biodegradable pouches, 5-axis CNC titanium drone arms, or full-stack
+                cloud ERP infrastructure, MPI converts plain descriptions into
+                institutional-grade specifications in seconds.
+              </p>
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={() => navigate("startup.procurement")}
+                  className="group inline-flex items-center gap-2 text-xs font-bold text-[#0B1F4B] hover:text-[#123B7A] cursor-pointer"
+                >
+                  <span>Experience Natural Language Intake</span>
+                  <Icons.ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                </button>
+              </div>
+            </div>
+
+            {/* Visual A */}
+            <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200 shadow-2xs space-y-4">
+              <div className="flex items-center justify-between text-xs font-mono text-slate-500 border-b border-slate-200 pb-3">
+                <span>INPUT: Raw Natural Language Prompt</span>
+                <span className="text-emerald-600 font-bold">● AI PARSER READY</span>
+              </div>
+              <div className="p-4 bg-white rounded-xl border border-slate-200 text-xs sm:text-sm text-slate-800 leading-relaxed font-medium">
+                "Looking for 500 units rigid cardboard packaging boxes with gold foil logo stamping and custom black EVA foam inserts for perfume launch next month."
+              </div>
+              <div className="p-4 bg-[#0B1F4B] text-white rounded-xl text-xs space-y-2 font-mono">
+                <div className="text-amber-300 font-bold">OUTPUT: Institutional RFQ BOM</div>
+                <div className="text-slate-300 text-[11px] space-y-1">
+                  <div>• Material: 1200 GSM Kappa Board + 157 GSM Art Paper</div>
+                  <div>• Finish: Matte Lamination + Micro Spot UV Gold Foil</div>
+                  <div>• Insert: Custom Die-Cut EVA Foam (High Density)</div>
+                  <div>• Target Batch MOQ: 500 Units • Lead Time: 12 Days</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Chapter B: Verified Marketplace */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            {/* Visual B */}
+            <div className="order-2 lg:order-1 bg-slate-50 rounded-2xl p-6 border border-slate-200 shadow-2xs space-y-4">
+              <div className="flex items-center justify-between text-xs font-mono text-slate-500 border-b border-slate-200 pb-3">
+                <span>FACTORY DOSSIER #MCH-4819</span>
+                <span className="text-blue-700 font-bold">100% STATUTORY AUDITED</span>
+              </div>
+              <div className="bg-white rounded-xl p-4 border border-slate-200 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="font-bold text-slate-900 text-sm">
+                    Apex Precision Packaging Ltd.
+                  </div>
+                  <span className="text-[10px] bg-amber-50 text-amber-800 font-bold px-2 py-0.5 rounded border border-amber-200">
+                    ZED Gold Pass
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-600 pt-1">
+                  <div>Udyam: UDYAM-MH-12-0048192</div>
+                  <div>GSTIN: 27AABCA1234F1Z6</div>
+                  <div>Location: Bengaluru, KA</div>
+                  <div>ISO: 9001:2015 Certified</div>
+                </div>
+                <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
+                  <span className="text-slate-500">Live Heidelberg Press Capacity:</span>
+                  <span className="font-bold text-emerald-600">68% Utilized (32% Open)</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="order-1 lg:order-2 space-y-4">
+              <span className="font-mono text-xs font-semibold uppercase tracking-widest text-[#F97316]">
+                Verified Marketplace
+              </span>
+              <h2
+                className="text-3xl sm:text-4xl font-extrabold text-[#0B1F4B] tracking-tight leading-tight"
+                style={{ fontFamily: "Plus Jakarta Sans" }}
+              >
+                Know exactly who you are buying from.
+              </h2>
+              <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
+                Zero phantom brokers or fictitious trading houses. Every factory
+                profile on MPI reveals real machine capacity ledgers, statutory
+                Udyam certificates, and verified past order drop-test results.
+              </p>
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={() => navigate("msme.home")}
+                  className="group inline-flex items-center gap-2 text-xs font-bold text-[#0B1F4B] hover:text-[#123B7A] cursor-pointer"
+                >
+                  <span>Inspect Verified Supplier Standards</span>
+                  <Icons.ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Chapter C: Smart Comparison */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="space-y-4">
+              <span className="font-mono text-xs font-semibold uppercase tracking-widest text-[#F97316]">
+                Smart Comparison
+              </span>
+              <h2
+                className="text-3xl sm:text-4xl font-extrabold text-[#0B1F4B] tracking-tight leading-tight"
+                style={{ fontFamily: "Plus Jakarta Sans" }}
+              >
+                Compare bids before you commit a single Rupee.
+              </h2>
+              <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
+                Side-by-side factory bid analysis normalized across tooling fees,
+                unit manufacturing rates, QA drop test protocols, and statutory
+                ZED subsidy offsets. You make procurement decisions backed by data.
+              </p>
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={() => navigate("startup.procurement")}
+                  className="group inline-flex items-center gap-2 text-xs font-bold text-[#0B1F4B] hover:text-[#123B7A] cursor-pointer"
+                >
+                  <span>View Side-by-Side Bidding Engine</span>
+                  <Icons.ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                </button>
+              </div>
+            </div>
+
+            {/* Visual C */}
+            <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200 shadow-2xs space-y-3">
+              <div className="flex items-center justify-between text-xs font-mono text-slate-500 border-b border-slate-200 pb-3">
+                <span>COMPARATIVE BID ANALYSIS</span>
+                <span className="text-emerald-600 font-bold">3 ACTIVE FACTORY OFFERS</span>
+              </div>
+              <div className="space-y-2 text-xs">
+                <div className="p-3 bg-white rounded-xl border border-slate-200 flex items-center justify-between">
+                  <div>
+                    <div className="font-bold text-slate-900">Apex Precision (Bangalore)</div>
+                    <div className="text-[11px] text-slate-500">12 Days • ZED Gold • Drop Test 99.4%</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="font-bold text-emerald-700">₹72,000</div>
+                    <div className="text-[10px] text-slate-400">All Inclusive</div>
+                  </div>
+                </div>
+
+                <div className="p-3 bg-white rounded-xl border border-slate-200 flex items-center justify-between">
+                  <div>
+                    <div className="font-bold text-slate-900">Bharat Cartons (Pune)</div>
+                    <div className="text-[11px] text-slate-500">14 Days • ISO 9001 • Drop Test 98.8%</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="font-bold text-slate-800">₹76,500</div>
+                    <div className="text-[10px] text-slate-400">All Inclusive</div>
+                  </div>
+                </div>
+
+                <div className="p-3 bg-rose-50/60 rounded-xl border border-rose-200/80 flex items-center justify-between">
+                  <div>
+                    <div className="font-bold text-rose-900">Traditional Offline Broker</div>
+                    <div className="text-[11px] text-rose-600">Unverified Lead Time • No SLA</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="font-bold text-rose-700 line-through">₹1,08,000</div>
+                    <div className="text-[10px] text-rose-500">+35% Margin</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Chapter D: Savings Intelligence */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            {/* Visual D */}
+            <div className="order-2 lg:order-1 bg-slate-50 rounded-2xl p-6 border border-slate-200 shadow-2xs space-y-4">
+              <div className="flex items-center justify-between text-xs font-mono text-slate-500 border-b border-slate-200 pb-3">
+                <span>REVERSE MARGIN LEDGER</span>
+                <span className="text-emerald-700 font-bold">-₹36,000 DIRECT GAIN</span>
+              </div>
+              <div className="bg-white rounded-xl p-4 border border-slate-200 space-y-2 text-xs">
+                <div className="flex justify-between py-1 border-b border-slate-100">
+                  <span className="text-slate-500">Direct Tooling Cost:</span>
+                  <span className="font-semibold text-slate-800">₹6,000</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-100">
+                  <span className="text-slate-500">Unit Production (500 units @ ₹110):</span>
+                  <span className="font-semibold text-slate-800">₹55,000</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-100">
+                  <span className="text-slate-500">Statutory ZED Subsidy Concession:</span>
+                  <span className="font-bold text-emerald-600">-₹4,500</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-100">
+                  <span className="text-slate-500">GST 18% Input Tax Credit Eligible:</span>
+                  <span className="font-semibold text-slate-800">₹10,170</span>
+                </div>
+                <div className="flex justify-between pt-1 text-sm">
+                  <span className="font-bold text-[#0B1F4B]">Net Landed Factory Invoice:</span>
+                  <span className="font-extrabold text-emerald-700">₹66,670</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="order-1 lg:order-2 space-y-4">
+              <span className="font-mono text-xs font-semibold uppercase tracking-widest text-[#F97316]">
+                Savings Intelligence
+              </span>
+              <h2
+                className="text-3xl sm:text-4xl font-extrabold text-[#0B1F4B] tracking-tight leading-tight"
+                style={{ fontFamily: "Plus Jakarta Sans" }}
+              >
+                See the value MPI creates on every procurement cycle.
+              </h2>
+              <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
+                By bypassing layer upon layer of sales reps and broker fees, you
+                retain full reverse-margin visibility. Every Rupee saved goes straight
+                back into your product development and growth runway.
+              </p>
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={() => navigate("startup.procurement")}
+                  className="group inline-flex items-center gap-2 text-xs font-bold text-[#0B1F4B] hover:text-[#123B7A] cursor-pointer"
+                >
+                  <span>Explore Direct Sourcing Savings</span>
+                  <Icons.ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                </button>
+              </div>
             </div>
           </div>
         </div>
+      </section>
 
-        <ProductCatalogue
-          onQuoteProduct={(product) => {
-            setRequirementText(
-              `Need sourcing quotation for ${product.name} (${product.category}) for our upcoming batch launch.`
-            )
-            setSelectedCategory(product.category as CatalogCategory)
-            navigate("startup.procurement")
-          }}
-          onAskAI={(query, category) => {
-            if (query) setRequirementText(query)
-            if (category) setSelectedCategory(category as CatalogCategory)
-            const aiEl = document.getElementById("ai-procurement-engine")
-            if (aiEl) {
-              aiEl.scrollIntoView({ behavior: "smooth" })
-            } else {
-              navigate("startup.procurement")
-            }
-          }}
-          onExploreWorkspace={() => navigate("startup.procurement")}
+      {/* ─── 7. FLAGSHIP CATALOGUE DISCOVERY SECTION ───────────────────────── */}
+      <ProductCatalogue
+        onQuoteProduct={(prod) => {
+          setRequirementText(
+            `Need sourcing quote for ${prod.name} (${prod.category}) with standard institutional specifications`,
+          )
+          setSelectedCategory(prod.category)
+          navigate("startup.procurement")
+        }}
+        onAskAI={(query, cat) => {
+          if (query) setRequirementText(query)
+          if (cat) setSelectedCategory(cat as CatalogCategory)
+          navigate("startup.procurement")
+        }}
+        onExploreWorkspace={() => navigate("startup.procurement")}
+      />
+
+      {/* ─── 8. PARTNER / ECOSYSTEM VISUALIZATION SECTION ──────────────────── */}
+      <section className="py-20 bg-white border-y border-slate-200/80 scroll-reveal">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
+          <span className="font-mono text-xs font-semibold uppercase tracking-widest text-[#F97316]">
+            The Connected Ecosystem
+          </span>
+
+          <h2
+            className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#0B1F4B] tracking-tight leading-tight"
+            style={{ fontFamily: "Plus Jakarta Sans" }}
+          >
+            MPI unites India's manufacturing grid.
+          </h2>
+
+          <p className="text-sm sm:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed">
+            Bridging fast-growing tech startups with regional manufacturing clusters,
+            statutory subsidy frameworks, certified quality labs, and escrow banking.
+          </p>
+
+          {/* Ecosystem Visual Network */}
+          <div className="mt-12 p-8 sm:p-12 bg-slate-50/70 rounded-3xl border border-slate-200 relative overflow-hidden">
+            {/* Center Node */}
+            <div className="flex flex-col items-center justify-center">
+              <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl bg-[#0B1F4B] text-white flex flex-col items-center justify-center shadow-xl border-4 border-white z-10">
+                <span className="text-xl sm:text-2xl font-black tracking-tight" style={{ fontFamily: "Plus Jakarta Sans" }}>
+                  MPI
+                </span>
+                <span className="text-[9px] text-amber-400 uppercase tracking-widest font-bold mt-0.5">
+                  Core Engine
+                </span>
+              </div>
+            </div>
+
+            {/* Orbiting Satellite Nodes */}
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mt-8 max-w-4xl mx-auto">
+              <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs text-left space-y-1">
+                <div className="flex items-center gap-2 font-bold text-slate-900 text-xs">
+                  <MaterialIcon name="rocket_launch" size={16} className="text-blue-600" />
+                  <span>Startups & D2C Brands</span>
+                </div>
+                <div className="text-[11px] text-slate-500">
+                  Natural language intake, fast prototyping, zero advance risk.
+                </div>
+              </div>
+
+              <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs text-left space-y-1">
+                <div className="flex items-center gap-2 font-bold text-slate-900 text-xs">
+                  <MaterialIcon name="precision_manufacturing" size={16} className="text-[#F97316]" />
+                  <span>MSME Factory Fleet</span>
+                </div>
+                <div className="text-[11px] text-slate-500">
+                  1,240+ Tier-1 manufacturers filling idle machine capacity.
+                </div>
+              </div>
+
+              <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs text-left space-y-1">
+                <div className="flex items-center gap-2 font-bold text-slate-900 text-xs">
+                  <MaterialIcon name="policy" size={16} className="text-amber-600" />
+                  <span>Govt Grant Frameworks</span>
+                </div>
+                <div className="text-[11px] text-slate-500">
+                  ZED Subsidies, SISFS Seed grants, and Design Clinic assistance.
+                </div>
+              </div>
+
+              <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs text-left space-y-1">
+                <div className="flex items-center gap-2 font-bold text-slate-900 text-xs">
+                  <MaterialIcon name="lock" size={16} className="text-emerald-600" />
+                  <span>Milestone Escrow Banking</span>
+                </div>
+                <div className="text-[11px] text-slate-500">
+                  Tripartite escrow accounts with QC inspection release gates.
+                </div>
+              </div>
+
+              <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs text-left space-y-1">
+                <div className="flex items-center gap-2 font-bold text-slate-900 text-xs">
+                  <MaterialIcon name="fact_check" size={16} className="text-indigo-600" />
+                  <span>Quality Inspection Labs</span>
+                </div>
+                <div className="text-[11px] text-slate-500">
+                  Standardized batch drop testing, burst strength, and tolerance audit.
+                </div>
+              </div>
+
+              <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs text-left space-y-1">
+                <div className="flex items-center gap-2 font-bold text-slate-900 text-xs">
+                  <MaterialIcon name="location_city" size={16} className="text-slate-700" />
+                  <span>Industrial Hub Corridors</span>
+                </div>
+                <div className="text-[11px] text-slate-500">
+                  Peenya, Okhla, Coimbatore, Pune, Sivakasi cluster links.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── 9. INTEGRATION & WORKFLOW CENTER ──────────────────────────────── */}
+      <section className="py-20 bg-[#FAFAFC] scroll-reveal">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-3xl mx-auto text-center space-y-4 mb-14">
+            <span className="font-mono text-xs font-semibold uppercase tracking-widest text-[#F97316]">
+              Workflow Consolidation
+            </span>
+            <h2
+              className="text-3xl sm:text-4xl font-extrabold text-[#0B1F4B] tracking-tight leading-tight"
+              style={{ fontFamily: "Plus Jakarta Sans" }}
+            >
+              Everything your procurement workflow needs, connected in one place.
+            </h2>
+            <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-normal">
+              From requirement drafting to statutory tax invoices, manage your entire
+              supply chain through a single unified command center.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-2.5">
+              <span className="text-xs font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded">
+                01 • Instant RFQ Dispatch
+              </span>
+              <h3 className="font-bold text-slate-900 text-sm">
+                Broadcast in Seconds
+              </h3>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Send standardized technical RFQs to matched factories without
+                calling 15 different agents.
+              </p>
+            </div>
+
+            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-2.5">
+              <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
+                02 • Capacity Matching
+              </span>
+              <h3 className="font-bold text-slate-900 text-sm">
+                Idle Machine Hours
+              </h3>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Take advantage of verified factory downtime to negotiate the best
+                possible unit rates.
+              </p>
+            </div>
+
+            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-2.5">
+              <span className="text-xs font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded">
+                03 • Subsidy Automation
+              </span>
+              <h3 className="font-bold text-slate-900 text-sm">
+                Claim ZED & SISFS
+              </h3>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Automatic statutory grant eligibility checks with ready-to-file
+                documentation.
+              </p>
+            </div>
+
+            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-2.5">
+              <span className="text-xs font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded">
+                04 • Single Escrow Ledger
+              </span>
+              <h3 className="font-bold text-slate-900 text-sm">
+                Milestone Tracking
+              </h3>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Track production phases, batch inspections, and delivery dispatches
+                in real time.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── 10. TESTIMONIALS / CREDIBILITY SECTION ────────────────────────── */}
+      <section className="py-20 bg-white border-y border-slate-200/80 scroll-reveal">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center space-y-4 mb-14">
+            <span className="font-mono text-xs font-semibold uppercase tracking-widest text-[#F97316]">
+              Real Ecosystem Feedback
+            </span>
+            <h2
+              className="text-3xl sm:text-4xl font-extrabold text-[#0B1F4B] tracking-tight leading-tight"
+              style={{ fontFamily: "Plus Jakarta Sans" }}
+            >
+              Trusted by emerging founders and Tier-1 manufacturers.
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-slate-50/70 p-6 rounded-2xl border border-slate-200/90 shadow-2xs space-y-4 flex flex-col justify-between">
+              <div className="space-y-3">
+                <div className="flex text-amber-400 text-xs">★★★★★</div>
+                <p className="text-xs sm:text-sm text-slate-700 leading-relaxed italic">
+                  "We needed 2,000 custom rigid printed boxes for our D2C organic launch.
+                  MPI parsed our requirements in minutes, matched us with a ZED Gold factory
+                  in Pune, and saved us ₹38,000 compared to regional packaging agents."
+                </p>
+              </div>
+              <div className="pt-2 border-t border-slate-200">
+                <div className="font-bold text-slate-900 text-xs">Ananya Deshmukh</div>
+                <div className="text-[11px] text-slate-500">Co-founder & COO, Aura Botanicals D2C</div>
+              </div>
+            </div>
+
+            <div className="bg-slate-50/70 p-6 rounded-2xl border border-slate-200/90 shadow-2xs space-y-4 flex flex-col justify-between">
+              <div className="space-y-3">
+                <div className="flex text-amber-400 text-xs">★★★★★</div>
+                <p className="text-xs sm:text-sm text-slate-700 leading-relaxed italic">
+                  "Sourcing 5-axis CNC machining with ±0.02mm tolerance for aeronautical
+                  6061 aluminum without an 8-month lead time was a nightmare. MPI connected
+                  us directly with a precision facility in Peenya within 48 hours."
+                </p>
+              </div>
+              <div className="pt-2 border-t border-slate-200">
+                <div className="font-bold text-slate-900 text-xs">Vikramaditya Rao</div>
+                <div className="text-[11px] text-slate-500">Head of Hardware, Aerovex Drones</div>
+              </div>
+            </div>
+
+            <div className="bg-slate-50/70 p-6 rounded-2xl border border-slate-200/90 shadow-2xs space-y-4 flex flex-col justify-between">
+              <div className="space-y-3">
+                <div className="flex text-amber-400 text-xs">★★★★★</div>
+                <p className="text-xs sm:text-sm text-slate-700 leading-relaxed italic">
+                  "Our 6-color offset presses had 30% idle time between major export cycles.
+                  MPI connects us to serious startups with structured technical specs and
+                  guaranteed escrow payments. It has completely optimized our machine hours."
+                </p>
+              </div>
+              <div className="pt-2 border-t border-slate-200">
+                <div className="font-bold text-slate-900 text-xs">Rajeshwar Patel</div>
+                <div className="text-[11px] text-slate-500">Managing Director, Apex Precision Ltd.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── 11. GOVERNMENT SCHEMES ESTIMATOR (INTERACTIVE TOOL) ───────────── */}
+      <section id="government-schemes" className="py-20 bg-[#FAFAFC] scroll-reveal">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+            <div className="lg:col-span-5 space-y-4">
+              <span className="font-mono text-xs font-semibold uppercase tracking-widest text-[#F97316]">
+                Government Schemes Intelligence
+              </span>
+              <h2
+                className="text-3xl font-extrabold text-[#0B1F4B] tracking-tight leading-tight"
+                style={{ fontFamily: "Plus Jakarta Sans" }}
+              >
+                Government Subsidies & Sourcing Grants.
+              </h2>
+              <p className="text-sm text-slate-600 leading-relaxed">
+                Indian startups sourcing through certified MSMEs are eligible for statutory
+                quality and tooling grants up to 80% under ZED, Design Clinic, and Startup
+                India Seed Fund (SISFS) schemes.
+              </p>
+              <div className="pt-2 flex flex-wrap gap-3">
+                <button
+                  type="button"
+                  onClick={() => navigate("government-schemes.match")}
+                  className="inline-flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-lg bg-[#0B1F4B] hover:bg-[#123B7A] text-white cursor-pointer shadow-2xs"
+                >
+                  <span>Match My Business Schemes</span>
+                  <Icons.ArrowRight className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => navigate("government-schemes.browse")}
+                  className="px-4 py-2 text-xs font-semibold rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 cursor-pointer shadow-2xs"
+                >
+                  Browse All 30 Schemes
+                </button>
+              </div>
+            </div>
+
+            {/* Interactive Calculator */}
+            <div className="lg:col-span-7 bg-[#0B1F4B] text-white p-6 sm:p-8 rounded-2xl shadow-xl border border-[#123B7A] space-y-6">
+              <div className="flex items-center justify-between border-b border-[#123B7A] pb-3">
+                <div className="font-bold text-sm text-white flex items-center gap-2">
+                  <MaterialIcon name="calculate" size={18} className="text-amber-400" />
+                  <span>Interactive Grant Estimator</span>
+                </div>
+                <span className="text-[11px] font-mono text-slate-300">
+                  DPIIT / MSME Ministry
+                </span>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <div className="flex justify-between text-xs font-medium text-slate-300 mb-2">
+                    <span>Estimated Sourcing Budget:</span>
+                    <span className="font-bold text-amber-300 text-sm">
+                      ₹{calcBudget.toLocaleString("en-IN")}
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min={20000}
+                    max={1000000}
+                    step={10000}
+                    value={calcBudget}
+                    onChange={(e) => setCalcBudget(Number(e.target.value))}
+                    className="w-full accent-[#F97316] cursor-pointer"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 pt-2 text-xs">
+                  <div className="bg-[#123B7A]/60 p-3.5 rounded-xl border border-blue-400/20">
+                    <span className="text-slate-400 block text-[10px] uppercase font-bold">
+                      Potential Govt Grant
+                    </span>
+                    <span className="text-lg font-extrabold text-amber-300">
+                      ₹{calculatedSchemeBenefit.amount.toLocaleString("en-IN")}
+                    </span>
+                    <span className="text-[10px] text-slate-300 block mt-0.5">
+                      Up to {calculatedSchemeBenefit.rate}% Subsidy
+                    </span>
+                  </div>
+
+                  <div className="bg-[#123B7A]/60 p-3.5 rounded-xl border border-blue-400/20">
+                    <span className="text-slate-400 block text-[10px] uppercase font-bold">
+                      Net Startup Landed Outlay
+                    </span>
+                    <span className="text-lg font-extrabold text-emerald-400">
+                      ₹{calculatedSchemeBenefit.netCost.toLocaleString("en-IN")}
+                    </span>
+                    <span className="text-[10px] text-slate-300 block mt-0.5">
+                      Protected Under Escrow
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── 12. FAQ SECTION (CLEAN ACCORDION) ─────────────────────────────── */}
+      <section className="py-20 bg-white border-y border-slate-200/80 scroll-reveal">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+          <div className="text-center space-y-4">
+            <span className="font-mono text-xs font-semibold uppercase tracking-widest text-[#F97316]">
+              Frequently Asked Questions
+            </span>
+            <h2
+              className="text-3xl sm:text-4xl font-extrabold text-[#0B1F4B] tracking-tight leading-tight"
+              style={{ fontFamily: "Plus Jakarta Sans" }}
+            >
+              Everything you need to know about MPI.
+            </h2>
+          </div>
+
+          <div className="space-y-3">
+            {faqItems.map((item, idx) => {
+              const isOpen = openFaqIndex === idx
+              return (
+                <div
+                  key={idx}
+                  className="border border-slate-200 rounded-xl overflow-hidden transition-all duration-200"
+                >
+                  <button
+                    type="button"
+                    onClick={() => setOpenFaqIndex(isOpen ? null : idx)}
+                    className="w-full p-4 sm:p-5 text-left flex items-center justify-between gap-4 font-semibold text-slate-900 text-sm sm:text-base hover:bg-slate-50/80 cursor-pointer transition-colors"
+                  >
+                    <span>{item.q}</span>
+                    <MaterialIcon
+                      name={isOpen ? "expand_less" : "expand_more"}
+                      size={20}
+                      className="text-slate-400 shrink-0"
+                    />
+                  </button>
+                  {isOpen && (
+                    <div className="px-4 pb-5 sm:px-5 sm:pb-6 text-xs sm:text-sm text-slate-600 leading-relaxed border-t border-slate-100 pt-3">
+                      {item.a}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── 13. HIGH-CONVERSION FINAL CALL TO ACTION ──────────────────────── */}
+      <section className="py-20 lg:py-28 bg-[#0B1F4B] text-white relative overflow-hidden">
+        {/* Soft Ambient Background Glow */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -bottom-32 left-1/2 -translate-x-1/2 w-[800px] h-[350px] bg-gradient-to-t from-orange-500/10 via-blue-500/10 to-transparent rounded-full blur-3xl"
         />
-      </section>
 
-      {/* ─── DUAL PLATFORM WORKSPACE GATEWAYS (3D FLIPPING CARDS) ──────────────── */}
-      <section className="py-20 bg-gradient-to-b from-[#0B1F4B] via-[#0E275E] to-[#0B1F4B] text-white relative overflow-hidden scroll-reveal">
-        {/* Ambient background glows */}
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute inset-0 bg-[radial-gradient(#ffffff0a_1px,transparent_1px)] bg-size-[24px_24px] pointer-events-none" />
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6 relative z-10">
+          <span className="font-mono text-xs uppercase tracking-widest text-amber-400 font-bold">
+            Start Your Procurement Journey
+          </span>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="text-center max-w-3xl mx-auto mb-14">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest bg-white/10 text-orange-400 border border-white/15 backdrop-blur-md mb-3">
-              ⚡ Tailored Operating Systems
-            </span>
-            <h2
-              className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight"
-              style={{ fontFamily: "Plus Jakarta Sans" }}
-            >
-              Choose Your Platform Workspace
-            </h2>
-            <p className="text-sm sm:text-base text-slate-300 mt-3">
-              Whether you are an emerging startup seeking manufacturing or an established MSME seeking high-intent purchase orders. Hover or click to flip & inspect modules.
-            </p>
-          </div>
+          <h2
+            className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight"
+            style={{ fontFamily: "Plus Jakarta Sans" }}
+          >
+            Ready to make your procurement intelligent?
+          </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10">
-            {/* 1. STARTUP GATEWAY FLIPPING CARD */}
-            <div className="perspective-1000 h-125">
-              <div
-                className={`relative w-full h-full duration-700 transform-style-preserve-3d transition-transform ${
-                  isStartupCardFlipped ? "rotate-y-180" : ""
-                }`}
-              >
-                {/* FRONT FACE */}
-                <div
-                  className={`absolute inset-0 w-full h-full backface-hidden rounded-3xl bg-slate-900/90 backdrop-blur-xl border-2 border-blue-400/40 p-8 sm:p-9 flex flex-col justify-between shadow-[0_12px_40px_rgba(11,31,75,0.4)] ${
-                    isStartupCardFlipped ? "pointer-events-none" : "pointer-events-auto"
-                  }`}
-                >
-                  <div>
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-blue-500/20 text-blue-300 border border-blue-400/30 text-xs font-bold tracking-wide">
-                        <span>For Buyers & Founders</span>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => setIsStartupCardFlipped(true)}
-                        className="text-xs text-blue-300 hover:text-white bg-blue-500/20 hover:bg-blue-500/30 px-3 py-1 rounded-full border border-blue-400/30 font-semibold flex items-center gap-1.5 transition-all cursor-pointer"
-                        title="Flip to see features"
-                      >
-                        <span>🔄 Flip to Deep Dive</span>
-                      </button>
-                    </div>
+          <p className="text-base sm:text-lg text-slate-300 max-w-2xl mx-auto leading-relaxed font-normal">
+            Join hundreds of Indian startups sourcing packaging, prototyping, digital
+            services, and compliance from verified MSME factories today.
+          </p>
 
-                    <h3
-                      className="text-2xl font-black text-white mb-3"
-                      style={{ fontFamily: "Plus Jakarta Sans" }}
-                    >
-                      Startup Procurement Command Center
-                    </h3>
-                    <p className="text-sm text-slate-300 leading-relaxed mb-6">
-                      Intake plain requirements, auto-generate engineering RFQs, compare verified bids side-by-side, unlock Government Schemes, and manage purchase orders.
-                    </p>
-
-                    <ul className="space-y-3 text-xs sm:text-sm text-slate-200 font-medium">
-                      <li className="flex items-center gap-3">
-                        <div className="w-5 h-5 rounded-full bg-blue-500/20 border border-blue-400/40 flex items-center justify-center shrink-0">
-                          <Icons.Check className="w-3.5 h-3.5 text-blue-400" />
-                        </div>
-                        <span>AI specification extraction & RFQ generator</span>
-                      </li>
-                      <li className="flex items-center gap-3">
-                        <div className="w-5 h-5 rounded-full bg-blue-500/20 border border-blue-400/40 flex items-center justify-center shrink-0">
-                          <Icons.Check className="w-3.5 h-3.5 text-blue-400" />
-                        </div>
-                        <span>Multi-quote landed cost comparison matrix</span>
-                      </li>
-                      <li className="flex items-center gap-3">
-                        <div className="w-5 h-5 rounded-full bg-blue-500/20 border border-blue-400/40 flex items-center justify-center shrink-0">
-                          <Icons.Check className="w-3.5 h-3.5 text-blue-400" />
-                        </div>
-                        <span>10-milestone order tracking with inspection gates</span>
-                      </li>
-                    </ul>
-                  </div>
-
-                  <div className="space-y-3 pt-4 border-t border-white/10">
-                    <button
-                      type="button"
-                      onClick={() => navigate("startup.home")}
-                      className="w-full py-3.5 px-6 rounded-xl font-bold text-sm bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-lg shadow-blue-500/30 flex items-center justify-center gap-2 transition-all cursor-pointer"
-                    >
-                      <span>Enter as Startup</span>
-                      <Icons.ArrowRight className="w-4 h-4" />
-                    </button>
-                    <div className="text-center">
-                      <button
-                        type="button"
-                        onClick={() => openSignInModal("startup")}
-                        className="text-xs text-blue-300 hover:text-white font-semibold transition-colors cursor-pointer"
-                      >
-                        Need an account? Register as Startup →
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* BACK FACE */}
-                <div
-                  className={`absolute inset-0 w-full h-full backface-hidden rotate-y-180 rounded-3xl bg-linear-to-br from-[#0c1f4a] via-[#102b66] to-[#14327a] border-2 border-blue-400 p-8 sm:p-9 flex flex-col justify-between shadow-2xl text-white ${
-                    isStartupCardFlipped ? "pointer-events-auto" : "pointer-events-none"
-                  }`}
-                >
-                  <div>
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="text-xs font-bold uppercase tracking-wider text-blue-300">
-                        ⚡ Built-in Capabilities
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => setIsStartupCardFlipped(false)}
-                        className="text-xs text-blue-200 hover:text-white bg-white/10 hover:bg-white/20 px-3 py-1 rounded-full border border-white/20 font-semibold flex items-center gap-1.5 transition-all cursor-pointer"
-                      >
-                        <span>🔄 Flip Back</span>
-                      </button>
-                    </div>
-                    <h4 className="text-xl font-bold text-white mb-4">
-                      Startup Operating Engine
-                    </h4>
-
-                    <div className="space-y-3 text-xs sm:text-[13px] text-blue-100 leading-relaxed">
-                      <div className="p-3 rounded-xl bg-white/5 border border-white/10">
-                        <div className="font-bold text-white mb-0.5">Reverse Margin Intelligence</div>
-                        <div>Reverse engineering formulas breakdown raw material cost vs tooling vs margins.</div>
-                      </div>
-                      <div className="p-3 rounded-xl bg-white/5 border border-white/10">
-                        <div className="font-bold text-white mb-0.5">DPIIT & ZED Subsidies</div>
-                        <div>Instant eligibility mapping across 7 Central & State incentive schemes.</div>
-                      </div>
-                      <div className="p-3 rounded-xl bg-white/5 border border-white/10">
-                        <div className="font-bold text-white mb-0.5">Escrow-backed Milestones</div>
-                        <div>Zero advance risk with staged milestone payments and QC gate sign-offs.</div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="pt-3 border-t border-white/10 space-y-2">
-                    <button
-                      type="button"
-                      onClick={() => navigate("startup.home")}
-                      className="w-full py-3 px-5 rounded-xl font-bold text-xs bg-white text-[#0B1F4B] hover:bg-slate-100 shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer"
-                    >
-                      <span>Launch Startup Workspace Now</span>
-                      <Icons.ArrowRight className="w-4 h-4" />
-                    </button>
-                    <div className="text-center">
-                      <button
-                        type="button"
-                        onClick={() => setIsStartupCardFlipped(false)}
-                        className="text-xs text-blue-300 hover:text-white transition-colors cursor-pointer"
-                      >
-                        ← Return to Overview
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* 2. MSME GATEWAY FLIPPING CARD */}
-            <div className="perspective-1000 h-125">
-              <div
-                className={`relative w-full h-full duration-700 transform-style-preserve-3d transition-transform ${
-                  isMsmeCardFlipped ? "rotate-y-180" : ""
-                }`}
-              >
-                {/* FRONT FACE */}
-                <div
-                  className={`absolute inset-0 w-full h-full backface-hidden rounded-3xl bg-slate-900/90 backdrop-blur-xl border-2 border-orange-400/40 p-8 sm:p-9 flex flex-col justify-between shadow-[0_12px_40px_rgba(249,115,22,0.25)] ${
-                    isMsmeCardFlipped ? "pointer-events-none" : "pointer-events-auto"
-                  }`}
-                >
-                  <div>
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-orange-500/20 text-orange-300 border border-orange-400/30 text-xs font-bold tracking-wide">
-                        <span>For Suppliers & Manufacturers</span>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => setIsMsmeCardFlipped(true)}
-                        className="text-xs text-orange-300 hover:text-white bg-orange-500/20 hover:bg-orange-500/30 px-3 py-1 rounded-full border border-orange-400/30 font-semibold flex items-center gap-1.5 transition-all cursor-pointer"
-                        title="Flip to see features"
-                      >
-                        <span>🔄 Flip to Deep Dive</span>
-                      </button>
-                    </div>
-
-                    <h3
-                      className="text-2xl font-black text-white mb-3"
-                      style={{ fontFamily: "Plus Jakarta Sans" }}
-                    >
-                      MSME Business Command Center
-                    </h3>
-                    <p className="text-sm text-slate-300 leading-relaxed mb-6">
-                      Complete statutory verification (Udyam, GST, ISO), list machine capacities across 7 categories, and quote directly on verified startup RFQs.
-                    </p>
-
-                    <ul className="space-y-3 text-xs sm:text-sm text-slate-200 font-medium">
-                      <li className="flex items-center gap-3">
-                        <div className="w-5 h-5 rounded-full bg-orange-500/20 border border-orange-400/40 flex items-center justify-center shrink-0">
-                          <Icons.Check className="w-3.5 h-3.5 text-[#F97316]" />
-                        </div>
-                        <span>Real-time RFQ opportunities feed with match scores</span>
-                      </li>
-                      <li className="flex items-center gap-3">
-                        <div className="w-5 h-5 rounded-full bg-orange-500/20 border border-orange-400/40 flex items-center justify-center shrink-0">
-                          <Icons.Check className="w-3.5 h-3.5 text-[#F97316]" />
-                        </div>
-                        <span>Itemized quote response builder with tooling costs</span>
-                      </li>
-                      <li className="flex items-center gap-3">
-                        <div className="w-5 h-5 rounded-full bg-orange-500/20 border border-orange-400/40 flex items-center justify-center shrink-0">
-                          <Icons.Check className="w-3.5 h-3.5 text-[#F97316]" />
-                        </div>
-                        <span>Machinery capacity & statutory certification ledger</span>
-                      </li>
-                    </ul>
-                  </div>
-
-                  <div className="space-y-3 pt-4 border-t border-white/10">
-                    <button
-                      type="button"
-                      onClick={() => navigate("msme.home")}
-                      className="w-full py-3.5 px-6 rounded-xl font-bold text-sm bg-linear-to-r from-orange-500 to-amber-600 hover:from-orange-400 hover:to-amber-500 text-white shadow-lg shadow-orange-500/30 flex items-center justify-center gap-2 transition-all cursor-pointer"
-                    >
-                      <span>Enter as MSME Supplier</span>
-                      <Icons.ArrowRight className="w-4 h-4" />
-                    </button>
-                    <div className="text-center">
-                      <button
-                        type="button"
-                        onClick={() => openSignInModal("msme")}
-                        className="text-xs text-orange-300 hover:text-white font-semibold transition-colors cursor-pointer"
-                      >
-                        New supplier? Register as MSME →
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* BACK FACE */}
-                <div
-                  className={`absolute inset-0 w-full h-full backface-hidden rotate-y-180 rounded-3xl bg-linear-to-br from-[#4d2105] via-[#6d2f07] to-[#8d3c0a] border-2 border-orange-400 p-8 sm:p-9 flex flex-col justify-between shadow-2xl text-white ${
-                    isMsmeCardFlipped ? "pointer-events-auto" : "pointer-events-none"
-                  }`}
-                >
-                  <div>
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="text-xs font-bold uppercase tracking-wider text-orange-300">
-                        🏭 Supplier Growth Engine
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => setIsMsmeCardFlipped(false)}
-                        className="text-xs text-orange-200 hover:text-white bg-white/10 hover:bg-white/20 px-3 py-1 rounded-full border border-white/20 font-semibold flex items-center gap-1.5 transition-all cursor-pointer"
-                      >
-                        <span>🔄 Flip Back</span>
-                      </button>
-                    </div>
-                    <h4 className="text-xl font-bold text-white mb-4">
-                      MSME Digital Factory Tools
-                    </h4>
-
-                    <div className="space-y-3 text-xs sm:text-[13px] text-orange-100 leading-relaxed">
-                      <div className="p-3 rounded-xl bg-white/5 border border-white/10">
-                        <div className="font-bold text-white mb-0.5">High-Intent PO Matching</div>
-                        <div>Zero junk inquiries. Only pre-budgeted, spec-validated demand routed to your machines.</div>
-                      </div>
-                      <div className="p-3 rounded-xl bg-white/5 border border-white/10">
-                        <div className="font-bold text-white mb-0.5">45-Day Payment Guarantee</div>
-                        <div>TReDS discounting & MSMED Act Section 15 compliance built into every milestone.</div>
-                      </div>
-                      <div className="p-3 rounded-xl bg-white/5 border border-white/10">
-                        <div className="font-bold text-white mb-0.5">ZED Gold Certification Fast-Track</div>
-                        <div>Get audited & verified to win institutional public sector and export orders.</div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="pt-3 border-t border-white/10 space-y-2">
-                    <button
-                      type="button"
-                      onClick={() => navigate("msme.home")}
-                      className="w-full py-3 px-5 rounded-xl font-bold text-xs bg-white text-[#F97316] hover:bg-slate-100 shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer"
-                    >
-                      <span>Launch MSME Workspace Now</span>
-                      <Icons.ArrowRight className="w-4 h-4" />
-                    </button>
-                    <div className="text-center">
-                      <button
-                        type="button"
-                        onClick={() => setIsMsmeCardFlipped(false)}
-                        className="text-xs text-orange-300 hover:text-white transition-colors cursor-pointer"
-                      >
-                        ← Return to Overview
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ─── 5. HOW IT WORKS (THE 5-STEP HORIZONTAL JOURNEY) ───────────────────── */}
-      <section id="how-it-works" className="py-20 sm:py-24 bg-white relative overflow-hidden scroll-reveal">
-        {/* Subtle background texture */}
-        <div className="absolute inset-0 bg-[radial-gradient(#0B1F4B08_1px,transparent_1px)] bg-size-[20px_20px] pointer-events-none" />
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-[#F97316] bg-orange-50 px-4 py-1.5 rounded-full border border-orange-200 mb-4">
-              3-Step Sourcing Engine
-            </span>
-            <h2
-              className="text-3xl sm:text-4xl lg:text-[44px] font-extrabold text-[#0B1F4B] tracking-tight leading-tight"
-              style={{ fontFamily: "Plus Jakarta Sans" }}
-            >
-              How MPI Solves Sourcing for Indian Startups
-            </h2>
-            <p className="text-sm sm:text-base text-slate-500 mt-3 max-w-2xl mx-auto">
-              From plain-text requirement to verified MSME delivery in three intelligent steps.
-            </p>
-          </div>
-
-          {/* 3-Step Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
-            {journeySteps.map((step, idx) => (
-              <div
-                key={step.num}
-                onClick={() => setActiveJourneyStep(idx)}
-                className={`group relative rounded-3xl overflow-hidden transition-all duration-300 cursor-pointer ${
-                  activeJourneyStep === idx
-                    ? "ring-2 ring-[#0B1F4B]/30 shadow-2xl -translate-y-2 scale-[1.02]"
-                    : "shadow-lg hover:shadow-xl hover:-translate-y-1"
-                }`}
-              >
-                {/* Gradient Header Band */}
-                <div className={`bg-linear-to-r ${step.gradient} px-7 py-5 text-white relative`}>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <span className="text-3xl">{step.icon}</span>
-                      <div>
-                        <div className="text-[11px] font-bold uppercase tracking-widest text-white/70">
-                          Step {step.num}
-                        </div>
-                        <h3
-                          className="text-lg font-extrabold text-white leading-tight"
-                          style={{ fontFamily: "Plus Jakarta Sans" }}
-                        >
-                          {step.title}
-                        </h3>
-                      </div>
-                    </div>
-                    {/* Step number watermark */}
-                    <span className="text-5xl font-black text-white/10 select-none" style={{ fontFamily: "Plus Jakarta Sans" }}>
-                      {step.num}
-                    </span>
-                  </div>
-                  <div className="mt-1.5 text-[11px] font-semibold text-white/80 tracking-wide">
-                    {step.subtitle}
-                  </div>
-                </div>
-
-                {/* Card body */}
-                <div className="bg-white px-7 py-6 border border-slate-200/80 border-t-0 rounded-b-3xl">
-                  <p className="text-[13px] text-slate-600 leading-relaxed mb-5">
-                    {step.desc}
-                  </p>
-
-                  {/* Highlight chips */}
-                  <div className="flex flex-wrap gap-2 mb-5">
-                    {step.highlights.map((h, hIdx) => (
-                      <span
-                        key={hIdx}
-                        className={`text-[11px] font-semibold px-2.5 py-1 rounded-lg border transition-colors ${
-                          step.accentColor === "deepBlue"
-                            ? "bg-blue-50/70 text-[#0B1F4B] border-blue-200/80"
-                            : step.accentColor === "orange"
-                              ? "bg-orange-50 text-[#C2410C] border-orange-200"
-                              : "bg-slate-50 text-[#0B1F4B] border-slate-200/90"
-                        }`}
-                      >
-                        {h}
-                      </span>
-                    ))}
-                  </div>
-
-                  {/* Metric footer */}
-                  <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
-                    <span
-                      className={`text-lg font-bold ${
-                        step.accentColor === "deepBlue"
-                          ? "text-[#0B1F4B]"
-                          : step.accentColor === "orange"
-                            ? "text-[#F97316]"
-                            : "text-[#0B1F4B]"
-                      }`}
-                      style={{ fontFamily: "Plus Jakarta Sans" }}
-                    >
-                      {step.metric}
-                    </span>
-                    {step.accentColor === "deepBlueOrange" && (
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-[#F97316] bg-orange-50 px-2 py-0.5 rounded-md border border-orange-200">
-                        Zero Advance Risk
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                {/* Connector arrow (between cards on desktop) */}
-                {idx < journeySteps.length - 1 && (
-                  <div className="hidden md:flex absolute -right-5 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white border-2 border-slate-200 shadow-md items-center justify-center text-slate-400 group-hover:text-[#F97316] group-hover:border-orange-300 transition-colors">
-                    <Icons.ArrowRight className="w-4 h-4" />
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-12 text-center">
+          <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
             <button
               type="button"
               onClick={() => navigate("startup.procurement")}
-              className="inline-flex items-center gap-2.5 px-7 py-3 rounded-full font-bold text-sm bg-[#0B1F4B]/88 backdrop-blur-md border border-white/20 text-white hover:bg-[#123B7A]/94 hover:border-white/35 shadow-[inset_0_1px_1px_rgba(255,255,255,0.22)] transition-all cursor-pointer"
+              className="group inline-flex items-center gap-2.5 px-6 py-3.5 text-sm font-bold rounded-xl bg-[#F97316] hover:bg-[#EA580C] active:bg-[#F97316] text-white shadow-lg hover:shadow-xl transition-all cursor-pointer"
             >
-              <span>Try the 3-Step Engine in Workspace</span>
-              <Icons.ArrowRight className="w-4 h-4" />
+              <span>Start with MPI</span>
+              <Icons.ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </button>
+
+            <button
+              type="button"
+              onClick={() => navigate("register.msme")}
+              className="px-6 py-3.5 text-sm font-semibold rounded-xl bg-transparent hover:bg-white/10 text-white border border-white/20 transition-all cursor-pointer"
+            >
+              Register as MSME Supplier
             </button>
           </div>
         </div>
       </section>
 
-      {/* ─── 6. BENTO FEATURE SPOTLIGHT ───────────────────────────────────────── */}
-      <section className="py-16 sm:py-20 bg-white border-y border-slate-200 scroll-reveal">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-12">
-            <span className="text-xs font-bold uppercase tracking-widest text-blue-700 bg-blue-50 px-3 py-1 rounded-full border border-blue-200">
-              Institutional Advantage
-            </span>
-            <h2
-              className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0B1F4B] tracking-tight mt-3"
-              style={{ fontFamily: "Plus Jakarta Sans" }}
-            >
-              Why Startups Need MPI Procurement Support
-            </h2>
-            <p className="text-sm sm:text-base text-slate-600 mt-2">
-              Founders lose weeks negotiating with middlemen, miscommunicating
-              specs, and forfeiting government schemes. MPI replaces guesswork
-              with structured intelligence.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Bento Card 1 */}
-            <div className="p-6 rounded-2xl bg-[#F7F9FC] border border-slate-200 flex flex-col justify-between">
-              <div>
-                <div className="w-12 h-12 rounded-xl bg-blue-100 text-[#0B1F4B] flex items-center justify-center font-bold mb-4">
-                  <Icons.FileText className="w-6 h-6" />
-                </div>
-                <h3 className="text-lg font-bold text-[#0B1F4B] mb-2">
-                  Institutional Spec Drafting
-                </h3>
-                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                  Converts vague ideas into precise engineering & manufacturing
-                  specifications (tolerances, GSM, drop testing, certifications)
-                  so vendors quote accurately the first time.
-                </p>
+      {/* ─── 14. MINIMAL CLEAN FOOTER (REFERENCE STYLE) ────────────────────── */}
+      <footer className="bg-white border-t border-slate-200 text-slate-600 text-xs py-14">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
+            {/* Col 1: Brand Info */}
+            <div className="col-span-2 space-y-3">
+              <div className="font-extrabold text-lg text-[#0B1F4B]" style={{ fontFamily: "Plus Jakarta Sans" }}>
+                MPI — Market Procurement Intelligence
               </div>
-              <div className="mt-6 pt-4 border-t border-slate-200/80 flex items-center justify-between text-xs font-semibold text-blue-700">
-                <span>Zero back-and-forth ambiguity</span>
-                <Icons.Check className="w-4 h-4 text-emerald-600" />
-              </div>
-            </div>
-
-            {/* Bento Card 2 */}
-            <div className="p-6 rounded-2xl bg-[#F7F9FC] border border-slate-200 flex flex-col justify-between">
-              <div>
-                <div className="w-12 h-12 rounded-xl bg-orange-100 text-[#F97316] flex items-center justify-center font-bold mb-4">
-                  <Icons.Coins className="w-6 h-6" />
-                </div>
-                <h3 className="text-lg font-bold text-[#0B1F4B] mb-2">
-                  Transparent Landed Cost Comparison
-                </h3>
-                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                  Compare bids side-by-side with full breakdown into tooling
-                  costs, unit fabrication, QA testing, logistics, and GST,
-                  ensuring no surprise post-order fees.
-                </p>
-              </div>
-              <div className="mt-6 pt-4 border-t border-slate-200/80 flex items-center justify-between text-xs font-semibold text-[#F97316]">
-                <span>Supplier #001 vs #002 breakdown</span>
-                <Icons.Check className="w-4 h-4 text-emerald-600" />
-              </div>
-            </div>
-
-            {/* Bento Card 3 */}
-            <div className="p-6 rounded-2xl bg-[#F7F9FC] border border-slate-200 flex flex-col justify-between">
-              <div>
-                <div className="w-12 h-12 rounded-xl bg-yellow-100 text-[#D9A400] flex items-center justify-center font-bold mb-4">
-                  <Icons.Award className="w-6 h-6" />
-                </div>
-                <h3 className="text-lg font-bold text-[#0B1F4B] mb-2">
-                  Government Schemes Intelligence
-                </h3>
-                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                  Automatically flags eligible MSME & DPIIT government schemes
-                  (ZED Quality Certification, Design Clinic, SISFS Grants)
-                  providing up to 80% reimbursement on qualified expenses.
-                </p>
-              </div>
-              <div className="mt-6 pt-4 border-t border-slate-200/80 flex items-center justify-between text-xs font-semibold text-[#D9A400]">
-                <span>Up to ₹5L-₹9L grant matching</span>
-                <Icons.Check className="w-4 h-4 text-emerald-600" />
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-
-
-      {/* ─── 8. GOVERNMENT SCHEMES INTELLIGENCE CENTER & CALCULATOR ─────────────── */}
-      <section
-        id="government-schemes"
-        className="py-16 sm:py-20 bg-white border-t border-slate-200"
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
-            <div className="lg:col-span-5 space-y-4">
-              <span className="text-xs font-bold uppercase tracking-widest text-[#D9A400] bg-[#FFF7D6] px-3 py-1 rounded-full border border-yellow-200">
-                Government Schemes Intelligence
-              </span>
-              <h2
-                className="text-2xl sm:text-3xl font-extrabold text-[#0B1F4B] tracking-tight"
-                style={{ fontFamily: "Plus Jakarta Sans" }}
-              >
-                Government Schemes & MSME Sourcing Grants
-              </h2>
-              <p className="text-sm text-slate-600 leading-relaxed">
-                Indian startups sourcing through certified MSMEs are eligible
-                for statutory quality and tooling grants up to 80% under ZED,
-                Design Clinic, and Startup India Seed Fund (SISFS) schemes.
+              <p className="text-slate-500 leading-relaxed text-xs max-w-sm">
+                Empowering Indian startups with verified MSME manufacturing capacity,
+                reverse-margin price discovery, and milestone escrow guarantees.
               </p>
-
-              <div className="space-y-3 pt-2">
-                {schemes.slice(0, 2).map((sch) => (
-                  <div
-                    key={sch.id}
-                    className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 border border-slate-200"
-                  >
-                    <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold shrink-0">
-                      <Icons.Check className="w-4 h-4" />
-                    </div>
-                    <div className="text-xs">
-                      <div className="font-bold text-slate-900">
-                        {sch.title}
-                      </div>
-                      <div className="text-slate-500">
-                        {sch.maxBenefit} ({sch.ministry})
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="pt-2 flex flex-wrap gap-2.5">
-                <MPIButton
-                  variant="primary"
-                  size="sm"
-                  onClick={() => navigate("government-schemes.match" as Screen)}
-                >
-                  Find Schemes for My Business →
-                </MPIButton>
-                <MPIButton
-                  variant="outline"
-                  size="sm"
-                  onClick={() =>
-                    navigate("government-schemes.browse" as Screen)
-                  }
-                >
-                  Browse All 30 Schemes
-                </MPIButton>
+              <div className="text-[11px] text-slate-400 font-mono pt-1">
+                A Make In India & DPIIT Ecosystem Initiative
               </div>
             </div>
 
-            {/* Interactive Calculator Card */}
-            <div className="lg:col-span-7">
-              <div className="bg-[#0B1F4B] text-white rounded-2xl p-6 sm:p-8 shadow-xl border border-[#123B7A]">
-                <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-                  <Icons.Coins className="w-5 h-5 text-[#F97316]" />
-                  <span>Government Scheme Assistance Estimator</span>
-                </h3>
-
-                <div className="space-y-5">
-                  <div>
-                    <div className="flex justify-between text-xs font-semibold text-slate-300 mb-2">
-                      <span>Estimated Procurement Budget:</span>
-                      <span className="text-[#FFF7D6] font-bold text-sm">
-                        ₹{calcBudget.toLocaleString("en-IN")}
-                      </span>
-                    </div>
-                    <input
-                      type="range"
-                      min={20000}
-                      max={1000000}
-                      step={10000}
-                      value={calcBudget}
-                      onChange={(e) => setCalcBudget(Number(e.target.value))}
-                      className="w-full accent-[#F97316] cursor-pointer"
-                    />
-                    <div className="flex justify-between text-[10px] text-slate-400 mt-1">
-                      <span>₹20,000</span>
-                      <span>₹5,00,000</span>
-                      <span>₹10,00,000</span>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="text-xs font-semibold text-slate-300 block mb-2">
-                      Procurement Category:
-                    </label>
-                    <select
-                      value={calcCategory}
-                      onChange={(e) =>
-                        setCalcCategory(e.target.value as CatalogCategory)
-                      }
-                      aria-label="Procurement Category for Scheme"
-                      className="w-full bg-[#123B7A] border border-blue-400/30 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-[#F97316]"
-                    >
-                      {CATALOG_CATEGORIES.map((cat) => (
-                        <option
-                          key={cat}
-                          value={cat}
-                          className="bg-[#0B1F4B] text-white"
-                        >
-                          {cat}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4 pt-4 border-t border-[#123B7A]">
-                    <div className="bg-[#123B7A]/60 p-4 rounded-xl border border-blue-400/20">
-                      <div className="text-[11px] text-slate-300 uppercase font-bold">
-                        Eligible Scheme Benefit ({calculatedSchemeBenefit.rate}
-                        %)
-                      </div>
-                      <div className="text-xl sm:text-2xl font-extrabold text-[#D9A400] mt-1">
-                        ₹
-                        {calculatedSchemeBenefit.amount.toLocaleString("en-IN")}
-                      </div>
-                      <div className="text-[10px] text-slate-300 mt-0.5">
-                        Govt reimbursement estimate
-                      </div>
-                    </div>
-
-                    <div className="bg-[#123B7A]/60 p-4 rounded-xl border border-blue-400/20">
-                      <div className="text-[11px] text-slate-300 uppercase font-bold">
-                        Effective Net Cost to Startup
-                      </div>
-                      <div className="text-xl sm:text-2xl font-extrabold text-emerald-400 mt-1">
-                        ₹
-                        {calculatedSchemeBenefit.netCost.toLocaleString(
-                          "en-IN",
-                        )}
-                      </div>
-                      <div className="text-[10px] text-slate-300 mt-0.5">
-                        Direct post-scheme cost
-                      </div>
-                    </div>
-                  </div>
-
-                  <MPIButton
-                    variant="ai"
-                    fullWidth
-                    size="md"
-                    onClick={() => {
-                      setTargetBudget(calcBudget)
-                      setSelectedCategory(calcCategory)
-                      navigate("startup.procurement")
-                    }}
-                    icon={<Icons.Sparkles className="w-4 h-4" />}
-                  >
-                    Apply Government Schemes in Startup Procurement →
-                  </MPIButton>
-                </div>
+            {/* Col 2: Platform */}
+            <div className="space-y-2.5">
+              <div className="font-bold text-slate-900 text-xs uppercase tracking-wider">
+                Platform
               </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-
-      {/* ─── 10. ENTERPRISE FOOTER ────────────────────────────────────────────── */}
-      <footer className="bg-[#0B1F4B] text-white pt-14 pb-10 border-t border-[#123B7A]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 pb-10 border-b border-[#123B7A]">
-            {/* Col 1: Brand */}
-            <div className="space-y-3">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-[#F97316] text-white flex items-center justify-center font-bold">
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.5"
-                  >
-                    <path d="M4 14L8 8L12 12L16 6L20 14" />
-                  </svg>
-                </div>
-                <span
-                  className="font-extrabold text-xl tracking-tight text-white"
-                  style={{ fontFamily: "Plus Jakarta Sans" }}
-                >
-                  MPI
-                </span>
-              </div>
-              <p className="text-xs text-slate-300 leading-relaxed">
-                Market Procurement Intelligence — The institutional MPI
-                procurement support bridging emerging startups with verified
-                Indian MSME manufacturers.
-              </p>
-              <div className="text-[11px] text-slate-400">
-                🇮🇳 Aligned with Make in India & DPIIT Startup India
-              </div>
-            </div>
-
-            {/* Col 2: Approved Categories */}
-            <div>
-              <div className="text-xs font-bold uppercase tracking-wider text-slate-300 mb-3">
-                7 Solution Catalogs
-              </div>
-              <ul className="space-y-2 text-xs text-slate-300">
-                {CATALOG_CATEGORIES.map((cat) => (
-                  <li key={cat}>
-                    <button
-                      onClick={() => {
-                        setSelectedMarketCategory(cat)
-                        const el = document.getElementById("marketplace")
-                        el?.scrollIntoView({ behavior: "smooth" })
-                      }}
-                      className="hover:text-white transition-colors cursor-pointer text-left"
-                    >
-                      {cat}
-                    </button>
-                  </li>
-                ))}
+              <ul className="space-y-2">
+                <li>
+                  <a href="#marketplace" className="hover:text-[#0B1F4B] transition-colors">
+                    Catalogue
+                  </a>
+                </li>
+                <li>
+                  <button onClick={() => navigate("startup.home")} className="hover:text-[#0B1F4B] transition-colors cursor-pointer">
+                    Startup Hub
+                  </button>
+                </li>
+                <li>
+                  <button onClick={() => navigate("msme.home")} className="hover:text-[#0B1F4B] transition-colors cursor-pointer">
+                    MSME Portal
+                  </button>
+                </li>
+                <li>
+                  <button onClick={() => navigate("government-schemes.match")} className="hover:text-[#0B1F4B] transition-colors cursor-pointer">
+                    Govt Schemes (30)
+                  </button>
+                </li>
               </ul>
             </div>
 
-            {/* Col 3: Workspaces */}
-            <div>
-              <div className="text-xs font-bold uppercase tracking-wider text-slate-300 mb-3">
-                Platform Portals
+            {/* Col 3: Solutions */}
+            <div className="space-y-2.5">
+              <div className="font-bold text-slate-900 text-xs uppercase tracking-wider">
+                Solutions
               </div>
-              <ul className="space-y-2 text-xs text-slate-300">
+              <ul className="space-y-2">
                 <li>
-                  <button
-                    onClick={() => navigate("startup.home")}
-                    className="hover:text-white transition-colors"
-                  >
-                    Startup Command Center
+                  <button onClick={() => { setSelectedCategory("Packaging & Printing"); navigate("startup.procurement") }} className="hover:text-[#0B1F4B] transition-colors cursor-pointer">
+                    Packaging Materials
                   </button>
                 </li>
                 <li>
-                  <button
-                    onClick={() => navigate("startup.procurement")}
-                    className="hover:text-white transition-colors"
-                  >
-                    AI RFQ & Spec Builder
+                  <button onClick={() => { setSelectedCategory("Prototyping & Product Development"); navigate("startup.procurement") }} className="hover:text-[#0B1F4B] transition-colors cursor-pointer">
+                    CNC & 3D Prototyping
                   </button>
                 </li>
                 <li>
-                  <button
-                    onClick={() => navigate("msme.home")}
-                    className="hover:text-white transition-colors"
-                  >
-                    MSME Supplier Portal
+                  <button onClick={() => { setSelectedCategory("IT & Digital Services"); navigate("startup.procurement") }} className="hover:text-[#0B1F4B] transition-colors cursor-pointer">
+                    IT & Digital Systems
                   </button>
                 </li>
                 <li>
-                  <button
-                    onClick={() => navigate("admin.home")}
-                    className="hover:text-white transition-colors"
-                  >
-                    Operations & Governance Console
+                  <button onClick={() => { setSelectedCategory("Compliance & Legal Support"); navigate("startup.procurement") }} className="hover:text-[#0B1F4B] transition-colors cursor-pointer">
+                    Compliance & Audits
+                  </button>
+                </li>
+              </ul>
+            </div>
+
+            {/* Col 4: Portals & Governance */}
+            <div className="space-y-2.5">
+              <div className="font-bold text-slate-900 text-xs uppercase tracking-wider">
+                Governance
+              </div>
+              <ul className="space-y-2">
+                <li>
+                  <button onClick={() => navigate("login.admin")} className="hover:text-[#0B1F4B] transition-colors cursor-pointer">
+                    Admin Portal
                   </button>
                 </li>
                 <li>
-                  <button
-                    onClick={() => navigate("analytics.detail.ai-insights")}
-                    className="hover:text-white transition-colors"
-                  >
+                  <button onClick={() => navigate("analytics.detail.ai-insights")} className="hover:text-[#0B1F4B] transition-colors cursor-pointer">
                     Analytics Studio
                   </button>
                 </li>
+                <li>
+                  <button onClick={() => navigate("analytics.support")} className="hover:text-[#0B1F4B] transition-colors cursor-pointer">
+                    Support Desk
+                  </button>
+                </li>
+                <li>
+                  <button onClick={() => navigate("login.startup")} className="hover:text-[#0B1F4B] transition-colors cursor-pointer">
+                    Sign In
+                  </button>
+                </li>
               </ul>
-            </div>
-
-            {/* Col 4: Statutory & Contact */}
-            <div className="space-y-3 text-xs text-slate-300">
-              <div className="text-xs font-bold uppercase tracking-wider text-slate-300 mb-1">
-                MSME Sourcing Desk
-              </div>
-              <p className="text-slate-400 leading-relaxed">
-                National MSME Verification & Grievance Sourcing Helpline:
-              </p>
-              <div className="font-semibold text-white">
-                procure@mpi-bharat.in
-              </div>
-              <div className="text-slate-400">
-                +91 (80) 4120-9900 (Mon–Fri, 9am–6pm IST)
-              </div>
-              <div className="pt-2">
-                <span className="inline-block bg-[#123B7A] px-2.5 py-1 rounded text-[11px] font-mono text-emerald-400">
-                  Udyam Verification Gateway: Operational
-                </span>
-              </div>
             </div>
           </div>
 
-          <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 gap-4">
-            <div>
-              © 2026 Market Procurement Intelligence (MPI) Technologies Ltd. All
-              rights reserved.
-            </div>
-            <div className="flex items-center gap-6">
-              <button
-                onClick={() => navigate("home")}
-                className="hover:text-white"
-              >
-                Privacy Policy
-              </button>
-              <button
-                onClick={() => navigate("home")}
-                className="hover:text-white"
-              >
-                Terms of Procurement
-              </button>
-              <button
-                onClick={() => navigate("home")}
-                className="hover:text-white"
-              >
-                Security & Escrow
-              </button>
+          <div className="border-t border-slate-200 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-500">
+            <div>© {new Date().getFullYear()} MPI — Market Procurement Intelligence. All rights reserved.</div>
+            <div className="flex items-center gap-5">
+              <span>Privacy Policy</span>
+              <span>•</span>
+              <span>Terms of Procurement</span>
+              <span>•</span>
+              <span>Security & Telemetry</span>
             </div>
           </div>
         </div>
       </footer>
 
-      {/* ─── 11. PRODUCT DETAIL MODAL (VIEW DETAILS) ─────────────────────────── */}
-      {selectedProductDetail && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-fade-in">
-          <div className="bg-white rounded-2xl w-full max-w-lg border border-slate-200 shadow-2xl overflow-hidden flex flex-col">
-            <div className="relative h-44 bg-slate-100">
-              <img
-                src={selectedProductDetail.image}
-                alt={selectedProductDetail.name}
-                className="w-full h-full object-cover"
-              />
-              <button
-                onClick={() => setSelectedProductDetail(null)}
-                className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-black/80 transition-colors"
-              >
-                <Icons.Close className="w-4 h-4" />
-              </button>
-              <div className="absolute bottom-3 left-3">
-                <span className="bg-[#0B1F4B] text-white text-[11px] font-bold px-2.5 py-1 rounded-md">
-                  {selectedProductDetail.category}
-                </span>
-              </div>
-            </div>
-
-            <div className="p-6 space-y-4">
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <h3 className="text-lg font-bold text-[#0B1F4B]">
-                    {selectedProductDetail.name}
-                  </h3>
-                  <span className="text-xs bg-emerald-50 text-emerald-800 border border-emerald-200 font-semibold px-2 py-0.5 rounded">
-                    MPI Verified
-                  </span>
-                </div>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  {selectedProductDetail.description}
-                </p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3 text-xs bg-slate-50 p-3.5 rounded-xl border border-slate-200">
-                <div>
-                  <span className="text-slate-400 block text-[10px] font-bold uppercase">
-                    Typical Lead Time
-                  </span>
-                  <span className="font-semibold text-slate-800">
-                    7–12 Business Days
-                  </span>
-                </div>
-                <div>
-                  <span className="text-slate-400 block text-[10px] font-bold uppercase">
-                    Standard MOQ
-                  </span>
-                  <span className="font-semibold text-slate-800">
-                    100–500 units
-                  </span>
-                </div>
-                <div>
-                  <span className="text-slate-400 block text-[10px] font-bold uppercase">
-                    Verified Suppliers
-                  </span>
-                  <span className="font-semibold text-emerald-600">
-                    18+ Vetted Indian MSMEs
-                  </span>
-                </div>
-                <div>
-                  <span className="text-slate-400 block text-[10px] font-bold uppercase">
-                    Government Schemes
-                  </span>
-                  <span className="font-semibold text-[#D9A400]">
-                    Eligible for ZED Subsidy
-                  </span>
-                </div>
-              </div>
-
-              <div className="pt-2 flex gap-3">
-                <MPIButton
-                  variant="outline"
-                  className="flex-1"
-                  onClick={() => setSelectedProductDetail(null)}
-                >
-                  Close
-                </MPIButton>
-                <MPIButton
-                  variant="ai"
-                  className="flex-1"
-                  onClick={() => {
-                    setRequirementText(
-                      `Need sourcing quote for ${selectedProductDetail.name} (${selectedProductDetail.category})`,
-                    )
-                    setSelectedCategory(
-                      selectedProductDetail.category as CatalogCategory,
-                    )
-                    setSelectedProductDetail(null)
-                    navigate("startup.procurement")
-                  }}
-                  icon={<Icons.ArrowRight className="w-4 h-4" />}
-                >
-                  Request Quote
-                </MPIButton>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ─── 12. GOVERNMENT SCHEMES DETAIL MODAL ─────────────────────────────── */}
-      {showSchemeDetailModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-fade-in">
-          <div className="bg-white rounded-2xl w-full max-w-2xl border border-slate-200 shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
-            <div className="p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
-              <div className="flex items-center gap-2">
-                <Icons.Award className="w-5 h-5 text-[#D9A400]" />
-                <h3 className="font-bold text-slate-900 text-base">
-                  Government Schemes & Sourcing Assistance
-                </h3>
-              </div>
-              <button
-                onClick={() => setShowSchemeDetailModal(false)}
-                className="p-1 rounded-md text-slate-400 hover:text-slate-700"
-              >
-                <Icons.Close className="w-4 h-4" />
-              </button>
-            </div>
-
-            <div className="p-6 overflow-y-auto space-y-4">
-              {schemes.map((sch) => (
-                <div
-                  key={sch.id}
-                  className="p-4 rounded-xl border border-slate-200 bg-white space-y-2"
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <div>
-                      <span className="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded">
-                        {sch.ministry}
-                      </span>
-                      <h4 className="text-sm font-bold text-slate-900 mt-1">
-                        {sch.title}
-                      </h4>
-                    </div>
-                    <span className="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded">
-                      {sch.subsidyPercentage}% Subsidy
-                    </span>
-                  </div>
-                  <p className="text-xs text-slate-600 leading-relaxed">
-                    <strong>Eligibility:</strong> {sch.eligibility}
-                  </p>
-                  <div className="text-xs text-[#D9A400] font-semibold">
-                    Maximum Benefit: {sch.maxBenefit}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="p-4 border-t border-slate-200 bg-slate-50 flex justify-end">
-              <MPIButton
-                variant="primary"
-                size="sm"
-                onClick={() => {
-                  setShowSchemeDetailModal(false)
-                  navigate("startup.procurement")
-                }}
-              >
-                Claim Schemes in Procurement →
-              </MPIButton>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ─── 13. COMMAND PALETTE MODAL (⌘K) ──────────────────────────────────── */}
+      {/* ─── 15. COMMAND PALETTE MODAL (⌘K) ────────────────────────────────── */}
       {showSearchModal && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-start justify-center pt-20 px-4 animate-fade-in">
           <div className="bg-white rounded-2xl w-full max-w-2xl border border-slate-200 shadow-2xl overflow-hidden">
@@ -2191,11 +1654,7 @@ export default function Home({
 
             <div className="p-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-500">
               <span>
-                Press{" "}
-                <kbd className="bg-white border border-slate-300 px-1 rounded">
-                  ESC
-                </kbd>{" "}
-                to close
+                Press <kbd className="bg-white border border-slate-300 px-1 rounded">ESC</kbd> to close
               </span>
               <span>MPI Intelligent Marketplace</span>
             </div>

@@ -325,19 +325,25 @@ export default function GlobalNavBar({
                 })}
               </div>
             ) : (
-              /* Clean Solution Anchors (on Home Screen Desktop) */
-              <div className="hidden lg:flex items-center gap-5 text-xs font-semibold text-slate-600 pl-2">
+              /* Clean Reference Nav Links (on Home Screen Desktop) */
+              <div className="hidden lg:flex items-center gap-6 text-[13px] font-medium text-slate-600 pl-4">
                 <a
                   href="#marketplace"
-                  className="hover:text-[#0B1F4B] transition-colors cursor-pointer flex items-center gap-1"
+                  className="hover:text-[#0B1F4B] transition-colors cursor-pointer"
                 >
-                  <span>Catalogue</span>
+                  Products
+                </a>
+                <a
+                  href="#solutions"
+                  className="hover:text-[#0B1F4B] transition-colors cursor-pointer"
+                >
+                  Solutions
                 </a>
                 <a
                   href="#how-it-works"
                   className="hover:text-[#0B1F4B] transition-colors cursor-pointer"
                 >
-                  How It Works
+                  How MPI Works
                 </a>
                 <button
                   onClick={() => navigate("startup.home")}
@@ -353,17 +359,17 @@ export default function GlobalNavBar({
                 </button>
                 <button
                   onClick={() => navigate("government-schemes.match")}
-                  className="hover:text-[#0B1F4B] transition-colors cursor-pointer flex items-center gap-1 text-[#0B1F4B]"
+                  className="hover:text-[#0B1F4B] transition-colors cursor-pointer flex items-center gap-1.5 text-slate-700"
                 >
-                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                  <span>30 Govt Schemes</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#F97316]" />
+                  <span>Govt Schemes</span>
                 </button>
               </div>
             )}
           </div>
 
           {/* Right section: Hub Links, Translator & Action CTA Buttons */}
-          <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             {/* Desktop Hub Links (inside Sub-portals) */}
             {!isHomeScreen && showQuickLinks && (
               <div className="hidden xl:flex items-center gap-1">
@@ -405,24 +411,24 @@ export default function GlobalNavBar({
             {/* Global Language Translator Button (Globe + EN) */}
             <LanguageTranslatorButton variant={variant === "navy" ? "navy" : "default"} />
 
-            {/* Direct High-Intent Action CTAs */}
+            {/* Direct High-Intent Action CTAs (Reference Match) */}
             {isHomeScreen ? (
-              <div className="hidden sm:flex items-center gap-2">
-                <MPIButton
-                  variant="ghost"
-                  size="sm"
+              <div className="hidden sm:flex items-center gap-2.5">
+                <button
+                  type="button"
                   onClick={() => navigate("login.startup")}
+                  className="px-3.5 py-1.5 text-xs font-semibold text-slate-700 hover:text-[#0B1F4B] hover:bg-slate-100/80 rounded-lg transition-colors cursor-pointer"
                 >
                   Sign In
-                </MPIButton>
-                <MPIButton
-                  variant="primary"
-                  size="sm"
+                </button>
+                <button
+                  type="button"
                   onClick={() => navigate("startup.procurement")}
-                  icon={<Icons.Sparkles className="w-3.5 h-3.5 text-amber-300" />}
+                  className="group inline-flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-xl bg-[#0B1F4B] hover:bg-[#123B7A] active:bg-[#0B1F4B] text-white shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer"
                 >
-                  Launch Procurement
-                </MPIButton>
+                  <span>Start with MPI</span>
+                  <Icons.ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                </button>
               </div>
             ) : (
               /* Hub Switcher Dropdown for non-home pages */
