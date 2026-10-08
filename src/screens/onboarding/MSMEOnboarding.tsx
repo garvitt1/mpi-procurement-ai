@@ -268,7 +268,7 @@ export default function MSMEOnboarding({ navigate, goBack }: NavProps) {
   }
 
   return (
-    <div className="min-h-screen bg-[#F7F9FC] text-[#0B1220] flex flex-col font-sans selection:bg-[#F97316] selection:text-white">
+    <div className="min-h-screen bg-[#F7F9FC] text-[#0B1220] flex flex-col font-sans selection:bg-[#051F16] selection:text-white">
       {/* ── Top Header ──────────────────────────────────────────────────────── */}
       <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 px-4 sm:px-6 py-2.5 sm:py-3.5 flex items-center justify-between gap-3">
         <div className="flex items-center gap-2 sm:gap-4 min-w-0">
@@ -299,12 +299,12 @@ export default function MSMEOnboarding({ navigate, goBack }: NavProps) {
                 Home
               </button>
               <span>/</span>
-              <span className="text-[#0B1F4B] font-semibold truncate">
+              <span className="text-[#051F16] font-semibold truncate">
                 MSME Onboarding
               </span>
             </div>
 
-            <div className="text-xs sm:text-sm font-bold text-[#0B1F4B] truncate">
+            <div className="text-xs sm:text-sm font-bold text-[#051F16] truncate">
               MSME Supplier Onboarding & Statutory Audit Protocol (11 Steps)
             </div>
           </div>
@@ -331,10 +331,10 @@ export default function MSMEOnboarding({ navigate, goBack }: NavProps) {
       <div className="bg-white border-b border-slate-200 px-4 sm:px-8 py-3">
         <div className="max-w-4xl mx-auto flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <span className="w-6 h-6 rounded-full bg-[#0B1F4B] text-white flex items-center justify-center font-bold text-xs">
+            <span className="w-6 h-6 rounded-full bg-[#051F16] text-white flex items-center justify-center font-bold text-xs">
               {currentStep}
             </span>
-            <span className="text-xs font-extrabold text-[#0B1F4B]">
+            <span className="text-xs font-extrabold text-[#051F16]">
               Step {currentStep} of {totalSteps}:{" "}
               {currentStep === 1 && "Enterprise Profile"}
               {currentStep === 2 && "Udyam & Tax IDs"}
@@ -356,7 +356,7 @@ export default function MSMEOnboarding({ navigate, goBack }: NavProps) {
 
         <div className="max-w-4xl mx-auto w-full bg-slate-100 h-2 rounded-full mt-2.5 overflow-hidden">
           <div
-            className="bg-[#0B1F4B] h-full rounded-full transition-all duration-300"
+            className="bg-[#051F16] h-full rounded-full transition-all duration-300"
             style={{ width: `${(currentStep / totalSteps) * 100}%` }}
           />
         </div>
@@ -376,11 +376,11 @@ export default function MSMEOnboarding({ navigate, goBack }: NavProps) {
           {currentStep === 1 && (
             <div className="space-y-6">
               <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-blue-700">
+                <span className="text-xs font-bold uppercase tracking-wider text-emerald-800">
                   Step 1 · Business Entity
                 </span>
                 <h1
-                  className="text-2xl font-extrabold text-[#0B1F4B] mt-1"
+                  className="text-2xl font-extrabold text-[#051F16] mt-1"
                   style={{ fontFamily: "Plus Jakarta Sans" }}
                 >
                   Enterprise Profile & Statutory Classification
@@ -401,7 +401,7 @@ export default function MSMEOnboarding({ navigate, goBack }: NavProps) {
                     value={enterpriseName}
                     onChange={(e) => setEnterpriseName(e.target.value)}
                     placeholder="e.g. Apex Precision Packaging Ltd."
-                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-blue-600"
+                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-[#051F16]"
                   />
                 </div>
 
@@ -414,7 +414,7 @@ export default function MSMEOnboarding({ navigate, goBack }: NavProps) {
                     value={contactPerson}
                     onChange={(e) => setContactPerson(e.target.value)}
                     placeholder="e.g. Vikram Joshi (VP Operations)"
-                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-blue-600"
+                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-[#051F16]"
                   />
                 </div>
 
@@ -430,7 +430,7 @@ export default function MSMEOnboarding({ navigate, goBack }: NavProps) {
                         onClick={() => setEnterpriseType(et)}
                         className={`py-2 px-2 text-xs font-bold rounded-lg border text-center transition-all cursor-pointer ${
                           enterpriseType === et
-                            ? "bg-[#0B1F4B] text-white border-[#0B1F4B] shadow-xs"
+                            ? "bg-[#051F16] text-white border-[#051F16] shadow-xs"
                             : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100"
                         }`}
                       >
@@ -449,7 +449,7 @@ export default function MSMEOnboarding({ navigate, goBack }: NavProps) {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="v.joshi@apexpackaging.in"
-                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-blue-600"
+                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-[#051F16]"
                   />
                 </div>
 
@@ -462,7 +462,7 @@ export default function MSMEOnboarding({ navigate, goBack }: NavProps) {
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="+91 98220 44102"
-                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-blue-600"
+                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-[#051F16]"
                   />
                 </div>
 
@@ -475,7 +475,7 @@ export default function MSMEOnboarding({ navigate, goBack }: NavProps) {
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
                     placeholder="Pune"
-                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-blue-600"
+                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-[#051F16]"
                   />
                 </div>
 
@@ -488,7 +488,7 @@ export default function MSMEOnboarding({ navigate, goBack }: NavProps) {
                     value={state}
                     onChange={(e) => setState(e.target.value)}
                     placeholder="Maharashtra"
-                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-blue-600"
+                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-[#051F16]"
                   />
                 </div>
               </div>
@@ -499,11 +499,11 @@ export default function MSMEOnboarding({ navigate, goBack }: NavProps) {
           {currentStep === 2 && (
             <div className="space-y-6">
               <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-blue-700">
+                <span className="text-xs font-bold uppercase tracking-wider text-emerald-800">
                   Step 2 · Statutory Registrations
                 </span>
                 <h1
-                  className="text-2xl font-extrabold text-[#0B1F4B] mt-1"
+                  className="text-2xl font-extrabold text-[#051F16] mt-1"
                   style={{ fontFamily: "Plus Jakarta Sans" }}
                 >
                   Statutory Udyam, GSTIN, & Factory Premise
@@ -524,7 +524,7 @@ export default function MSMEOnboarding({ navigate, goBack }: NavProps) {
                     value={udyamNumber}
                     onChange={(e) => setUdyamNumber(e.target.value)}
                     placeholder="e.g. UDYAM-MH-12-0048192"
-                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-blue-600 font-mono"
+                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-[#051F16] font-mono"
                   />
                 </div>
 
@@ -538,7 +538,7 @@ export default function MSMEOnboarding({ navigate, goBack }: NavProps) {
                       value={gstNumber}
                       onChange={(e) => setGstNumber(e.target.value)}
                       placeholder="e.g. 27AAACA9921B1ZM"
-                      className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-blue-600 font-mono"
+                      className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-[#051F16] font-mono"
                     />
                   </div>
 
@@ -551,7 +551,7 @@ export default function MSMEOnboarding({ navigate, goBack }: NavProps) {
                       value={panNumber}
                       onChange={(e) => setPanNumber(e.target.value)}
                       placeholder="e.g. AAACA9921B"
-                      className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-blue-600 font-mono"
+                      className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-[#051F16] font-mono"
                     />
                   </div>
                 </div>
@@ -565,7 +565,7 @@ export default function MSMEOnboarding({ navigate, goBack }: NavProps) {
                     value={factoryAddress}
                     onChange={(e) => setFactoryAddress(e.target.value)}
                     placeholder="Plot / Shed number, Industrial Area / MIDC / GIDC, City, Pincode"
-                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-blue-600"
+                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-[#051F16]"
                   />
                 </div>
               </div>
@@ -576,11 +576,11 @@ export default function MSMEOnboarding({ navigate, goBack }: NavProps) {
           {currentStep === 3 && (
             <div className="space-y-6">
               <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-blue-700">
+                <span className="text-xs font-bold uppercase tracking-wider text-emerald-800">
                   Step 3 · Supply Capabilities
                 </span>
                 <h1
-                  className="text-2xl font-extrabold text-[#0B1F4B] mt-1"
+                  className="text-2xl font-extrabold text-[#051F16] mt-1"
                   style={{ fontFamily: "Plus Jakarta Sans" }}
                 >
                   What categories and manufacturing services do you offer?
@@ -604,15 +604,15 @@ export default function MSMEOnboarding({ navigate, goBack }: NavProps) {
                         onClick={() => toggleCategory(cat)}
                         className={`p-3.5 rounded-xl border flex items-center justify-between cursor-pointer transition-all ${
                           isSelected
-                            ? "bg-blue-50/50 border-blue-500 shadow-2xs"
+                            ? "bg-emerald-50/50 border-[#051F16] shadow-2xs"
                             : "bg-white border-slate-200 hover:bg-slate-50"
                         }`}
                       >
-                        <span className="text-xs font-bold text-[#0B1F4B]">
+                        <span className="text-xs font-bold text-[#051F16]">
                           {cat}
                         </span>
                         {isSelected && (
-                          <span className="text-blue-700 font-bold">✓</span>
+                          <span className="text-emerald-800 font-bold">✓</span>
                         )}
                       </div>
                     )
@@ -626,11 +626,11 @@ export default function MSMEOnboarding({ navigate, goBack }: NavProps) {
           {currentStep === 4 && (
             <div className="space-y-6">
               <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-blue-700">
+                <span className="text-xs font-bold uppercase tracking-wider text-emerald-800">
                   Step 4 · Capacity
                 </span>
                 <h1
-                  className="text-2xl font-extrabold text-[#0B1F4B] mt-1"
+                  className="text-2xl font-extrabold text-[#051F16] mt-1"
                   style={{ fontFamily: "Plus Jakarta Sans" }}
                 >
                   Manufacturing & Monthly Service Capacity
@@ -651,7 +651,7 @@ export default function MSMEOnboarding({ navigate, goBack }: NavProps) {
                     value={monthlyCapacity}
                     onChange={(e) => setMonthlyCapacity(e.target.value)}
                     placeholder="e.g. 85,000 units/mo or 25,000 meters/mo"
-                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-blue-600"
+                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-[#051F16]"
                   />
                 </div>
 
@@ -660,7 +660,7 @@ export default function MSMEOnboarding({ navigate, goBack }: NavProps) {
                     <label className="text-xs font-bold text-slate-700">
                       Current Shop Floor Capacity Utilization:
                     </label>
-                    <span className="text-xs font-extrabold text-[#0B1F4B] bg-slate-100 px-2.5 py-0.5 rounded">
+                    <span className="text-xs font-extrabold text-[#051F16] bg-slate-100 px-2.5 py-0.5 rounded">
                       {capacityUtilization}% ({100 - capacityUtilization}%
                       Available for MPI RFQs)
                     </span>
@@ -689,7 +689,7 @@ export default function MSMEOnboarding({ navigate, goBack }: NavProps) {
                         onClick={() => setShiftsPerDay(shifts)}
                         className={`py-2.5 px-3 rounded-xl border text-xs font-bold text-center transition-all cursor-pointer ${
                           shiftsPerDay === shifts
-                            ? "bg-[#0B1F4B] text-white border-[#0B1F4B]"
+                            ? "bg-[#051F16] text-white border-[#051F16]"
                             : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
                         }`}
                       >
@@ -709,11 +709,11 @@ export default function MSMEOnboarding({ navigate, goBack }: NavProps) {
           {currentStep === 5 && (
             <div className="space-y-6">
               <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-blue-700">
+                <span className="text-xs font-bold uppercase tracking-wider text-emerald-800">
                   Step 5 · Machine Park
                 </span>
                 <h1
-                  className="text-2xl font-extrabold text-[#0B1F4B] mt-1"
+                  className="text-2xl font-extrabold text-[#051F16] mt-1"
                   style={{ fontFamily: "Plus Jakarta Sans" }}
                 >
                   Machinery, Equipment & Tooling Park
@@ -734,7 +734,7 @@ export default function MSMEOnboarding({ navigate, goBack }: NavProps) {
                       e.key === "Enter" && (e.preventDefault(), addMachine())
                     }
                     placeholder="e.g. Haas VF-2SS 5-Axis CNC Milling Center"
-                    className="flex-1 px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-blue-600"
+                    className="flex-1 px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-[#051F16]"
                   />
                   <MPIButton
                     variant="outline"
@@ -755,7 +755,7 @@ export default function MSMEOnboarding({ navigate, goBack }: NavProps) {
                         <span className="text-slate-400 font-mono">
                           0{idx + 1}.
                         </span>
-                        <span className="font-bold text-[#0B1F4B]">{m}</span>
+                        <span className="font-bold text-[#051F16]">{m}</span>
                       </div>
                       <button
                         type="button"
@@ -775,11 +775,11 @@ export default function MSMEOnboarding({ navigate, goBack }: NavProps) {
           {currentStep === 6 && (
             <div className="space-y-6">
               <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-blue-700">
+                <span className="text-xs font-bold uppercase tracking-wider text-emerald-800">
                   Step 6 · Quality Standards
                 </span>
                 <h1
-                  className="text-2xl font-extrabold text-[#0B1F4B] mt-1"
+                  className="text-2xl font-extrabold text-[#051F16] mt-1"
                   style={{ fontFamily: "Plus Jakarta Sans" }}
                 >
                   Statutory Quality Standards & Certifications
@@ -807,7 +807,7 @@ export default function MSMEOnboarding({ navigate, goBack }: NavProps) {
                       key={cert}
                       className={`flex items-start gap-3 p-3.5 rounded-xl border transition-all cursor-pointer ${
                         isChecked
-                          ? "bg-blue-50/50 border-blue-400 shadow-2xs"
+                          ? "bg-emerald-50/50 border-blue-400 shadow-2xs"
                           : "bg-white border-slate-200 hover:bg-slate-50"
                       }`}
                     >
@@ -815,7 +815,7 @@ export default function MSMEOnboarding({ navigate, goBack }: NavProps) {
                         type="checkbox"
                         checked={isChecked}
                         onChange={() => toggleCertification(cert)}
-                        className="rounded text-blue-600 focus:ring-blue-500 w-4 h-4 mt-0.5"
+                        className="rounded text-emerald-700 focus:ring-emerald-500 w-4 h-4 mt-0.5"
                       />
                       <span className="text-xs font-bold text-slate-800">
                         {cert}
@@ -831,11 +831,11 @@ export default function MSMEOnboarding({ navigate, goBack }: NavProps) {
           {currentStep === 7 && (
             <div className="space-y-6">
               <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-blue-700">
+                <span className="text-xs font-bold uppercase tracking-wider text-emerald-800">
                   Step 7 · Pricing & MOQ
                 </span>
                 <h1
-                  className="text-2xl font-extrabold text-[#0B1F4B] mt-1"
+                  className="text-2xl font-extrabold text-[#051F16] mt-1"
                   style={{ fontFamily: "Plus Jakarta Sans" }}
                 >
                   Standard Minimum Order Quantities & Commercial Terms
@@ -856,7 +856,7 @@ export default function MSMEOnboarding({ navigate, goBack }: NavProps) {
                       type="number"
                       value={moqStandard}
                       onChange={(e) => setMoqStandard(Number(e.target.value))}
-                      className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-blue-600"
+                      className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-[#051F16]"
                     />
                   </div>
 
@@ -868,7 +868,7 @@ export default function MSMEOnboarding({ navigate, goBack }: NavProps) {
                       type="number"
                       value={leadTimeDays}
                       onChange={(e) => setLeadTimeDays(Number(e.target.value))}
-                      className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-blue-600"
+                      className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-[#051F16]"
                     />
                   </div>
                 </div>
@@ -881,7 +881,7 @@ export default function MSMEOnboarding({ navigate, goBack }: NavProps) {
                     rows={3}
                     value={standardPaymentTerms}
                     onChange={(e) => setStandardPaymentTerms(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-blue-600"
+                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-[#051F16]"
                   />
                 </div>
               </div>
@@ -892,11 +892,11 @@ export default function MSMEOnboarding({ navigate, goBack }: NavProps) {
           {currentStep === 8 && (
             <div className="space-y-6">
               <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-blue-700">
+                <span className="text-xs font-bold uppercase tracking-wider text-emerald-800">
                   Step 8 · Testing & QA
                 </span>
                 <h1
-                  className="text-2xl font-extrabold text-[#0B1F4B] mt-1"
+                  className="text-2xl font-extrabold text-[#051F16] mt-1"
                   style={{ fontFamily: "Plus Jakarta Sans" }}
                 >
                   In-House Testing & Quality Inspection Facilities
@@ -922,7 +922,7 @@ export default function MSMEOnboarding({ navigate, goBack }: NavProps) {
                       key={fac}
                       className={`flex items-start gap-3 p-3.5 rounded-xl border transition-all cursor-pointer ${
                         isChecked
-                          ? "bg-blue-50/50 border-blue-400 shadow-2xs"
+                          ? "bg-emerald-50/50 border-blue-400 shadow-2xs"
                           : "bg-white border-slate-200 hover:bg-slate-50"
                       }`}
                     >
@@ -930,7 +930,7 @@ export default function MSMEOnboarding({ navigate, goBack }: NavProps) {
                         type="checkbox"
                         checked={isChecked}
                         onChange={() => toggleTestingFacility(fac)}
-                        className="rounded text-blue-600 focus:ring-blue-500 w-4 h-4 mt-0.5"
+                        className="rounded text-emerald-700 focus:ring-emerald-500 w-4 h-4 mt-0.5"
                       />
                       <span className="text-xs font-bold text-slate-800">
                         {fac}
@@ -946,11 +946,11 @@ export default function MSMEOnboarding({ navigate, goBack }: NavProps) {
           {currentStep === 9 && (
             <div className="space-y-6">
               <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-blue-700">
+                <span className="text-xs font-bold uppercase tracking-wider text-emerald-800">
                   Step 9 · Logistics
                 </span>
                 <h1
-                  className="text-2xl font-extrabold text-[#0B1F4B] mt-1"
+                  className="text-2xl font-extrabold text-[#051F16] mt-1"
                   style={{ fontFamily: "Plus Jakarta Sans" }}
                 >
                   Packaging & Pan-India Dispatch Capabilities
@@ -967,7 +967,7 @@ export default function MSMEOnboarding({ navigate, goBack }: NavProps) {
                     type="checkbox"
                     checked={panIndiaDispatch}
                     onChange={(e) => setPanIndiaDispatch(e.target.checked)}
-                    className="rounded text-blue-600 focus:ring-blue-500 w-4 h-4"
+                    className="rounded text-emerald-700 focus:ring-emerald-500 w-4 h-4"
                   />
                   <div className="text-xs">
                     <span className="font-bold text-slate-900">
@@ -987,11 +987,11 @@ export default function MSMEOnboarding({ navigate, goBack }: NavProps) {
           {currentStep === 10 && (
             <div className="space-y-6">
               <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-blue-700">
+                <span className="text-xs font-bold uppercase tracking-wider text-emerald-800">
                   Step 10 · Government Subsidies
                 </span>
                 <h1
-                  className="text-2xl font-extrabold text-[#0B1F4B] mt-1"
+                  className="text-2xl font-extrabold text-[#051F16] mt-1"
                   style={{ fontFamily: "Plus Jakarta Sans" }}
                 >
                   Government Schemes Utilized & Subsidy Pass-Through
@@ -1016,7 +1016,7 @@ export default function MSMEOnboarding({ navigate, goBack }: NavProps) {
                       key={sch}
                       className={`flex items-start gap-3 p-3.5 rounded-xl border transition-all cursor-pointer ${
                         isChecked
-                          ? "bg-blue-50/50 border-blue-400 shadow-2xs"
+                          ? "bg-emerald-50/50 border-blue-400 shadow-2xs"
                           : "bg-white border-slate-200 hover:bg-slate-50"
                       }`}
                     >
@@ -1024,7 +1024,7 @@ export default function MSMEOnboarding({ navigate, goBack }: NavProps) {
                         type="checkbox"
                         checked={isChecked}
                         onChange={() => toggleScheme(sch)}
-                        className="rounded text-blue-600 focus:ring-blue-500 w-4 h-4 mt-0.5"
+                        className="rounded text-emerald-700 focus:ring-emerald-500 w-4 h-4 mt-0.5"
                       />
                       <span className="text-xs font-bold text-slate-800">
                         {sch}
@@ -1040,11 +1040,11 @@ export default function MSMEOnboarding({ navigate, goBack }: NavProps) {
           {currentStep === 11 && (
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-blue-700">
+                <span className="text-xs font-bold uppercase tracking-wider text-emerald-800">
                   Step 11 · Verification & Password
                 </span>
                 <h1
-                  className="text-2xl font-extrabold text-[#0B1F4B] mt-1"
+                  className="text-2xl font-extrabold text-[#051F16] mt-1"
                   style={{ fontFamily: "Plus Jakarta Sans" }}
                 >
                   Confirm Verification Documents & Set Password
@@ -1062,7 +1062,7 @@ export default function MSMEOnboarding({ navigate, goBack }: NavProps) {
                   </div>
                   <div className="flex items-center justify-between text-xs text-slate-700 bg-white p-2.5 rounded-lg border border-slate-200">
                     <span className="flex items-center gap-2">
-                      <Icons.FileText className="w-4 h-4 text-blue-600" />
+                      <Icons.FileText className="w-4 h-4 text-emerald-700" />
                       <span>{uploadedUdyamDoc}</span>
                     </span>
                     <span className="text-emerald-700 font-bold text-[11px] bg-emerald-50 px-2 py-0.5 rounded">
@@ -1071,7 +1071,7 @@ export default function MSMEOnboarding({ navigate, goBack }: NavProps) {
                   </div>
                   <div className="flex items-center justify-between text-xs text-slate-700 bg-white p-2.5 rounded-lg border border-slate-200">
                     <span className="flex items-center gap-2">
-                      <Icons.FileText className="w-4 h-4 text-blue-600" />
+                      <Icons.FileText className="w-4 h-4 text-emerald-700" />
                       <span>{uploadedGstDoc}</span>
                     </span>
                     <span className="text-emerald-700 font-bold text-[11px] bg-emerald-50 px-2 py-0.5 rounded">
@@ -1089,7 +1089,7 @@ export default function MSMEOnboarding({ navigate, goBack }: NavProps) {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Minimum 6 characters"
-                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-blue-600"
+                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-[#051F16]"
                   />
                 </div>
 
@@ -1102,7 +1102,7 @@ export default function MSMEOnboarding({ navigate, goBack }: NavProps) {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Re-enter password"
-                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-blue-600"
+                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-[#051F16]"
                   />
                 </div>
 
@@ -1111,7 +1111,7 @@ export default function MSMEOnboarding({ navigate, goBack }: NavProps) {
                     type="checkbox"
                     checked={agreedTerms}
                     onChange={(e) => setAgreedTerms(e.target.checked)}
-                    className="rounded text-blue-600 focus:ring-blue-500 w-4 h-4 mt-0.5"
+                    className="rounded text-emerald-700 focus:ring-emerald-500 w-4 h-4 mt-0.5"
                   />
                   <span className="text-xs text-slate-600 leading-snug">
                     I declare that all machinery specifications and statutory

@@ -1,23 +1,50 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { Screen } from "../../App"
-import { RoleKey, mockLogin, mockGoogleAuth, setAdminSession, detectRoleFromLoginId } from "../../lib/mockAuth"
-import { CATALOG_CATEGORIES } from "../../lib/mpiCatalog"
+import {
+  RoleKey,
+  mockLogin,
+  mockGoogleAuth,
+  setAdminSession,
+  detectRoleFromLoginId,
+} from "../../lib/mockAuth"
+import {
+  getPendingAction,
+  clearPendingAction,
+  PendingActionContext,
+  logUserJourney,
+} from "../../lib/sessionManager"
+import MaterialIcon from "../ui/MaterialIcon"
 
-interface AuthModalProps {
+export interface AuthPortalContext {
+  badge?: string
+  title?: string
+  description?: string
+  icon?: string
+}
+
+export interface AuthModalProps {
   isOpen: boolean
   initialMode?: "login" | "signin"
+  initialRole?: RoleKey
+  targetScreen?: Screen
+  portalContext?: AuthPortalContext
   onClose: () => void
   navigate: (screen: Screen) => void
+  onAuthSuccess?: (role: RoleKey, pendingAction: PendingActionContext | null) => void
 }
 
 export default function AuthModal({
   isOpen,
   initialMode = "login",
+  initialRole = "startup",
+  targetScreen,
+  portalContext,
   onClose,
   navigate,
+  onAuthSuccess,
 }: AuthModalProps) {
   const [mode, setMode] = useState<"login" | "signin">(initialMode)
-  const [role, setRole] = useState<RoleKey>("startup")
+  const [role, setRole] = useState<RoleKey>(initialRole)
 
   // Login form state
   const [email, setEmail] = useState("")
@@ -26,20 +53,114 @@ export default function AuthModal({
   const [submitting, setSubmitting] = useState(false)
   const [errorMsg, setErrorMsg] = useState("")
 
-  // Sign In / Registration: Step 2 details state
-  // Step 1 = Google auth or credentials; Step 2 = Details asked
+  // Registration step
   const [step, setStep] = useState<1 | 2>(1)
-  const [authGoogleUser, setAuthGoogleUser] = useState<{
-    name: string
-    email: string
-    avatar?: string
-  } | null>(null)
 
-  const [companyName, setCompanyName] = useState("")
-  const [city, setCity] = useState("")
-  const [selectedCategory, setSelectedCategory] = useState<string>(CATALOG_CATEGORIES[0])
+  // Sync mode and role whenever modal opens or props change
+  useEffect(() => {
+    if (isOpen) {
+      setMode(initialMode)
+      if (initialRole) setRole(initialRole)
+      setErrorMsg("")
+      setStep(1)
+    }
+  }, [isOpen, initialMode, initialRole])
+
+  // Close on ESC key press
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isOpen) {
+        onClose()
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [isOpen, onClose])
 
   if (!isOpen) return null
+
+  // Helper to handle post-login navigation seamlessly
+  const completeAuthRedirect = (detectedRole: RoleKey) => {
+    const pending = getPendingAction()
+    logUserJourney("AUTH_LOGIN_SUCCESS", {
+      detectedRole,
+      hasPendingAction: Boolean(pending),
+      pendingTarget: pending?.targetScreen,
+      targetScreen,
+    })
+
+    if (onAuthSuccess) {
+      onAuthSuccess(detectedRole, pending)
+      clearPendingAction()
+      onClose()
+      return
+    }
+
+    onClose()
+    if (pending && pending.targetScreen) {
+      clearPendingAction()
+      if (detectedRole === "admin") {
+        setAdminSession(true)
+        navigate("admin.home")
+      } else {
+        navigate(pending.targetScreen)
+      }
+      return
+    }
+
+    if (targetScreen) {
+      // If logging in as admin, always preserve admin route authority
+      if (detectedRole === "admin") {
+        setAdminSession(true)
+        navigate("admin.home")
+      } else {
+        navigate(targetScreen)
+      }
+      return
+    }
+
+    if (detectedRole === "admin") {
+      setAdminSession(true)
+      navigate("admin.home")
+    } else if (detectedRole === "msme") {
+      navigate("msme.home")
+    } else {
+      navigate("startup.home")
+    }
+  }
+
+  // Helper to handle post-registration navigation
+  const completeSignInRedirect = (userRole: RoleKey) => {
+    const pending = getPendingAction()
+    logUserJourney("AUTH_SIGNIN_SUCCESS", {
+      userRole,
+      hasPendingAction: Boolean(pending),
+      pendingTarget: pending?.targetScreen,
+      targetScreen,
+    })
+
+    if (onAuthSuccess) {
+      onAuthSuccess(userRole, pending)
+      clearPendingAction()
+      onClose()
+      return
+    }
+
+    onClose()
+    if (pending && pending.targetScreen) {
+      clearPendingAction()
+      navigate(pending.targetScreen)
+      return
+    }
+
+    if (targetScreen && (targetScreen === "government-schemes.match" || targetScreen.startsWith("startup.") || targetScreen.startsWith("msme."))) {
+      navigate(targetScreen)
+    } else if (userRole === "msme") {
+      navigate("msme.onboarding")
+    } else {
+      navigate("startup.onboarding")
+    }
+  }
 
   // ─── LOGIN HANDLERS ──────────────────────────────────────────────────────────
   const handleLoginSubmit = async (e: React.FormEvent) => {
@@ -50,7 +171,7 @@ export default function AuthModal({
       return
     }
 
-    // Automatically detect role according to login ID
+    // Automatically detect role according to login ID or fall back to selected role
     const detectedRole = detectRoleFromLoginId(email)
     setRole(detectedRole)
 
@@ -64,7 +185,7 @@ export default function AuthModal({
     }
 
     const user = {
-      name: email.split("@")[0] || (detectedRole === "admin" ? "Admin" : "Founder"),
+      name: email.split("@")[0] || (detectedRole === "admin" ? "Admin" : "Executive"),
       email: email.trim(),
       role: detectedRole,
     }
@@ -73,46 +194,24 @@ export default function AuthModal({
       localStorage.setItem("mpi_user_role", detectedRole)
     } catch {}
 
-    if (detectedRole === "admin") {
-      setAdminSession(true)
-      onClose()
-      navigate("admin.home")
-    } else if (detectedRole === "msme") {
-      onClose()
-      navigate("msme.home")
-    } else {
-      onClose()
-      navigate("startup.home")
-    }
+    completeAuthRedirect(detectedRole)
   }
 
   const handleGoogleLogin = async () => {
     setSubmitting(true)
     setErrorMsg("")
-    const detectedRole = email.trim() ? detectRoleFromLoginId(email) : "startup"
-    setRole(detectedRole)
-    const result = await mockGoogleAuth(detectedRole)
+    const preferredRole = initialRole || (email.trim() ? detectRoleFromLoginId(email) : "startup")
+    setRole(preferredRole)
+    const result = await mockGoogleAuth(preferredRole)
     setSubmitting(false)
 
     if (result.success) {
-      const userRole = result.user?.role || detectedRole
-      if (userRole === "admin") {
-        setAdminSession(true)
-        onClose()
-        navigate("admin.home")
-      } else if (userRole === "msme") {
-        onClose()
-        navigate("msme.home")
-      } else {
-        onClose()
-        navigate("startup.home")
-      }
+      const userRole = result.user?.role || preferredRole
+      completeAuthRedirect(userRole)
     }
   }
 
   // ─── SIGN IN (NEW ACCOUNT) HANDLERS ──────────────────────────────────────────
-  // After signing in, user is directly taken to the complete onboarding flow
-  // where complete details, requirements, category & current business details are asked!
   const handleGoogleSignInStep1 = async () => {
     setSubmitting(true)
     setErrorMsg("")
@@ -120,12 +219,7 @@ export default function AuthModal({
     setSubmitting(false)
 
     if (result.success) {
-      onClose()
-      if (role === "msme") {
-        navigate("msme.onboarding")
-      } else {
-        navigate("startup.onboarding")
-      }
+      completeSignInRedirect(role)
     }
   }
 
@@ -145,42 +239,61 @@ export default function AuthModal({
       localStorage.setItem("mpi_user_role", role)
     } catch {}
 
-    onClose()
-    if (role === "msme") {
-      navigate("msme.onboarding")
+    completeSignInRedirect(role)
+  }
+
+  // Quick fill demo accounts
+  const quickFillAccount = (type: "startup" | "msme" | "admin") => {
+    setErrorMsg("")
+    if (type === "startup") {
+      setEmail("founder@novabio.tech")
+      setPassword("founder@123")
+      setRole("startup")
+    } else if (type === "msme") {
+      setEmail("director@apexprecision.in")
+      setPassword("apex@123")
+      setRole("msme")
     } else {
-      navigate("startup.onboarding")
+      setEmail("admin")
+      setPassword("bhavesh@123")
+      setRole("admin")
     }
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs animate-fade-in">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-fade-in"
+      onClick={onClose}
+    >
       <div
-        className="relative w-full max-w-md bg-white rounded-2xl border border-slate-200 shadow-2xl overflow-hidden"
+        className="relative w-full max-w-md bg-white rounded-2xl sm:rounded-3xl border border-slate-200/90 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.35)] overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 pt-5 pb-4 border-b border-slate-100">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-[#0B1F4B] text-white flex items-center justify-center font-bold text-sm">
+            <div className="w-8 h-8 rounded-xl bg-[#051F16] text-[#A3F65C] flex items-center justify-center font-bold text-sm shadow-xs border border-[#0A3525]">
               M
             </div>
             <div>
-              <h3 className="text-base font-bold text-[#0B1F4B] tracking-tight">
-                {mode === "login" ? "Login to MPI" : step === 1 ? "Sign In to MPI" : "Complete Your Profile"}
+              <h3 className="text-base font-extrabold text-[#051F16] tracking-tight">
+                {mode === "login"
+                  ? portalContext?.title || "Login to MPI"
+                  : step === 1
+                  ? "Sign In to MPI"
+                  : "Complete Profile"}
               </h3>
               <p className="text-[11px] text-slate-500">
                 {mode === "login"
-                  ? "Access your verified procurement dashboard"
-                  : step === 1
-                  ? "Sign in with Google to get started"
-                  : "Tell us a bit about your business"}
+                  ? "Access your verified portal & intelligence"
+                  : "Create your verified procurement identity"}
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
             className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+            aria-label="Close modal"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -188,22 +301,43 @@ export default function AuthModal({
           </button>
         </div>
 
-        {/* Tab Toggle (Login vs Sign In) when on Step 1 */}
+        {/* Portal-Specific Context Pill / Banner */}
+        {portalContext && (
+          <div className="mx-6 mt-4 p-3 rounded-xl bg-slate-50 border border-slate-200/80 flex items-start gap-3">
+            <div className="w-7 h-7 rounded-lg bg-[#051F16] text-[#A3F65C] flex items-center justify-center font-bold text-xs shrink-0 mt-0.5 shadow-2xs">
+              <MaterialIcon name={portalContext.icon || "lock"} size={16} />
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-900 border border-emerald-300">
+                  {portalContext.badge || "Protected Portal"}
+                </span>
+              </div>
+              {portalContext.description && (
+                <p className="text-[11px] text-slate-600 mt-1 leading-relaxed">
+                  {portalContext.description}
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Tab Toggle (Log In vs Sign In) */}
         {step === 1 && (
-          <div className="flex border-b border-slate-200 bg-slate-50/70 p-1">
+          <div className="mx-6 mt-4 flex border border-slate-200 bg-slate-100/80 p-1 rounded-xl">
             <button
               type="button"
               onClick={() => {
                 setMode("login")
                 setErrorMsg("")
               }}
-              className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+              className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
                 mode === "login"
-                  ? "bg-white text-[#0B1F4B] shadow-2xs"
-                  : "text-slate-500 hover:text-slate-800"
+                  ? "bg-white text-[#051F16] shadow-xs"
+                  : "text-slate-500 hover:text-slate-900"
               }`}
             >
-              Login
+              Log In
             </button>
             <button
               type="button"
@@ -211,10 +345,10 @@ export default function AuthModal({
                 setMode("signin")
                 setErrorMsg("")
               }}
-              className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+              className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
                 mode === "signin"
-                  ? "bg-white text-[#0B1F4B] shadow-2xs"
-                  : "text-slate-500 hover:text-slate-800"
+                  ? "bg-white text-[#051F16] shadow-xs"
+                  : "text-slate-500 hover:text-slate-900"
               }`}
             >
               Sign In (New User)
@@ -226,12 +360,12 @@ export default function AuthModal({
         <div className="p-6">
           {errorMsg && (
             <div className="mb-4 p-2.5 rounded-lg bg-rose-50 border border-rose-200 text-xs font-medium text-rose-700 flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+              <span className="w-1.5 h-1.5 rounded-full bg-rose-500 shrink-0" />
               <span>{errorMsg}</span>
             </div>
           )}
 
-          {/* ─────────── MODE 1: LOGIN ─────────── */}
+          {/* ─────────── MODE 1: LOG IN ─────────── */}
           {mode === "login" && (
             <div className="space-y-4">
               {/* Google Authentication for Login */}
@@ -280,8 +414,8 @@ export default function AuthModal({
                     type="text"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Enter email or username (e.g. admin)"
-                    className="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs sm:text-sm text-slate-800 placeholder:text-slate-400 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 bg-white"
+                    placeholder="Enter email or username (e.g. founder@novabio.tech)"
+                    className="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs sm:text-sm text-slate-800 placeholder:text-slate-400 outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 bg-white"
                   />
                 </div>
 
@@ -295,12 +429,12 @@ export default function AuthModal({
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="••••••••"
-                      className="w-full px-3 py-2 pr-12 rounded-lg border border-slate-200 text-xs sm:text-sm text-slate-800 placeholder:text-slate-400 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 bg-white"
+                      className="w-full px-3 py-2 pr-12 rounded-lg border border-slate-200 text-xs sm:text-sm text-slate-800 placeholder:text-slate-400 outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 bg-white"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[11px] font-semibold text-slate-400 hover:text-slate-700"
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[11px] font-semibold text-slate-400 hover:text-slate-700 cursor-pointer"
                     >
                       {showPassword ? "Hide" : "Show"}
                     </button>
@@ -310,15 +444,46 @@ export default function AuthModal({
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="w-full mt-2 py-2.5 rounded-xl bg-[#0B1F4B] hover:bg-[#123B7A] text-white text-xs sm:text-sm font-bold shadow-xs hover:shadow-md transition-all cursor-pointer disabled:opacity-60"
+                  className="w-full mt-2 py-2.5 rounded-xl bg-[#051F16] hover:bg-[#083A28] text-white text-xs sm:text-sm font-bold shadow-xs hover:shadow-md transition-all cursor-pointer disabled:opacity-60 border border-[#0A3525]"
                 >
-                  {submitting ? "Authenticating..." : "Login"}
+                  {submitting ? "Authenticating..." : "Log In"}
                 </button>
               </form>
+
+              {/* Quick Demo Fill Buttons for frictionless evaluation */}
+              <div className="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-1.5 text-[11px] text-slate-500">
+                <span className="font-semibold text-slate-400">⚡ Demo 1-Click:</span>
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => quickFillAccount("startup")}
+                    className="px-2 py-0.5 rounded bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 text-slate-700 font-medium transition-colors cursor-pointer"
+                    title="Pre-fill Startup founder credentials"
+                  >
+                    Startup
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => quickFillAccount("msme")}
+                    className="px-2 py-0.5 rounded bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 text-slate-700 font-medium transition-colors cursor-pointer"
+                    title="Pre-fill MSME supplier credentials"
+                  >
+                    MSME
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => quickFillAccount("admin")}
+                    className="px-2 py-0.5 rounded bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 text-slate-700 font-medium transition-colors cursor-pointer"
+                    title="Pre-fill Admin credentials"
+                  >
+                    Admin
+                  </button>
+                </div>
+              </div>
             </div>
           )}
 
-          {/* ─────────── MODE 2: SIGN IN (STEP 1: AUTH) ─────────── */}
+          {/* ─────────── MODE 2: SIGN IN (CREATE ACCOUNT) ─────────── */}
           {mode === "signin" && step === 1 && (
             <div className="space-y-4">
               <div>
@@ -331,7 +496,7 @@ export default function AuthModal({
                     onClick={() => setRole("startup")}
                     className={`py-2.5 px-3 rounded-xl border text-xs font-bold flex flex-col items-center gap-1 transition-all cursor-pointer ${
                       role === "startup"
-                        ? "bg-[#0B1F4B] text-white border-[#0B1F4B] shadow-2xs"
+                        ? "bg-[#051F16] text-white border-[#051F16] shadow-xs"
                         : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
                     }`}
                   >
@@ -343,7 +508,7 @@ export default function AuthModal({
                     onClick={() => setRole("msme")}
                     className={`py-2.5 px-3 rounded-xl border text-xs font-bold flex flex-col items-center gap-1 transition-all cursor-pointer ${
                       role === "msme"
-                        ? "bg-[#EA580C] text-white border-[#EA580C] shadow-2xs"
+                        ? "bg-[#051F16] text-[#A3F65C] border-[#051F16] shadow-xs"
                         : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
                     }`}
                   >
@@ -358,9 +523,9 @@ export default function AuthModal({
                 type="button"
                 disabled={submitting}
                 onClick={handleGoogleSignInStep1}
-                className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl border-2 border-slate-200 hover:border-blue-400 bg-white hover:bg-blue-50/30 text-slate-800 text-sm font-bold transition-all shadow-2xs hover:shadow-xs cursor-pointer disabled:opacity-60"
+                className="w-full flex items-center justify-center gap-3 py-2.5 px-4 rounded-xl border-2 border-slate-200 hover:border-emerald-400 bg-white hover:bg-emerald-50/20 text-slate-800 text-xs sm:text-sm font-bold transition-all shadow-2xs hover:shadow-xs cursor-pointer disabled:opacity-60"
               >
-                <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
                   <path
                     fill="#4285F4"
                     d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -399,7 +564,7 @@ export default function AuthModal({
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="founder@company.com"
-                    className="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs sm:text-sm text-slate-800 placeholder:text-slate-400 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 bg-white"
+                    className="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs sm:text-sm text-slate-800 placeholder:text-slate-400 outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 bg-white"
                   />
                 </div>
                 <div>
@@ -411,20 +576,20 @@ export default function AuthModal({
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="At least 6 characters"
-                    className="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs sm:text-sm text-slate-800 placeholder:text-slate-400 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 bg-white"
+                    className="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs sm:text-sm text-slate-800 placeholder:text-slate-400 outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 bg-white"
                   />
                 </div>
                 <button
                   type="submit"
-                  className="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-blue-900 text-white text-xs sm:text-sm font-bold shadow-xs transition-all cursor-pointer"
+                  className="w-full py-2.5 rounded-xl bg-[#051F16] hover:bg-[#083A28] text-white text-xs sm:text-sm font-bold shadow-xs transition-all cursor-pointer border border-[#0A3525]"
                 >
                   Continue to Complete Details & Requirements →
                 </button>
               </form>
 
-              <div className="p-3 rounded-xl bg-blue-50/80 border border-blue-200/80 text-[11px] text-[#0B1F4B] space-y-1">
+              <div className="p-3 rounded-xl bg-emerald-50/80 border border-emerald-200/80 text-[11px] text-[#051F16] space-y-1">
                 <div className="font-bold flex items-center gap-1.5">
-                  <span>📋</span>
+                  <MaterialIcon name="verified_user" size={14} className="text-emerald-700" />
                   <span>Full Onboarding & Requirement Profile</span>
                 </div>
                 <p className="text-slate-600 leading-relaxed">
@@ -438,4 +603,3 @@ export default function AuthModal({
     </div>
   )
 }
-

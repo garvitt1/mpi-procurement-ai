@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react"
 import { Screen, NavProps } from "../../App"
 import { MPILogo } from "../shared"
-import { Icons, MPIButton } from "../design-system/MPIDesignSystem"
+import { Icons } from "../design-system/MPIDesignSystem"
 import LanguageTranslatorButton from "./LanguageTranslatorButton"
 import MaterialIcon from "../ui/MaterialIcon"
+import AuthModal, { AuthPortalContext } from "../auth/AuthModal"
+import { RoleKey } from "../../lib/mockAuth"
 
 export interface BreadcrumbCrumb {
   label: string
@@ -110,7 +112,7 @@ export function getScreenBreadcrumbs(screen: Screen): BreadcrumbCrumb[] {
     crumbs.push({ label: "Government Schemes", screen: "government-schemes.match" })
     const schemeTitles: Record<string, string> = {
       "government-schemes.match": "Eligibility Matcher",
-      "government-schemes.browse": "Compendium of 30 Schemes",
+      "government-schemes.browse": "Compendium of Schemes",
       "government-schemes.detail": "Scheme Details",
     }
     const subTitle = schemeTitles[screen]
@@ -175,11 +177,19 @@ export function getScreenBreadcrumbs(screen: Screen): BreadcrumbCrumb[] {
   return crumbs
 }
 
-interface GlobalNavBarProps extends NavProps {
+export interface AuthRequestOptions {
+  mode?: "login" | "signin"
+  defaultRole?: RoleKey
+  targetScreen?: Screen
+  portalContext?: AuthPortalContext
+}
+
+export interface GlobalNavBarProps extends NavProps {
   variant?: "light" | "navy" | "subtle"
   showQuickLinks?: boolean
   customBackLabel?: string
   className?: string
+  onOpenAuth?: (options?: AuthRequestOptions) => void
 }
 
 export default function GlobalNavBar({
@@ -190,11 +200,39 @@ export default function GlobalNavBar({
   showQuickLinks = true,
   customBackLabel,
   className = "",
+  onOpenAuth,
 }: GlobalNavBarProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
+  const [internalAuthModal, setInternalAuthModal] = useState<{
+    open: boolean
+    mode: "login" | "signin"
+    defaultRole: RoleKey
+    targetScreen?: Screen
+    portalContext?: AuthPortalContext
+  }>({
+    open: false,
+    mode: "login",
+    defaultRole: "startup",
+  })
+
   const crumbs = getScreenBreadcrumbs(currentScreen)
   const isHomeScreen = currentScreen === "home" || currentScreen === "landing"
+
+  const handleRequestAuth = (options?: AuthRequestOptions) => {
+    if (onOpenAuth) {
+      onOpenAuth(options)
+    } else {
+      setInternalAuthModal({
+        open: true,
+        mode: options?.mode || "login",
+        defaultRole: options?.defaultRole || "startup",
+        targetScreen: options?.targetScreen,
+        portalContext: options?.portalContext,
+      })
+    }
+    setMobileMenuOpen(false)
+  }
 
   useEffect(() => {
     const handleScroll = () => {
@@ -210,7 +248,7 @@ export default function GlobalNavBar({
     { label: "Home", screen: "home", iconName: "home" },
     ...(currentScreen.startsWith("msme.") ? [] : [{ label: "Startup Hub", screen: "startup.home" as Screen, iconName: "rocket_launch", badge: "Buyers" }]),
     ...(currentScreen.startsWith("startup.") ? [] : [{ label: "MSME Portal", screen: "msme.home" as Screen, iconName: "precision_manufacturing", badge: "Suppliers" }]),
-    { label: "Govt Schemes", screen: "government-schemes.match", iconName: "policy", badge: "30 Schemes" },
+    { label: "Govt Schemes", screen: "government-schemes.match", iconName: "policy", badge: "Subsidies" },
     { label: "Analytics Studio", screen: "analytics.detail.ai-insights", iconName: "insights" },
     { label: "Admin Portal", screen: "admin.home", iconName: "admin_panel_settings" },
   ]
@@ -234,10 +272,10 @@ export default function GlobalNavBar({
       className={`sticky top-0 w-full z-40 transition-all duration-300 border-b select-none ${
         variant === "navy"
           ? isScrolled
-            ? "bg-[#0B1F4B]/95 backdrop-blur-xl text-white border-[#123B7A] shadow-[0_12px_36px_-6px_rgba(11,31,75,0.4)]"
-            : "bg-[#0B1F4B] text-white border-transparent"
+            ? "bg-[#051F16]/95 backdrop-blur-xl text-white border-[#0A3525] shadow-[0_12px_36px_-6px_rgba(5,31,22,0.4)]"
+            : "bg-[#051F16] text-white border-transparent"
           : isScrolled
-          ? "bg-white/92 backdrop-blur-xl text-slate-800 border-slate-200/90 shadow-[0_10px_30px_-10px_rgba(11,31,75,0.08)]"
+          ? "bg-white/92 backdrop-blur-xl text-slate-800 border-slate-200/90 shadow-[0_10px_30px_-10px_rgba(5,31,22,0.08)]"
           : "bg-white/80 backdrop-blur-md text-slate-800 border-slate-200/50"
       } ${className}`}
     >
@@ -261,7 +299,7 @@ export default function GlobalNavBar({
             {/* Separator */}
             <div
               className={`h-5 w-px shrink-0 hidden sm:block ${
-                variant === "navy" ? "bg-[#123B7A]" : "bg-slate-200"
+                variant === "navy" ? "bg-[#0A3525]" : "bg-slate-200"
               }`}
             />
 
@@ -271,7 +309,7 @@ export default function GlobalNavBar({
                 onClick={goBack}
                 className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer shrink-0 border ${
                   variant === "navy"
-                    ? "bg-[#123B7A]/70 hover:bg-[#123B7A] text-slate-200 hover:text-white border-blue-400/30"
+                    ? "bg-[#083A28]/80 hover:bg-[#083A28] text-slate-200 hover:text-white border-emerald-900/40"
                     : "bg-slate-100 hover:bg-slate-200/90 text-slate-700 hover:text-slate-900 border-slate-200 shadow-2xs hover:-translate-y-0.5"
                 }`}
                 title="Go to previous page"
@@ -301,7 +339,7 @@ export default function GlobalNavBar({
                       {isLast ? (
                         <span
                           className={`font-bold truncate max-w-[140px] sm:max-w-[220px] ${
-                            variant === "navy" ? "text-orange-400" : "text-[#0B1F4B]"
+                            variant === "navy" ? "text-[#A3F65C]" : "text-[#051F16]"
                           }`}
                           title={crumb.label}
                         >
@@ -329,39 +367,81 @@ export default function GlobalNavBar({
               <div className="hidden lg:flex items-center gap-6 text-[13px] font-medium text-slate-600 pl-4">
                 <a
                   href="#marketplace"
-                  className="hover:text-[#0B1F4B] transition-colors cursor-pointer"
+                  className="hover:text-[#051F16] transition-colors cursor-pointer"
                 >
                   Products
                 </a>
                 <a
                   href="#solutions"
-                  className="hover:text-[#0B1F4B] transition-colors cursor-pointer"
+                  className="hover:text-[#051F16] transition-colors cursor-pointer"
                 >
                   Solutions
                 </a>
                 <a
                   href="#how-it-works"
-                  className="hover:text-[#0B1F4B] transition-colors cursor-pointer"
+                  className="hover:text-[#051F16] transition-colors cursor-pointer"
                 >
                   How MPI Works
                 </a>
                 <button
-                  onClick={() => navigate("startup.home")}
-                  className="hover:text-[#0B1F4B] transition-colors cursor-pointer"
+                  type="button"
+                  onClick={() =>
+                    handleRequestAuth({
+                      mode: "login",
+                      defaultRole: "startup",
+                      targetScreen: "startup.home",
+                      portalContext: {
+                        badge: "Startup Buyer Portal",
+                        title: "Log in for Startups",
+                        description:
+                          "Access verified MSME suppliers, AI procurement copilot, live RFQ generator & order escrow.",
+                        icon: "rocket_launch",
+                      },
+                    })
+                  }
+                  className="hover:text-[#051F16] transition-colors cursor-pointer"
                 >
                   For Startups
                 </button>
                 <button
-                  onClick={() => navigate("msme.home")}
-                  className="hover:text-[#0B1F4B] transition-colors cursor-pointer"
+                  type="button"
+                  onClick={() =>
+                    handleRequestAuth({
+                      mode: "login",
+                      defaultRole: "msme",
+                      targetScreen: "msme.home",
+                      portalContext: {
+                        badge: "MSME Supplier Network",
+                        title: "Log in for MSMEs",
+                        description:
+                          "Access verified OEM purchase orders, active startup tenders, and escrow payments.",
+                        icon: "precision_manufacturing",
+                      },
+                    })
+                  }
+                  className="hover:text-[#051F16] transition-colors cursor-pointer"
                 >
                   For MSMEs
                 </button>
                 <button
-                  onClick={() => navigate("government-schemes.match")}
-                  className="hover:text-[#0B1F4B] transition-colors cursor-pointer flex items-center gap-1.5 text-slate-700"
+                  type="button"
+                  onClick={() =>
+                    handleRequestAuth({
+                      mode: "login",
+                      defaultRole: "startup",
+                      targetScreen: "government-schemes.match",
+                      portalContext: {
+                        badge: "Government Schemes Engine",
+                        title: "Log in for Government Schemes",
+                        description:
+                          "Match your enterprise against 30+ central subsidies (SISFS, CGTMSE, ZED) & track disbursements.",
+                        icon: "policy",
+                      },
+                    })
+                  }
+                  className="hover:text-[#051F16] transition-colors cursor-pointer flex items-center gap-1.5 text-slate-700"
                 >
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#F97316]" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#A3F65C] ring-1 ring-emerald-600/30" />
                   <span>Govt Schemes</span>
                 </button>
               </div>
@@ -413,20 +493,36 @@ export default function GlobalNavBar({
 
             {/* Direct High-Intent Action CTAs (Reference Match) */}
             {isHomeScreen ? (
-              <div className="hidden sm:flex items-center gap-2.5">
+              <div className="hidden sm:flex items-center gap-2">
                 <button
                   type="button"
-                  onClick={() => navigate("login.startup")}
-                  className="px-3.5 py-1.5 text-xs font-bold text-slate-800 hover:text-[#051F16] hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+                  onClick={() =>
+                    handleRequestAuth({
+                      mode: "login",
+                      defaultRole: "startup",
+                      targetScreen: "startup.home",
+                    })
+                  }
+                  className={`px-3.5 py-1.5 text-xs font-bold rounded-xl transition-all duration-150 cursor-pointer ${
+                    variant === "navy"
+                      ? "text-slate-200 hover:text-white hover:bg-white/10"
+                      : "text-slate-700 hover:text-[#051F16] hover:bg-slate-100 border border-slate-200/90 shadow-2xs hover:shadow-xs"
+                  }`}
                 >
-                  Sign In
+                  Log In
                 </button>
                 <button
                   type="button"
-                  onClick={() => navigate("startup.procurement")}
-                  className="group inline-flex items-center gap-2 px-4.5 py-2 text-xs font-bold rounded-xl bg-[#051F16] hover:bg-[#083A28] active:bg-[#051F16] text-white shadow-[0_2px_10px_rgba(5,31,22,0.2)] hover:shadow-[0_4px_14px_rgba(5,31,22,0.3)] border border-[#0A3525] active:scale-[0.98] transition-all duration-200 cursor-pointer"
+                  onClick={() =>
+                    handleRequestAuth({
+                      mode: "signin",
+                      defaultRole: "startup",
+                      targetScreen: "startup.home",
+                    })
+                  }
+                  className="group inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-xl bg-[#051F16] hover:bg-[#083A28] active:bg-[#051F16] text-white shadow-[0_2px_10px_rgba(5,31,22,0.18)] hover:shadow-[0_4px_16px_rgba(5,31,22,0.28)] border border-[#0A3525] active:scale-[0.98] transition-all duration-200 cursor-pointer"
                 >
-                  <span>Start with MPI</span>
+                  <span>Sign In</span>
                   <Icons.ArrowRight className="w-3.5 h-3.5 text-[#A3F65C] group-hover:translate-x-0.5 transition-transform" />
                 </button>
               </div>
@@ -451,9 +547,9 @@ export default function GlobalNavBar({
                       : "home"
                   }
                   onChange={(e) => navigate(e.target.value as Screen)}
-                  className={`text-xs font-semibold px-2.5 py-1.5 rounded-lg border cursor-pointer focus:outline-none focus:ring-2 focus:ring-orange-400 ${
+                  className={`text-xs font-semibold px-2.5 py-1.5 rounded-lg border cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#051F16] ${
                     variant === "navy"
-                      ? "bg-[#123B7A] text-white border-blue-400/30"
+                      ? "bg-[#083A28] text-white border-emerald-900/40"
                       : "bg-slate-100 text-slate-800 border-slate-200"
                   }`}
                 >
@@ -464,7 +560,7 @@ export default function GlobalNavBar({
                   {!currentScreen.startsWith("startup.") && (
                     <option value="msme.home">MSME Portal (Supplier)</option>
                   )}
-                  <option value="government-schemes.match">Government Schemes (30)</option>
+                  <option value="government-schemes.match">Government Schemes</option>
                   <option value="analytics.detail.ai-insights">Analytics Studio</option>
                   <option value="admin.home">Admin Portal</option>
                 </select>
@@ -476,7 +572,7 @@ export default function GlobalNavBar({
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className={`p-1.5 rounded-lg border sm:hidden transition-colors cursor-pointer ${
                 variant === "navy"
-                  ? "border-[#123B7A] text-slate-200 hover:bg-[#123B7A]"
+                  ? "border-[#0A3525] text-slate-200 hover:bg-[#083A28]"
                   : "border-slate-200 text-slate-700 hover:bg-slate-100"
               }`}
               aria-label="Toggle navigation menu"
@@ -514,7 +610,7 @@ export default function GlobalNavBar({
         <div
           className={`sm:hidden border-t px-4 py-4 space-y-2 animate-fade-in ${
             variant === "navy"
-              ? "bg-[#071534] border-[#123B7A]"
+              ? "bg-[#051F16] border-[#0A3525]"
               : "bg-white border-slate-200 shadow-xl"
           }`}
         >
@@ -523,18 +619,62 @@ export default function GlobalNavBar({
           </div>
           {navHubs.map((hub) => {
             const active = isCurrentHub(hub.screen)
+
+            const handleMobileItemClick = () => {
+              if (hub.screen === "startup.home") {
+                handleRequestAuth({
+                  mode: "login",
+                  defaultRole: "startup",
+                  targetScreen: "startup.home",
+                  portalContext: {
+                    badge: "Startup Buyer Portal",
+                    title: "Log in for Startups",
+                    description:
+                      "Access verified MSME suppliers, AI procurement copilot, live RFQ generator & order escrow.",
+                    icon: "rocket_launch",
+                  },
+                })
+              } else if (hub.screen === "msme.home") {
+                handleRequestAuth({
+                  mode: "login",
+                  defaultRole: "msme",
+                  targetScreen: "msme.home",
+                  portalContext: {
+                    badge: "MSME Supplier Network",
+                    title: "Log in for MSMEs",
+                    description:
+                      "Access verified OEM purchase orders, active startup tenders, and escrow payments.",
+                    icon: "precision_manufacturing",
+                  },
+                })
+              } else if (hub.screen === "government-schemes.match") {
+                handleRequestAuth({
+                  mode: "login",
+                  defaultRole: "startup",
+                  targetScreen: "government-schemes.match",
+                  portalContext: {
+                    badge: "Government Schemes Engine",
+                    title: "Log in for Government Schemes",
+                    description:
+                      "Match your enterprise against central subsidies (SISFS, CGTMSE, ZED) & track disbursements.",
+                    icon: "policy",
+                  },
+                })
+              } else {
+                navigate(hub.screen)
+                setMobileMenuOpen(false)
+              }
+            }
+
             return (
               <button
                 key={hub.screen}
-                onClick={() => {
-                  navigate(hub.screen)
-                  setMobileMenuOpen(false)
-                }}
+                onClick={handleMobileItemClick}
                 className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold cursor-pointer transition-colors ${
                   active
-                    ? "bg-[#0B1F4B] text-white"
+                    ? "bg-[#051F16] text-white"
                     : variant === "navy"
-                    ? "text-slate-200 hover:bg-[#123B7A]"
+                    ? "text-slate-200 hover:bg-[#083A28]"
                     : "text-slate-700 hover:bg-slate-100"
                 }`}
               >
@@ -553,31 +693,48 @@ export default function GlobalNavBar({
 
           {/* Direct CTA on Mobile */}
           <div className="pt-2 border-t border-slate-100 flex flex-col gap-2">
-            <MPIButton
-              variant="primary"
-              size="sm"
-              fullWidth
+            <button
+              type="button"
               onClick={() => {
-                navigate("startup.procurement")
-                setMobileMenuOpen(false)
+                handleRequestAuth({
+                  mode: "signin",
+                  defaultRole: "startup",
+                  targetScreen: "startup.home",
+                })
               }}
-              icon={<Icons.Sparkles className="w-3.5 h-3.5 text-amber-300" />}
+              className="w-full py-2.5 px-4 text-xs font-bold rounded-xl bg-[#051F16] hover:bg-[#083A28] text-white flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer"
             >
-              Launch MPI Procurement Support
-            </MPIButton>
-            <MPIButton
-              variant="outline"
-              size="sm"
-              fullWidth
+              <span>Sign In</span>
+              <Icons.ArrowRight className="w-3.5 h-3.5 text-[#A3F65C]" />
+            </button>
+            <button
+              type="button"
               onClick={() => {
-                navigate("login.startup")
-                setMobileMenuOpen(false)
+                handleRequestAuth({
+                  mode: "login",
+                  defaultRole: "startup",
+                  targetScreen: "startup.home",
+                })
               }}
+              className="w-full py-2.5 px-4 text-xs font-bold rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 transition-colors cursor-pointer"
             >
-              Sign In
-            </MPIButton>
+              Log In
+            </button>
           </div>
         </div>
+      )}
+
+      {/* Fallback Internal Auth Modal when onOpenAuth is not supplied by parent */}
+      {!onOpenAuth && (
+        <AuthModal
+          isOpen={internalAuthModal.open}
+          initialMode={internalAuthModal.mode}
+          initialRole={internalAuthModal.defaultRole}
+          targetScreen={internalAuthModal.targetScreen}
+          portalContext={internalAuthModal.portalContext}
+          onClose={() => setInternalAuthModal((prev) => ({ ...prev, open: false }))}
+          navigate={navigate}
+        />
       )}
     </nav>
   )

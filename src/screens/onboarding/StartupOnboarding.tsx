@@ -327,7 +327,7 @@ export default function StartupOnboarding({ navigate, goBack }: NavProps) {
   }
 
   return (
-    <div className="min-h-screen bg-[#F7F9FC] text-[#0B1220] flex flex-col font-sans selection:bg-[#F97316] selection:text-white">
+    <div className="min-h-screen bg-[#F7F9FC] text-[#0B1220] flex flex-col font-sans selection:bg-[#051F16] selection:text-white">
       {/* ── Top Header ──────────────────────────────────────────────────────── */}
       <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 px-4 sm:px-6 py-2.5 sm:py-3.5 flex items-center justify-between gap-3">
         <div className="flex items-center gap-2 sm:gap-4 min-w-0">
@@ -358,12 +358,12 @@ export default function StartupOnboarding({ navigate, goBack }: NavProps) {
                 Home
               </button>
               <span>/</span>
-              <span className="text-[#0B1F4B] font-semibold truncate">
+              <span className="text-[#051F16] font-semibold truncate">
                 Startup Onboarding
               </span>
             </div>
 
-            <div className="text-xs sm:text-sm font-bold text-[#0B1F4B] truncate">
+            <div className="text-xs sm:text-sm font-bold text-[#051F16] truncate">
               Startup & Buyer Onboarding Protocol (9 Steps)
             </div>
           </div>
@@ -390,10 +390,10 @@ export default function StartupOnboarding({ navigate, goBack }: NavProps) {
       <div className="bg-white border-b border-slate-200 px-4 sm:px-8 py-3">
         <div className="max-w-4xl mx-auto flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <span className="w-6 h-6 rounded-full bg-[#0B1F4B] text-white flex items-center justify-center font-bold text-xs">
+            <span className="w-6 h-6 rounded-full bg-[#051F16] text-white flex items-center justify-center font-bold text-xs">
               {currentStep}
             </span>
-            <span className="text-xs font-extrabold text-[#0B1F4B]">
+            <span className="text-xs font-extrabold text-[#051F16]">
               Step {currentStep} of {totalSteps}:{" "}
               {currentStep === 1 && "Basic Startup Info"}
               {currentStep === 2 && "Maturity Stage"}
@@ -413,7 +413,7 @@ export default function StartupOnboarding({ navigate, goBack }: NavProps) {
 
         <div className="max-w-4xl mx-auto w-full bg-slate-100 h-2 rounded-full mt-2.5 overflow-hidden">
           <div
-            className="bg-[#F97316] h-full rounded-full transition-all duration-300"
+            className="bg-[#051F16] h-full rounded-full transition-all duration-300"
             style={{ width: `${(currentStep / totalSteps) * 100}%` }}
           />
         </div>
@@ -433,11 +433,11 @@ export default function StartupOnboarding({ navigate, goBack }: NavProps) {
           {currentStep === 1 && (
             <div className="space-y-6">
               <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-[#F97316]">
+                <span className="text-xs font-bold uppercase tracking-wider text-emerald-700">
                   Step 1 · Basic Details
                 </span>
                 <h1
-                  className="text-2xl font-extrabold text-[#0B1F4B] mt-1"
+                  className="text-2xl font-extrabold text-[#051F16] mt-1"
                   style={{ fontFamily: "Plus Jakarta Sans" }}
                 >
                   Tell us about yourself and your startup
@@ -458,7 +458,7 @@ export default function StartupOnboarding({ navigate, goBack }: NavProps) {
                     value={founderName}
                     onChange={(e) => setFounderName(e.target.value)}
                     placeholder="e.g. Aarav Mehta"
-                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-blue-600"
+                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-[#051F16]"
                   />
                 </div>
 
@@ -471,7 +471,7 @@ export default function StartupOnboarding({ navigate, goBack }: NavProps) {
                     value={startupName}
                     onChange={(e) => setStartupName(e.target.value)}
                     placeholder="e.g. TechNova Innovations"
-                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-blue-600"
+                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-[#051F16]"
                   />
                 </div>
 
@@ -484,7 +484,7 @@ export default function StartupOnboarding({ navigate, goBack }: NavProps) {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="founder@company.com"
-                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-blue-600"
+                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-[#051F16]"
                   />
                 </div>
 
@@ -497,7 +497,7 @@ export default function StartupOnboarding({ navigate, goBack }: NavProps) {
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="+91 98765 43210"
-                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-blue-600"
+                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-[#051F16]"
                   />
                 </div>
 
@@ -510,7 +510,7 @@ export default function StartupOnboarding({ navigate, goBack }: NavProps) {
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
                     placeholder="Bengaluru"
-                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-blue-600"
+                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-[#051F16]"
                   />
                 </div>
 
@@ -523,7 +523,7 @@ export default function StartupOnboarding({ navigate, goBack }: NavProps) {
                     value={state}
                     onChange={(e) => setState(e.target.value)}
                     placeholder="Karnataka"
-                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-blue-600"
+                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-[#051F16]"
                   />
                 </div>
               </div>
@@ -534,11 +534,11 @@ export default function StartupOnboarding({ navigate, goBack }: NavProps) {
           {currentStep === 2 && (
             <div className="space-y-6">
               <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-[#F97316]">
+                <span className="text-xs font-bold uppercase tracking-wider text-emerald-700">
                   Step 2 · Maturity Stage
                 </span>
                 <h1
-                  className="text-2xl font-extrabold text-[#0B1F4B] mt-1"
+                  className="text-2xl font-extrabold text-[#051F16] mt-1"
                   style={{ fontFamily: "Plus Jakarta Sans" }}
                 >
                   What stage is your startup currently in?
@@ -558,16 +558,16 @@ export default function StartupOnboarding({ navigate, goBack }: NavProps) {
                       onClick={() => setStage(s.id as any)}
                       className={`p-4 rounded-xl border-2 transition-all cursor-pointer ${
                         isSelected
-                          ? "border-[#0B1F4B] bg-blue-50/40 shadow-xs"
+                          ? "border-[#051F16] bg-emerald-50/40 shadow-xs"
                           : "border-slate-200 bg-white hover:border-slate-300"
                       }`}
                     >
                       <div className="flex items-center justify-between">
-                        <div className="font-extrabold text-sm text-[#0B1F4B]">
+                        <div className="font-extrabold text-sm text-[#051F16]">
                           {s.label}
                         </div>
                         {isSelected && (
-                          <span className="text-blue-700 font-bold">✓</span>
+                          <span className="text-emerald-800 font-bold">✓</span>
                         )}
                       </div>
                       <p className="text-xs text-slate-600 mt-1.5 leading-relaxed">
@@ -584,11 +584,11 @@ export default function StartupOnboarding({ navigate, goBack }: NavProps) {
           {currentStep === 3 && (
             <div className="space-y-6">
               <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-[#F97316]">
+                <span className="text-xs font-bold uppercase tracking-wider text-emerald-700">
                   Step 3 · Product Line
                 </span>
                 <h1
-                  className="text-2xl font-extrabold text-[#0B1F4B] mt-1"
+                  className="text-2xl font-extrabold text-[#051F16] mt-1"
                   style={{ fontFamily: "Plus Jakarta Sans" }}
                 >
                   What products does your startup build and sell?
@@ -609,7 +609,7 @@ export default function StartupOnboarding({ navigate, goBack }: NavProps) {
                     value={industry}
                     onChange={(e) => setIndustry(e.target.value)}
                     placeholder="e.g. D2C Skincare, IoT Devices, EV Components, HealthTech"
-                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-blue-600"
+                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-[#051F16]"
                   />
                 </div>
 
@@ -622,7 +622,7 @@ export default function StartupOnboarding({ navigate, goBack }: NavProps) {
                     value={productsSold}
                     onChange={(e) => setProductsSold(e.target.value)}
                     placeholder="e.g. Connected air purification monitors with injection-molded casings and custom rigid retail packaging..."
-                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-blue-600"
+                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-[#051F16]"
                   />
                 </div>
               </div>
@@ -633,11 +633,11 @@ export default function StartupOnboarding({ navigate, goBack }: NavProps) {
           {currentStep === 4 && (
             <div className="space-y-6">
               <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-[#F97316]">
+                <span className="text-xs font-bold uppercase tracking-wider text-emerald-700">
                   Step 4 · Procurement Categories
                 </span>
                 <h1
-                  className="text-2xl font-extrabold text-[#0B1F4B] mt-1"
+                  className="text-2xl font-extrabold text-[#051F16] mt-1"
                   style={{ fontFamily: "Plus Jakarta Sans" }}
                 >
                   What do you need to procure from verified MSMEs?
@@ -662,7 +662,7 @@ export default function StartupOnboarding({ navigate, goBack }: NavProps) {
                         onClick={() => toggleCategory(cat)}
                         className={`text-xs px-3.5 py-2 rounded-xl border font-bold transition-all cursor-pointer ${
                           isSelected
-                            ? "bg-[#F97316] text-white border-[#F97316] shadow-xs"
+                            ? "bg-[#051F16] text-white border-[#051F16] shadow-xs"
                             : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100"
                         }`}
                       >
@@ -690,7 +690,7 @@ export default function StartupOnboarding({ navigate, goBack }: NavProps) {
                           onClick={() => toggleSubcategory(sub)}
                           className={`text-xs px-2.5 py-1.5 rounded-lg border font-medium transition-all cursor-pointer ${
                             isSelected
-                              ? "bg-[#0B1F4B] text-white border-[#0B1F4B] shadow-xs"
+                              ? "bg-[#051F16] text-white border-[#051F16] shadow-xs"
                               : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
                           }`}
                         >
@@ -711,7 +711,7 @@ export default function StartupOnboarding({ navigate, goBack }: NavProps) {
                   value={procurementDescription}
                   onChange={(e) => setProcurementDescription(e.target.value)}
                   placeholder="Describe dimensions, materials, or special tolerances in your own words..."
-                  className="w-full px-3.5 py-2 text-xs rounded-lg border border-slate-200 focus:outline-none focus:border-blue-600 bg-slate-50"
+                  className="w-full px-3.5 py-2 text-xs rounded-lg border border-slate-200 focus:outline-none focus:border-[#051F16] bg-slate-50"
                 />
               </div>
             </div>
@@ -721,11 +721,11 @@ export default function StartupOnboarding({ navigate, goBack }: NavProps) {
           {currentStep === 5 && (
             <div className="space-y-6">
               <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-[#F97316]">
+                <span className="text-xs font-bold uppercase tracking-wider text-emerald-700">
                   Step 5 · Budget & Turnaround
                 </span>
                 <h1
-                  className="text-2xl font-extrabold text-[#0B1F4B] mt-1"
+                  className="text-2xl font-extrabold text-[#051F16] mt-1"
                   style={{ fontFamily: "Plus Jakarta Sans" }}
                 >
                   What is your procurement budget and delivery speed?
@@ -742,7 +742,7 @@ export default function StartupOnboarding({ navigate, goBack }: NavProps) {
                     <label className="text-xs font-bold text-slate-700">
                       Estimated Annual Procurement Budget:
                     </label>
-                    <span className="text-sm font-extrabold text-[#0B1F4B] bg-blue-50 px-3 py-1 rounded-full border border-blue-200">
+                    <span className="text-sm font-extrabold text-[#051F16] bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
                       ₹{annualBudget.toLocaleString("en-IN")}
                     </span>
                   </div>
@@ -753,7 +753,7 @@ export default function StartupOnboarding({ navigate, goBack }: NavProps) {
                     step={25000}
                     value={annualBudget}
                     onChange={(e) => setAnnualBudget(Number(e.target.value))}
-                    className="w-full accent-[#F97316] cursor-pointer"
+                    className="w-full accent-[#051F16] cursor-pointer"
                   />
                   <div className="flex justify-between text-[11px] text-slate-400 mt-1">
                     <span>₹50,000 (Early batches)</span>
@@ -789,7 +789,7 @@ export default function StartupOnboarding({ navigate, goBack }: NavProps) {
                         onClick={() => setTurnaroundPriority(p.id as any)}
                         className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer ${
                           turnaroundPriority === p.id
-                            ? "bg-[#0B1F4B] text-white border-[#0B1F4B] shadow-xs"
+                            ? "bg-[#051F16] text-white border-[#051F16] shadow-xs"
                             : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
                         }`}
                       >
@@ -809,11 +809,11 @@ export default function StartupOnboarding({ navigate, goBack }: NavProps) {
           {currentStep === 6 && (
             <div className="space-y-6">
               <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-[#F97316]">
+                <span className="text-xs font-bold uppercase tracking-wider text-emerald-700">
                   Step 6 · Funding & Scale
                 </span>
                 <h1
-                  className="text-2xl font-extrabold text-[#0B1F4B] mt-1"
+                  className="text-2xl font-extrabold text-[#051F16] mt-1"
                   style={{ fontFamily: "Plus Jakarta Sans" }}
                 >
                   What is your funding status and organization scale?
@@ -842,7 +842,7 @@ export default function StartupOnboarding({ navigate, goBack }: NavProps) {
                         onClick={() => setFundingStage(fs)}
                         className={`py-2.5 px-2 text-xs font-bold rounded-lg border text-center transition-all cursor-pointer ${
                           fundingStage === fs
-                            ? "bg-[#0B1F4B] text-white border-[#0B1F4B] shadow-xs"
+                            ? "bg-[#051F16] text-white border-[#051F16] shadow-xs"
                             : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100"
                         }`}
                       >
@@ -858,7 +858,7 @@ export default function StartupOnboarding({ navigate, goBack }: NavProps) {
                       type="checkbox"
                       checked={hasDpiit}
                       onChange={(e) => setHasDpiit(e.target.checked)}
-                      className="rounded text-blue-600 focus:ring-blue-500 w-4 h-4"
+                      className="rounded text-emerald-700 focus:ring-emerald-500 w-4 h-4"
                     />
                     <div className="text-xs">
                       <span className="font-bold text-slate-900">
@@ -915,11 +915,11 @@ export default function StartupOnboarding({ navigate, goBack }: NavProps) {
           {currentStep === 7 && (
             <div className="space-y-6">
               <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-[#F97316]">
+                <span className="text-xs font-bold uppercase tracking-wider text-emerald-700">
                   Step 7 · Government Scheme Priorities
                 </span>
                 <h1
-                  className="text-2xl font-extrabold text-[#0B1F4B] mt-1"
+                  className="text-2xl font-extrabold text-[#051F16] mt-1"
                   style={{ fontFamily: "Plus Jakarta Sans" }}
                 >
                   Which statutory central schemes do you wish to leverage?
@@ -938,7 +938,7 @@ export default function StartupOnboarding({ navigate, goBack }: NavProps) {
                       key={sch}
                       className={`flex items-start gap-3 p-3.5 rounded-xl border transition-all cursor-pointer ${
                         isChecked
-                          ? "bg-blue-50/50 border-blue-300 shadow-2xs"
+                          ? "bg-emerald-50/50 border-blue-300 shadow-2xs"
                           : "bg-white border-slate-200 hover:bg-slate-50"
                       }`}
                     >
@@ -946,7 +946,7 @@ export default function StartupOnboarding({ navigate, goBack }: NavProps) {
                         type="checkbox"
                         checked={isChecked}
                         onChange={() => toggleSchemeInterest(sch)}
-                        className="rounded text-blue-600 focus:ring-blue-500 w-4 h-4 mt-0.5"
+                        className="rounded text-emerald-700 focus:ring-emerald-500 w-4 h-4 mt-0.5"
                       />
                       <span className="text-xs font-semibold text-slate-800 leading-snug">
                         {sch}
@@ -962,11 +962,11 @@ export default function StartupOnboarding({ navigate, goBack }: NavProps) {
           {currentStep === 8 && (
             <div className="space-y-6">
               <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-[#F97316]">
+                <span className="text-xs font-bold uppercase tracking-wider text-emerald-700">
                   Step 8 · Profile Verification
                 </span>
                 <h1
-                  className="text-2xl font-extrabold text-[#0B1F4B] mt-1"
+                  className="text-2xl font-extrabold text-[#051F16] mt-1"
                   style={{ fontFamily: "Plus Jakarta Sans" }}
                 >
                   Review your startup procurement profile
@@ -981,10 +981,10 @@ export default function StartupOnboarding({ navigate, goBack }: NavProps) {
               <div className="p-6 rounded-2xl bg-slate-50 border border-slate-200 space-y-4">
                 <div className="flex items-start justify-between">
                   <div>
-                    <div className="text-xs font-bold text-blue-700 bg-blue-100/70 px-2.5 py-0.5 rounded-full inline-block mb-1">
+                    <div className="text-xs font-bold text-emerald-800 bg-emerald-100/70 px-2.5 py-0.5 rounded-full inline-block mb-1">
                       {stage} Stage Startup
                     </div>
-                    <h2 className="text-xl font-extrabold text-[#0B1F4B]">
+                    <h2 className="text-xl font-extrabold text-[#051F16]">
                       {startupName}
                     </h2>
                     <div className="text-xs text-slate-600">
@@ -994,7 +994,7 @@ export default function StartupOnboarding({ navigate, goBack }: NavProps) {
 
                   {hasDpiit && (
                     <div className="text-right">
-                      <span className="text-[11px] font-bold text-blue-900 bg-blue-100 border border-blue-200 px-2 py-0.5 rounded">
+                      <span className="text-[11px] font-bold text-blue-900 bg-emerald-100/60 border border-emerald-200 px-2 py-0.5 rounded">
                         DPIIT Verified
                       </span>
                       <div className="text-[10px] text-slate-500 mt-0.5">
@@ -1063,11 +1063,11 @@ export default function StartupOnboarding({ navigate, goBack }: NavProps) {
           {currentStep === 9 && (
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-[#F97316]">
+                <span className="text-xs font-bold uppercase tracking-wider text-emerald-700">
                   Step 9 · Account Security
                 </span>
                 <h1
-                  className="text-2xl font-extrabold text-[#0B1F4B] mt-1"
+                  className="text-2xl font-extrabold text-[#051F16] mt-1"
                   style={{ fontFamily: "Plus Jakarta Sans" }}
                 >
                   Create your password to finalize your workspace
@@ -1088,7 +1088,7 @@ export default function StartupOnboarding({ navigate, goBack }: NavProps) {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Minimum 6 characters"
-                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-blue-600"
+                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-[#051F16]"
                   />
                 </div>
 
@@ -1101,7 +1101,7 @@ export default function StartupOnboarding({ navigate, goBack }: NavProps) {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Re-enter password"
-                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-blue-600"
+                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-[#051F16]"
                   />
                 </div>
 
@@ -1110,7 +1110,7 @@ export default function StartupOnboarding({ navigate, goBack }: NavProps) {
                     type="checkbox"
                     checked={agreedTerms}
                     onChange={(e) => setAgreedTerms(e.target.checked)}
-                    className="rounded text-blue-600 focus:ring-blue-500 w-4 h-4 mt-0.5"
+                    className="rounded text-emerald-700 focus:ring-emerald-500 w-4 h-4 mt-0.5"
                   />
                   <span className="text-xs text-slate-600 leading-snug">
                     I agree to the{" "}

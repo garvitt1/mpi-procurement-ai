@@ -45,7 +45,7 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({
             </div>
           ) : (
             <img
-              src={product.image}
+              src={imageSrc}
               alt={product.name}
               onError={() => setImgError(true)}
               className="w-full h-full object-cover"
@@ -65,7 +65,7 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({
 
           {/* Category Tag & Badge */}
           <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between text-white">
-            <span className="text-xs font-bold bg-[#0B1F4B]/90 backdrop-blur-md px-3 py-1 rounded-lg border border-white/10">
+            <span className="text-xs font-bold bg-[#051F16]/90 backdrop-blur-md px-3 py-1 rounded-lg border border-white/10">
               {product.category}
             </span>
             <span className="text-xs font-semibold bg-emerald-600/90 backdrop-blur-md px-2.5 py-1 rounded-lg flex items-center gap-1">
@@ -81,7 +81,7 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({
             <div className="flex items-center gap-2 mb-1.5">
               <h2
                 id="modal-title"
-                className="text-xl font-extrabold text-[#0B1F4B] tracking-tight"
+                className="text-xl font-extrabold text-[#051F16] tracking-tight"
                 style={{ fontFamily: "Plus Jakarta Sans" }}
               >
                 {product.name}
@@ -158,14 +158,14 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({
 
             {onAskAI && (
               <MPIButton
-                variant="secondary"
+                variant="ai"
                 size="md"
                 className="w-full sm:flex-1"
                 onClick={() => {
                   onClose()
                   onAskAI(product)
                 }}
-                icon={<MaterialIcon name="smart_toy" size={16} className="text-[#F97316]" />}
+                icon={<MaterialIcon name="smart_toy" size={16} className="text-emerald-700" />}
               >
                 Refine with AI Co-Founder
               </MPIButton>

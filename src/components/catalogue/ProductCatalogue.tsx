@@ -30,7 +30,7 @@ export const ProductCatalogue: React.FC<ProductCatalogueProps> = ({
       const params = new URLSearchParams(window.location.search)
       const catParam = params.get("category")
       const matched = CATEGORIES_METADATA.find(
-        (c) => c.id.toLowerCase() === (catParam || "").toLowerCase() || c.slug === catParam,
+        (c) => c.id.toLowerCase() === (catParam || "").toLowerCase(),
       )
       if (matched) return matched.id as CatalogCategory
     }
@@ -144,8 +144,8 @@ export const ProductCatalogue: React.FC<ProductCatalogueProps> = ({
       className="relative overflow-hidden py-16 lg:py-24 bg-linear-to-b from-white via-slate-50/70 to-white border-y border-slate-200/90 scroll-reveal"
     >
       {/* ─── SUBTLE PROCUREMENT NETWORK BACKGROUND (Low Opacity Grid & Gradients) ─── */}
-      <div className="absolute inset-0 pointer-events-none opacity-[0.035] bg-[radial-gradient(#0B1F4B_1px,transparent_1px)] [background-size:24px_24px]" />
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[350px] bg-linear-to-r from-blue-300/10 via-orange-300/10 to-indigo-300/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute inset-0 pointer-events-none opacity-[0.035] bg-[radial-gradient(#051F16_1px,transparent_1px)] [background-size:24px_24px]" />
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[350px] bg-linear-to-r from-[#A3F65C]/15 via-emerald-600/10 to-transparent rounded-full blur-3xl pointer-events-none" />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* ─── SECTION HEADER (Premium Apple / SaaS Style) ────────────────────── */}
@@ -191,7 +191,7 @@ export const ProductCatalogue: React.FC<ProductCatalogueProps> = ({
                   setCurrentRailIndex(0)
                 }}
                 placeholder="Search within catalogue..."
-                className="w-full pl-10 pr-4 py-2.5 text-xs sm:text-sm bg-white border border-slate-300 rounded-2xl focus:border-[#0B1F4B] focus:ring-4 focus:ring-blue-100/60 outline-none shadow-2xs transition-all"
+                className="w-full pl-10 pr-4 py-2.5 text-xs sm:text-sm bg-white border border-slate-300 rounded-2xl focus:border-[#051F16] focus:ring-4 focus:ring-emerald-100/60 outline-none shadow-2xs transition-all"
               />
               {searchQuery && (
                 <button
@@ -221,7 +221,7 @@ export const ProductCatalogue: React.FC<ProductCatalogueProps> = ({
         <div className="bg-white rounded-2xl border border-slate-200/90 p-4 sm:p-5 shadow-2xs mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-extrabold uppercase tracking-widest text-[#F97316]">
+              <span className="text-xs font-extrabold uppercase tracking-widest text-emerald-700">
                 {currentCategoryMeta.displayName}
               </span>
               <span className="text-slate-300">•</span>
@@ -285,10 +285,10 @@ export const ProductCatalogue: React.FC<ProductCatalogueProps> = ({
         )}
 
         {/* ─── 13. CAN'T FIND WHAT YOU NEED? ASK MPI AI WORKFLOW CTA ─────────── */}
-        <div className="mt-12 bg-linear-to-r from-[#0B1F4B] to-[#123B7A] rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6 border border-blue-400/20">
+        <div className="mt-12 bg-[#051F16] rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6 border border-[#0A3525]">
           <div className="space-y-2 max-w-xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/20 text-orange-300 text-xs font-bold border border-orange-400/30">
-              <MaterialIcon name="smart_toy" size={14} className="text-[#F97316]" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0A3525] text-[#A3F65C] text-xs font-bold border border-emerald-900/60">
+              <MaterialIcon name="smart_toy" size={14} className="text-[#A3F65C]" />
               <span>Custom & Specialized Procurement</span>
             </div>
             <h3
@@ -305,9 +305,8 @@ export const ProductCatalogue: React.FC<ProductCatalogueProps> = ({
 
           <div className="flex flex-wrap items-center gap-3 shrink-0">
             <MPIButton
-              variant="outline"
+              variant="secondary"
               size="md"
-              className="border-white/30 text-white hover:bg-white/10"
               onClick={onExploreWorkspace}
             >
               Open Full Workspace

@@ -35,7 +35,7 @@ export const CatalogueNavigation: React.FC<CatalogueNavigationProps> = ({
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
           <span>
             Showing <strong className="text-slate-900">{currentDisplayStart}–{currentDisplayEnd}</strong> of{" "}
-            <strong className="text-[#0B1F4B]">{totalCount}</strong> in {categoryName}
+            <strong className="text-[#051F16]">{totalCount}</strong> in {categoryName}
           </span>
         </div>
 
@@ -43,7 +43,7 @@ export const CatalogueNavigation: React.FC<CatalogueNavigationProps> = ({
           <button
             type="button"
             onClick={onExploreWorkspace}
-            className="text-xs font-semibold text-[#F97316] hover:text-orange-700 hover:underline cursor-pointer hidden md:inline-flex items-center gap-1"
+            className="text-xs font-semibold text-emerald-700 hover:text-emerald-900 hover:underline cursor-pointer hidden md:inline-flex items-center gap-1"
           >
             <span>Workspace View</span>
             <MaterialIcon name="open_in_new" size={13} />
@@ -66,7 +66,7 @@ export const CatalogueNavigation: React.FC<CatalogueNavigationProps> = ({
             aria-label="Previous products"
             className={`w-10 h-10 rounded-2xl flex items-center justify-center transition-all duration-200 cursor-pointer ${
               canScrollLeft
-                ? "bg-white border border-slate-200 hover:border-[#0B1F4B] hover:bg-[#0B1F4B] hover:text-white text-slate-800 shadow-2xs hover:shadow-sm"
+                ? "bg-white border border-slate-200 hover:border-[#051F16] hover:bg-[#051F16] hover:text-white text-slate-800 shadow-2xs hover:shadow-sm"
                 : "bg-slate-100 text-slate-300 border border-transparent cursor-not-allowed"
             }`}
           >
@@ -81,7 +81,7 @@ export const CatalogueNavigation: React.FC<CatalogueNavigationProps> = ({
             aria-label="Next products"
             className={`w-10 h-10 rounded-2xl flex items-center justify-center transition-all duration-200 cursor-pointer ${
               canScrollRight
-                ? "bg-white border border-slate-200 hover:border-[#0B1F4B] hover:bg-[#0B1F4B] hover:text-white text-slate-800 shadow-2xs hover:shadow-sm"
+                ? "bg-white border border-slate-200 hover:border-[#051F16] hover:bg-[#051F16] hover:text-white text-slate-800 shadow-2xs hover:shadow-sm"
                 : "bg-slate-100 text-slate-300 border border-transparent cursor-not-allowed"
             }`}
           >

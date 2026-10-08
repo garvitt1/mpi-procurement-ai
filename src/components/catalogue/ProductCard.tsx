@@ -28,7 +28,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     <div
       style={style}
       className={`group relative bg-white rounded-3xl border transition-all duration-300 ease-out flex flex-col justify-between overflow-hidden select-none shrink-0 ${
-        isCenter
+        isCenter || isActive
           ? "border-[#051F16] shadow-[0_20px_40px_-10px_rgba(5,31,22,0.12)] ring-1 ring-[#051F16]/20"
           : "border-slate-200/90 shadow-[0_4px_16px_-4px_rgba(0,0,0,0.04)] hover:border-slate-300 hover:shadow-[0_16px_32px_-8px_rgba(0,0,0,0.08)] hover:-translate-y-1"
       } ${className}`}
@@ -44,7 +44,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           </div>
         ) : (
           <img
-            src={product.image}
+            src={imageSrc}
             alt={product.name}
             loading="lazy"
             onError={() => setImageError(true)}

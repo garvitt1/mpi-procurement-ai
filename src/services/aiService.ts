@@ -807,7 +807,7 @@ VOICE, TONE & KNOWLEDGE-GATHERING DIRECTIVE:
 Active Buyer Parameters:
 • Category: ${rfqContext.category}
 • Quantity / Scope: ${scopeLabel}
-• Target Budget: ₹${rfqContext.targetBudget.toLocaleString("en-IN")}
+• Target Budget: ₹${rfqContext.targetBudget.toLocaleString("en-IN")} (~₹${unitCost.toLocaleString("en-IN")}/unit target)
 • Delivery Destination: ${rfqContext.deliveryLocation}
 • Current Specifications Ledger: ${rfqContext.specifications.length > 0 ? rfqContext.specifications.map((s) => `"${s}"`).join(", ") : "No specifications added yet"}
 

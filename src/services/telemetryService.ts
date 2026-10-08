@@ -6,6 +6,8 @@
  * Does NOT track sensitive business secrets, credentials, or PII.
  */
 
+import { hasConsent, hasUserDecided } from "./cookieConsentService"
+
 export type TelemetryEventType =
   | "landing_view"
   | "requirement_started"
@@ -45,6 +47,13 @@ export function trackTelemetryEvent(
   event: TelemetryEventType,
   metadata?: Record<string, string | number | boolean | null>,
 ): void {
+  // Enforce GDPR/DPDP analytics consent: if user has made a choice and analytics is disabled,
+  // do not record optional usage telemetry (essential error logs are exempted for platform stability)
+  const isEssentialError = event === "ai_error" || event === "rate_limit_exceeded"
+  if (!isEssentialError && hasUserDecided() && !hasConsent("analytics")) {
+    return
+  }
+
   const telemetryItem: TelemetryEvent = {
     event,
     timestamp: new Date().toISOString(),

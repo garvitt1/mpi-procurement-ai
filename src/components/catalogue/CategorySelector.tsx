@@ -94,7 +94,7 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
                 {/* Subtitle / Key Deliverables */}
                 <p
                   className={`text-[11px] leading-tight line-clamp-1 transition-colors ${
-                    isActive ? "text-blue-100/90" : "text-slate-500"
+                    isActive ? "text-emerald-100/90" : "text-slate-500"
                   }`}
                 >
                   {cat.subtitle}
@@ -103,7 +103,7 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
 
               {/* Bottom active indicator bar */}
               <div className="mt-3 pt-2 border-t border-slate-100/20 flex items-center justify-between text-[10px] font-semibold">
-                <span className={isActive ? "text-orange-300" : "text-slate-400"}>
+                <span className={isActive ? "text-[#A3F65C]" : "text-slate-400"}>
                   {isActive ? "Active View" : "Explore →"}
                 </span>
                 <span className={isActive ? "text-white/60 text-[9px]" : "text-slate-300 text-[9px]"}>

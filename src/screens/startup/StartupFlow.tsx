@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { NavProps, Screen } from "../../App"
 import {
   useProcurement,
@@ -27,7 +27,6 @@ import {
 import {
   chatWithProcurementCopilot,
   fallbackCopilotReply,
-  hasLiveAIConfigured,
   auditRFQReadinessWithAI,
   RFQReadinessResult,
   analyzeAndNegotiateQuoteWithAI,
@@ -81,7 +80,7 @@ function renderCopilotMarkdown(text: string) {
         elements.push(
           <ul
             key={`list-${elements.length}`}
-            className="my-1.5 space-y-1 pl-4 list-disc marker:text-[#F97316]"
+            className="my-1.5 space-y-1 pl-4 list-disc marker:text-emerald-700"
           >
             {listBuffer.map((item, idx) => (
               <li key={idx} className="leading-relaxed">
@@ -94,7 +93,7 @@ function renderCopilotMarkdown(text: string) {
         elements.push(
           <ol
             key={`list-${elements.length}`}
-            className="my-1.5 space-y-1 pl-4 list-decimal marker:font-bold marker:text-[#0B1F4B]"
+            className="my-1.5 space-y-1 pl-4 list-decimal marker:font-bold marker:text-[#051F16]"
           >
             {listBuffer.map((item, idx) => (
               <li key={idx} className="leading-relaxed">
@@ -365,7 +364,26 @@ export default function StartupFlow({
   )
 
   // Builder step state (1 to 7)
-  const [builderStep, setBuilderStep] = useState(1)
+  const [builderStep, setBuilderStep] = useState(
+    currentScreen === "startup.rfq"
+      ? 6
+      : currentScreen === "startup.match-results" || currentScreen === "startup.shortlist"
+      ? 5
+      : currentScreen === "startup.ai-analysis"
+      ? 2
+      : 1,
+  )
+
+  // Sync builderStep if screen changes while component is mounted
+  useEffect(() => {
+    if (currentScreen === "startup.rfq") {
+      setBuilderStep(6)
+    } else if (currentScreen === "startup.match-results" || currentScreen === "startup.shortlist") {
+      setBuilderStep(5)
+    } else if (currentScreen === "startup.ai-analysis") {
+      setBuilderStep(2)
+    }
+  }, [currentScreen])
   const [step1Guidance, setStep1Guidance] = useState<string | null>(null)
   const [newSpecInput, setNewSpecInput] = useState("")
   const [complianceChecks, setComplianceChecks] = useState<string[]>([
@@ -1092,7 +1110,7 @@ export default function StartupFlow({
                 <button
                   onClick={() => navigate("startup.home")}
                   className={`hover:text-slate-900 hover:underline cursor-pointer shrink-0 ${
-                    currentScreen === "startup.home" ? "font-bold text-[#0B1F4B]" : ""
+                    currentScreen === "startup.home" ? "font-bold text-[#051F16]" : ""
                   }`}
                 >
                   Startup Hub
@@ -1100,7 +1118,7 @@ export default function StartupFlow({
                 {currentScreen !== "startup.home" && (
                   <>
                     <span>/</span>
-                    <span className="text-[#0B1F4B] font-semibold truncate max-w-30 sm:max-w-50">
+                    <span className="text-[#051F16] font-semibold truncate max-w-30 sm:max-w-50">
                       {title}
                     </span>
                   </>
@@ -1108,11 +1126,16 @@ export default function StartupFlow({
               </div>
 
               <div
-                className="text-sm sm:text-lg font-bold text-[#0B1F4B] tracking-tight truncate"
+                className="text-sm sm:text-lg font-bold text-[#051F16] tracking-tight truncate"
                 style={{ fontFamily: "Plus Jakarta Sans" }}
               >
                 {title}
               </div>
+              {subtitle && (
+                <div className="text-[11px] text-slate-500 truncate hidden sm:block">
+                  {subtitle}
+                </div>
+              )}
             </div>
           </div>
 
@@ -1194,7 +1217,7 @@ export default function StartupFlow({
                 <div className="text-[11px] text-slate-500 font-medium">
                   Landed Price
                 </div>
-                <div className="text-sm font-extrabold text-[#0B1F4B]">
+                <div className="text-sm font-extrabold text-[#051F16]">
                   ₹
                   {(
                     MARKET_BASELINE_COST - selectedHistoryInsight.savingsAmount
@@ -1214,7 +1237,7 @@ export default function StartupFlow({
                 <div className="text-[11px] text-slate-500 font-medium">
                   Time Saved
                 </div>
-                <div className="text-sm font-extrabold text-[#F97316]">
+                <div className="text-sm font-extrabold text-emerald-700">
                   {selectedHistoryInsight.timeSaved}
                 </div>
               </div>
@@ -1222,8 +1245,8 @@ export default function StartupFlow({
 
             {/* Anonymized Supplier Context */}
             <div className="space-y-3 text-xs text-slate-700">
-              <div className="p-3 bg-blue-50/60 rounded-xl border border-blue-200">
-                <div className="font-bold text-[#0B1F4B] flex items-center justify-between mb-1">
+              <div className="p-3 bg-emerald-50/60 rounded-xl border border-emerald-200">
+                <div className="font-bold text-[#051F16] flex items-center justify-between mb-1">
                   <span>Selected Fulfillment Partner:</span>
                   <MPIVerifiedBadge label="Anonymity Guaranteed" />
                 </div>
@@ -1318,7 +1341,7 @@ export default function StartupFlow({
               </button>
             </div>
 
-            <div className="p-3 bg-blue-50/70 border border-blue-200 rounded-xl text-xs text-blue-900">
+            <div className="p-3 bg-emerald-50/70 border border-emerald-200 rounded-xl text-xs text-blue-900">
               <span className="font-bold">MPI Privacy Architecture:</span> Real
               company names, phone numbers, and direct emails are hidden to
               protect quote integrity and institutional escrow protection.
@@ -1328,7 +1351,7 @@ export default function StartupFlow({
               <div className="grid grid-cols-2 gap-2 text-slate-700">
                 <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-200">
                   <div className="text-slate-400">Match Compatibility</div>
-                  <div className="font-bold text-[#0B1F4B] text-sm">
+                  <div className="font-bold text-[#051F16] text-sm">
                     {selectedSupplierDetail.matchScore}% Fit
                   </div>
                 </div>
@@ -1414,7 +1437,7 @@ export default function StartupFlow({
           <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-start justify-between pb-3 border-b border-slate-100">
               <div>
-                <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#F97316]">
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-700">
                   Pre-Production Sourcing Protocol
                 </span>
                 <h3 className="text-base font-bold text-slate-900 mt-0.5">
@@ -1433,7 +1456,7 @@ export default function StartupFlow({
               </button>
             </div>
 
-            <div className="p-3 bg-blue-50/70 border border-blue-200 rounded-xl text-xs text-blue-900 leading-relaxed">
+            <div className="p-3 bg-emerald-50/70 border border-emerald-200 rounded-xl text-xs text-blue-900 leading-relaxed">
               <strong>Sample Assurance:</strong> Pre-production units allow
               physical evaluation of dimensional fitment, drop testing, and
               printing color tolerance before committing capital to 500+ units
@@ -1453,7 +1476,7 @@ export default function StartupFlow({
                       onClick={() => setSampleQty(q)}
                       className={`py-2 text-xs font-bold rounded-lg border text-center transition-all cursor-pointer ${
                         sampleQty === q
-                          ? "bg-[#0B1F4B] text-white border-[#0B1F4B]"
+                          ? "bg-[#051F16] text-white border-[#051F16]"
                           : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100"
                       }`}
                     >
@@ -1476,7 +1499,7 @@ export default function StartupFlow({
                   }
                   onChange={(e) => setSampleCustomNotes(e.target.value)}
                   placeholder="Specify key dimensions, finishes, or custom mockup fit requirements..."
-                  className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:border-blue-600"
+                  className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:border-[#051F16]"
                 />
               </div>
 
@@ -1488,7 +1511,7 @@ export default function StartupFlow({
                   type="text"
                   value={sampleShippingAddress}
                   onChange={(e) => setSampleShippingAddress(e.target.value)}
-                  className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:border-blue-600"
+                  className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:border-[#051F16]"
                 />
               </div>
 
@@ -1500,7 +1523,7 @@ export default function StartupFlow({
                   type="tel"
                   value={samplePhone}
                   onChange={(e) => setSamplePhone(e.target.value)}
-                  className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:border-blue-600"
+                  className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:border-[#051F16]"
                 />
               </div>
 
@@ -1641,7 +1664,7 @@ export default function StartupFlow({
                   rows={3}
                   value={evalNotes}
                   onChange={(e) => setEvalNotes(e.target.value)}
-                  className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:border-blue-600"
+                  className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:border-[#051F16]"
                 />
               </div>
             </div>
@@ -1688,7 +1711,7 @@ export default function StartupFlow({
                   <Icons.Sparkles className="w-5 h-5 text-amber-600" />
                 </div>
                 <div>
-                  <h3 className="text-base font-extrabold text-[#0B1F4B]">
+                  <h3 className="text-base font-extrabold text-[#051F16]">
                     AI Quote Negotiation Copilot
                   </h3>
                   <p className="text-xs text-slate-500">
@@ -1746,11 +1769,11 @@ export default function StartupFlow({
                 {/* Key Levers & Scope Differences */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
                   <div className="bg-white border border-slate-200 rounded-xl p-3.5 space-y-1.5">
-                    <div className="font-bold text-[#0B1F4B] flex items-center gap-1.5">
-                      <Icons.TrendingUp className="w-3.5 h-3.5 text-[#F97316]" />
+                    <div className="font-bold text-[#051F16] flex items-center gap-1.5">
+                      <Icons.TrendingUp className="w-3.5 h-3.5 text-emerald-700" />
                       <span>Key Negotiation Levers:</span>
                     </div>
-                    <ul className="space-y-1 text-slate-600 pl-4 list-disc marker:text-[#F97316]">
+                    <ul className="space-y-1 text-slate-600 pl-4 list-disc marker:text-emerald-700">
                       {negotiationModal.result.keyNegotiationLevers.map((lever, i) => (
                         <li key={i}>{lever}</li>
                       ))}
@@ -1758,11 +1781,11 @@ export default function StartupFlow({
                   </div>
 
                   <div className="bg-white border border-slate-200 rounded-xl p-3.5 space-y-1.5">
-                    <div className="font-bold text-[#0B1F4B] flex items-center gap-1.5">
-                      <Icons.FileText className="w-3.5 h-3.5 text-blue-600" />
+                    <div className="font-bold text-[#051F16] flex items-center gap-1.5">
+                      <Icons.FileText className="w-3.5 h-3.5 text-emerald-700" />
                       <span>Scope Observations:</span>
                     </div>
-                    <ul className="space-y-1 text-slate-600 pl-4 list-disc marker:text-blue-600">
+                    <ul className="space-y-1 text-slate-600 pl-4 list-disc marker:text-emerald-700">
                       {negotiationModal.result.scopeDifferences.map((diff, i) => (
                         <li key={i}>{diff}</li>
                       ))}
@@ -1782,7 +1805,7 @@ export default function StartupFlow({
                         setNegotiationModal((prev) => ({ ...prev, copied: true }))
                         setTimeout(() => setNegotiationModal((prev) => ({ ...prev, copied: false })), 2500)
                       }}
-                      className="text-xs text-[#0B1F4B] font-bold hover:underline flex items-center gap-1 cursor-pointer"
+                      className="text-xs text-[#051F16] font-bold hover:underline flex items-center gap-1 cursor-pointer"
                     >
                       {negotiationModal.copied ? (
                         <>
@@ -1820,11 +1843,11 @@ export default function StartupFlow({
           <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[92vh] overflow-y-auto border border-slate-200 shadow-2xl p-6 space-y-5">
             <div className="flex items-start justify-between border-b border-slate-100 pb-4">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-blue-900/10 text-[#0B1F4B] flex items-center justify-center">
-                  <Icons.Award className="w-5 h-5 text-[#0B1F4B]" />
+                <div className="w-9 h-9 rounded-xl bg-emerald-950/10 text-[#051F16] flex items-center justify-center">
+                  <Icons.Award className="w-5 h-5 text-[#051F16]" />
                 </div>
                 <div>
-                  <h3 className="text-base font-extrabold text-[#0B1F4B]">
+                  <h3 className="text-base font-extrabold text-[#051F16]">
                     Institutional Procurement Award Memorandum
                   </h3>
                   <p className="text-xs text-slate-500">
@@ -1854,7 +1877,7 @@ export default function StartupFlow({
                 <div>
                   <div className="flex justify-between text-slate-600 mb-1">
                     <span>Price</span>
-                    <strong className="text-[#0B1F4B]">{awardMemoModal.weights.price}%</strong>
+                    <strong className="text-[#051F16]">{awardMemoModal.weights.price}%</strong>
                   </div>
                   <input
                     type="range"
@@ -1868,13 +1891,13 @@ export default function StartupFlow({
                         weights: { ...prev.weights, price: p },
                       }))
                     }}
-                    className="w-full accent-[#0B1F4B]"
+                    className="w-full accent-[#051F16]"
                   />
                 </div>
                 <div>
                   <div className="flex justify-between text-slate-600 mb-1">
                     <span>Quality</span>
-                    <strong className="text-[#0B1F4B]">{awardMemoModal.weights.quality}%</strong>
+                    <strong className="text-[#051F16]">{awardMemoModal.weights.quality}%</strong>
                   </div>
                   <input
                     type="range"
@@ -1888,13 +1911,13 @@ export default function StartupFlow({
                         weights: { ...prev.weights, quality: q },
                       }))
                     }}
-                    className="w-full accent-[#0B1F4B]"
+                    className="w-full accent-[#051F16]"
                   />
                 </div>
                 <div>
                   <div className="flex justify-between text-slate-600 mb-1">
                     <span>Delivery</span>
-                    <strong className="text-[#0B1F4B]">{awardMemoModal.weights.delivery}%</strong>
+                    <strong className="text-[#051F16]">{awardMemoModal.weights.delivery}%</strong>
                   </div>
                   <input
                     type="range"
@@ -1908,13 +1931,13 @@ export default function StartupFlow({
                         weights: { ...prev.weights, delivery: d },
                       }))
                     }}
-                    className="w-full accent-[#0B1F4B]"
+                    className="w-full accent-[#051F16]"
                   />
                 </div>
                 <div>
                   <div className="flex justify-between text-slate-600 mb-1">
                     <span>Location/GST</span>
-                    <strong className="text-[#0B1F4B]">{awardMemoModal.weights.location}%</strong>
+                    <strong className="text-[#051F16]">{awardMemoModal.weights.location}%</strong>
                   </div>
                   <input
                     type="range"
@@ -1928,7 +1951,7 @@ export default function StartupFlow({
                         weights: { ...prev.weights, location: l },
                       }))
                     }}
-                    className="w-full accent-[#0B1F4B]"
+                    className="w-full accent-[#051F16]"
                   />
                 </div>
               </div>
@@ -1938,7 +1961,7 @@ export default function StartupFlow({
                   size="sm"
                   onClick={() => handleOpenAwardMemoModal(awardMemoModal.weights)}
                   isLoading={awardMemoModal.isLoading}
-                  icon={<Icons.Sparkles className="w-3.5 h-3.5 text-[#F97316]" />}
+                  icon={<Icons.Sparkles className="w-3.5 h-3.5 text-emerald-700" />}
                 >
                   Recalculate Award Memo with MPI AI
                 </MPIButton>
@@ -1947,7 +1970,7 @@ export default function StartupFlow({
 
             {awardMemoModal.isLoading ? (
               <div className="py-12 flex flex-col items-center justify-center space-y-3">
-                <div className="w-8 h-8 border-3 border-[#0B1F4B] border-t-transparent rounded-full animate-spin" />
+                <div className="w-8 h-8 border-3 border-[#051F16] border-t-transparent rounded-full animate-spin" />
                 <p className="text-xs font-semibold text-slate-600">
                   Formulating institutional award memorandum and compiling scorecard...
                 </p>
@@ -1978,7 +2001,7 @@ export default function StartupFlow({
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-slate-50 p-3 rounded-lg text-xs">
                   <div>
                     <span className="text-slate-400 block text-[10px]">Recommended Vendor</span>
-                    <strong className="text-[#0B1F4B] text-sm">{awardMemoModal.result.recommendedSupplier}</strong>
+                    <strong className="text-[#051F16] text-sm">{awardMemoModal.result.recommendedSupplier}</strong>
                   </div>
                   <div>
                     <span className="text-slate-400 block text-[10px]">Total Award Value</span>
@@ -2016,7 +2039,7 @@ export default function StartupFlow({
                           <tr key={idx} className="hover:bg-slate-50">
                             <td className="p-2.5 font-semibold text-slate-800">{item.criteria}</td>
                             <td className="p-2.5 text-slate-600">{item.weight}%</td>
-                            <td className="p-2.5 font-bold text-[#0B1F4B]">{item.score}/100</td>
+                            <td className="p-2.5 font-bold text-[#051F16]">{item.score}/100</td>
                             <td className="p-2.5 text-slate-500 text-[11px]">{item.notes}</td>
                           </tr>
                         ))}
@@ -2041,7 +2064,7 @@ export default function StartupFlow({
                   setAwardMemoModal((prev) => ({ ...prev, copied: true }))
                   setTimeout(() => setAwardMemoModal((prev) => ({ ...prev, copied: false })), 2000)
                 }}
-                className="text-xs text-[#0B1F4B] font-bold hover:underline cursor-pointer"
+                className="text-xs text-[#051F16] font-bold hover:underline cursor-pointer"
               >
                 {awardMemoModal.copied ? "✓ Copied Memo" : "Copy Plaintext Memo"}
               </button>
@@ -2078,11 +2101,11 @@ export default function StartupFlow({
           <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-slate-200 shadow-2xl p-6 space-y-5">
             <div className="flex items-start justify-between border-b border-slate-100 pb-4">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-orange-500/10 text-orange-700 flex items-center justify-center">
-                  <Icons.ShieldCheck className="w-5 h-5 text-[#F97316]" />
+                <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-800 flex items-center justify-center">
+                  <Icons.ShieldCheck className="w-5 h-5 text-emerald-700" />
                 </div>
                 <div>
-                  <h3 className="text-base font-extrabold text-[#0B1F4B]">
+                  <h3 className="text-base font-extrabold text-[#051F16]">
                     AI Government Scheme Pre-Screen
                   </h3>
                   <p className="text-xs text-slate-500">
@@ -2100,7 +2123,7 @@ export default function StartupFlow({
 
             {schemeModal.isLoading ? (
               <div className="py-12 flex flex-col items-center justify-center space-y-3">
-                <div className="w-8 h-8 border-3 border-[#F97316] border-t-transparent rounded-full animate-spin" />
+                <div className="w-8 h-8 border-3 border-emerald-500 border-t-transparent rounded-full animate-spin" />
                 <p className="text-xs font-semibold text-slate-600">
                   Pre-screening eligibility criteria and statutory document requirements with MPI AI...
                 </p>
@@ -2108,7 +2131,7 @@ export default function StartupFlow({
             ) : schemeModal.result ? (
               <div className="space-y-4">
                 {/* Fit Score & Financial Assistance */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-orange-50 border border-orange-200 rounded-xl p-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-emerald-50 border border-emerald-200 rounded-xl p-4">
                   <div>
                     <span className="text-[10px] font-bold text-orange-800 uppercase tracking-wider">
                       Eligibility Fit Score
@@ -2161,7 +2184,7 @@ export default function StartupFlow({
                                 checkedDocs: { ...prev.checkedDocs, [doc]: checked },
                               }))
                             }}
-                            className="mt-0.5 accent-[#0B1F4B]"
+                            className="mt-0.5 accent-[#051F16]"
                           />
                           <span className={isChecked ? "line-through text-slate-400" : "text-slate-800 font-medium"}>
                             {doc}
@@ -2177,7 +2200,7 @@ export default function StartupFlow({
                   <span className="text-xs font-bold text-slate-900 block">
                     Official Application Roadmap:
                   </span>
-                  <ol className="space-y-1.5 pl-4 list-decimal text-xs text-slate-600 marker:font-bold marker:text-[#0B1F4B]">
+                  <ol className="space-y-1.5 pl-4 list-decimal text-xs text-slate-600 marker:font-bold marker:text-[#051F16]">
                     {schemeModal.result.applicationSteps.map((step, idx) => (
                       <li key={idx} className="leading-relaxed">
                         {step}
@@ -2226,7 +2249,7 @@ export default function StartupFlow({
                   <Icons.ShieldCheck className="w-5 h-5 text-red-600" />
                 </div>
                 <div>
-                  <h3 className="text-base font-extrabold text-[#0B1F4B]">
+                  <h3 className="text-base font-extrabold text-[#051F16]">
                     AI Escrow Dispute & Neutral Arbitration
                   </h3>
                   <p className="text-xs text-slate-500">
@@ -2252,7 +2275,7 @@ export default function StartupFlow({
                   type="text"
                   value={disputeModal.disputeReason}
                   onChange={(e) => setDisputeModal((prev) => ({ ...prev, disputeReason: e.target.value }))}
-                  className="w-full p-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 outline-none focus:border-[#0B1F4B]"
+                  className="w-full p-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 outline-none focus:border-[#051F16]"
                   placeholder="Describe non-conformance or SLA breach..."
                 />
               </div>
@@ -2318,7 +2341,7 @@ export default function StartupFlow({
                     <span className="text-[10px] font-mono text-amber-800 uppercase font-bold">
                       TICKET ID: {disputeModal.result.disputeTicketId}
                     </span>
-                    <span className="text-xs font-extrabold bg-[#0B1F4B] text-white px-2.5 py-0.5 rounded-full">
+                    <span className="text-xs font-extrabold bg-[#051F16] text-white px-2.5 py-0.5 rounded-full">
                       Action: {disputeModal.result.suggestedEscrowAction}
                     </span>
                   </div>
@@ -2369,7 +2392,7 @@ export default function StartupFlow({
                     setTimeout(() => setDisputeModal((prev) => ({ ...prev, copied: false })), 2000)
                   }
                 }}
-                className="text-xs text-[#0B1F4B] font-bold hover:underline cursor-pointer"
+                className="text-xs text-[#051F16] font-bold hover:underline cursor-pointer"
               >
                 {disputeModal.copied ? "✓ Copied Notice" : "Copy Arbitration Notice"}
               </button>
@@ -2414,7 +2437,7 @@ export default function StartupFlow({
                 <span className="font-semibold text-slate-600 uppercase tracking-wider text-[11px]">
                   Active RFQs & Suppliers
                 </span>
-                <Icons.FileText className="w-4 h-4 text-[#0B1F4B]" />
+                <Icons.FileText className="w-4 h-4 text-[#051F16]" />
               </div>
               <div className="flex items-baseline gap-2">
                 <div className="text-2xl sm:text-3xl font-extrabold text-[#0B1220] tracking-tight">
@@ -2430,7 +2453,7 @@ export default function StartupFlow({
                 ↑ +1 this cycle
               </span>
               <span className="text-slate-600 font-medium text-[11px] bg-slate-100 px-2 py-0.5 rounded-full flex items-center gap-1">
-                <Icons.ShieldCheck className="w-3 h-3 text-blue-600" />
+                <Icons.ShieldCheck className="w-3 h-3 text-emerald-700" />
                 {shortlistedSupplierIds.length} Shortlisted (100% Vetted)
               </span>
             </div>
@@ -2466,7 +2489,7 @@ export default function StartupFlow({
                 <span className="font-semibold text-slate-600 uppercase tracking-wider text-[11px]">
                   Turnaround SLA
                 </span>
-                <Icons.Clock className="w-4 h-4 text-[#F97316]" />
+                <Icons.Clock className="w-4 h-4 text-emerald-700" />
               </div>
               <div className="text-2xl sm:text-3xl font-extrabold text-[#0B1220] tracking-tight">
                 8-12 Days
@@ -2489,13 +2512,13 @@ export default function StartupFlow({
                 <span className="font-semibold text-slate-600 uppercase tracking-wider text-[11px]">
                   Orders & Escrow Locked
                 </span>
-                <Icons.Coins className="w-4 h-4 text-[#0B1F4B]" />
+                <Icons.Coins className="w-4 h-4 text-[#051F16]" />
               </div>
               <div className="flex items-baseline justify-between gap-2">
                 <div className="text-2xl sm:text-3xl font-extrabold text-[#0B1220] tracking-tight">
                   ₹1,40,250
                 </div>
-                <span className="text-xs font-bold text-blue-900 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200">
+                <span className="text-xs font-bold text-blue-900 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
                   2 Orders in Flight
                 </span>
               </div>
@@ -2535,7 +2558,7 @@ export default function StartupFlow({
             <div>
               <div className="flex items-center justify-between text-xs font-semibold text-slate-700 mb-2">
                 <span>Current Phase: Milestone {currentMilestone} of 10</span>
-                <span className="text-[#0B1F4B] font-bold">
+                <span className="text-[#051F16] font-bold">
                   {currentMilestone >= 8
                     ? "QC & Drop Inspection"
                     : currentMilestone >= 4
@@ -2545,7 +2568,7 @@ export default function StartupFlow({
               </div>
               <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden flex">
                 <div
-                  className="bg-[#0B1F4B] h-full transition-all duration-500"
+                  className="bg-[#051F16] h-full transition-all duration-500"
                   style={{ width: `${(currentMilestone / 10) * 100}%` }}
                 />
               </div>
@@ -2565,7 +2588,7 @@ export default function StartupFlow({
                 <span className="text-slate-300">|</span>
                 <span>
                   Landed Cost:{" "}
-                  <strong className="text-[#0B1F4B]">₹65,250</strong>
+                  <strong className="text-[#051F16]">₹65,250</strong>
                 </span>
                 <span className="text-slate-300">|</span>
                 <span className="text-[#D9A400] font-bold">
@@ -2592,9 +2615,9 @@ export default function StartupFlow({
           </div>
 
           {/* Sourcing & Analytics Action Card */}
-          <div className="lg:col-span-4 bg-[#0B1F4B] text-white rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+          <div className="lg:col-span-4 bg-[#051F16] text-white rounded-2xl p-6 shadow-sm flex flex-col justify-between">
             <div>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#123B7A] text-orange-400 text-[10px] font-bold uppercase tracking-wider mb-3">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#0A3525] text-orange-400 text-[10px] font-bold uppercase tracking-wider mb-3">
                 <Icons.Sparkles className="w-3.5 h-3.5" />
                 AI Procurement Engine
               </div>
@@ -2611,7 +2634,7 @@ export default function StartupFlow({
               </p>
             </div>
 
-            <div className="mt-6 pt-4 border-t border-[#123B7A] space-y-2">
+            <div className="mt-6 pt-4 border-t border-[#0A3525] space-y-2">
               <MPIButton
                 variant="ai"
                 fullWidth
@@ -2644,7 +2667,7 @@ export default function StartupFlow({
             </div>
             <button
               onClick={() => navigate("startup.history")}
-              className="text-xs font-bold text-[#0B1F4B] hover:text-[#F97316] transition-colors cursor-pointer"
+              className="text-xs font-bold text-[#051F16] hover:text-[#A3F65C] transition-colors cursor-pointer"
             >
               View Full History & Insights →
             </button>
@@ -2663,7 +2686,7 @@ export default function StartupFlow({
                   <div className="text-[11px] text-slate-500 flex items-center gap-2">
                     <span className="font-mono text-slate-400">{item.id}</span>
                     <span>•</span>
-                    <span className="font-semibold text-[#0B1F4B]">
+                    <span className="font-semibold text-[#051F16]">
                       {item.category}
                     </span>
                     <span>•</span>
@@ -2704,7 +2727,13 @@ export default function StartupFlow({
   // ════════════════════════════════════════════════════════════════════════════
   // 2. 7-STEP GUIDED SOURCING BUILDER (startup.procurement)
   // ════════════════════════════════════════════════════════════════════════════
-  if (currentScreen === "startup.procurement") {
+  if (
+    currentScreen === "startup.procurement" ||
+    currentScreen === "startup.rfq" ||
+    currentScreen === "startup.ai-analysis" ||
+    currentScreen === "startup.match-results" ||
+    currentScreen === "startup.shortlist"
+  ) {
     const steps = [
       { num: 1, display: "1", name: "Requirement" },
       { num: 2, display: "2a", name: "Category & Specs" },
@@ -2718,11 +2747,11 @@ export default function StartupFlow({
     return renderShell(
       <div className="max-w-5xl mx-auto space-y-6">
         {/* 7-Step Stepper Bar (Mission Control Dock) */}
-        <div className="sticky top-16 z-20 bg-white/95 backdrop-blur-xl rounded-2xl border border-slate-200/90 p-4 sm:p-5 shadow-[0_12px_32px_-8px_rgba(11,31,75,0.08)] overflow-x-auto transition-all">
+        <div className="sticky top-16 z-20 bg-white/95 backdrop-blur-xl rounded-2xl border border-slate-200/90 p-4 sm:p-5 shadow-[0_12px_32px_-8px_rgba(5,31,22,0.08)] overflow-x-auto transition-all">
           <div className="flex items-center justify-between min-w-137.5 relative">
             <div className="absolute top-4.5 left-6 right-6 h-1 bg-slate-100 rounded-full z-0" />
             <div
-              className="absolute top-4.5 left-6 h-1 bg-gradient-to-r from-emerald-500 via-[#0B1F4B] to-[#F97316] rounded-full z-0 transition-all duration-500 ease-out shadow-xs"
+              className="absolute top-4.5 left-6 h-1 bg-gradient-to-r from-emerald-500 via-[#051F16] to-[#A3F65C] rounded-full z-0 transition-all duration-500 ease-out shadow-xs"
               style={{ width: `${((builderStep - 1) / 6) * 100}%` }}
             />
             {steps.map((s) => {
@@ -2737,7 +2766,7 @@ export default function StartupFlow({
                   <div
                     className={`w-9 h-9 rounded-full flex items-center justify-center text-[11px] font-bold transition-all duration-300 ${
                       isCurrent
-                        ? "bg-[#0B1F4B] text-white ring-4 ring-[#F97316]/30 shadow-md shadow-[#0B1F4B]/20 scale-110"
+                        ? "bg-[#051F16] text-white ring-4 ring-[#A3F65C]/40 shadow-md shadow-[#051F16]/20 scale-110"
                         : isPast
                           ? "bg-emerald-600 text-white ring-2 ring-emerald-200 shadow-2xs"
                           : "bg-white text-slate-500 border-2 border-slate-200 group-hover:border-slate-400 group-hover:text-slate-700 shadow-2xs"
@@ -2748,7 +2777,7 @@ export default function StartupFlow({
                   <span
                     className={`text-[11px] font-semibold mt-2 whitespace-nowrap transition-colors ${
                       isCurrent
-                        ? "text-[#0B1F4B] font-extrabold"
+                        ? "text-[#051F16] font-extrabold"
                         : isPast
                           ? "text-slate-700 font-medium"
                           : "text-slate-400 group-hover:text-slate-600"
@@ -2767,7 +2796,7 @@ export default function StartupFlow({
           <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-5 animate-fade-in">
             <div className="flex items-start justify-between">
               <div>
-                <h3 className="text-lg font-bold text-[#0B1F4B]">
+                <h3 className="text-lg font-bold text-[#051F16]">
                   Step 1: Plain-Language Requirement Intake
                 </h3>
                 <p className="text-xs text-slate-500 mt-0.5">
@@ -2805,7 +2834,7 @@ export default function StartupFlow({
                   }}
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 bg-white/80 hover:bg-slate-50 hover:border-slate-300 text-slate-700 shadow-2xs transition-all cursor-pointer"
                 >
-                  <MaterialIcon icon="precision_manufacturing" size={14} className="text-blue-600" />
+                  <MaterialIcon icon="precision_manufacturing" size={14} className="text-emerald-700" />
                   <span>Drone CNC Sample</span>
                 </button>
                 <button
@@ -2851,14 +2880,14 @@ export default function StartupFlow({
                 if (step1Guidance) setStep1Guidance(null)
               }}
               placeholder="e.g. Need 500 custom rigid printed boxes for our D2C skincare launch by next month, budget under ₹80k with custom foam inserts..."
-              className="w-full p-4 text-sm bg-slate-50 border border-slate-300 rounded-xl text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-[#0B1F4B] outline-none"
+              className="w-full p-4 text-sm bg-slate-50 border border-slate-300 rounded-xl text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-[#051F16] outline-none"
             />
 
             {step1Guidance && (
-              <div className="p-4 bg-blue-50/80 border border-blue-200 rounded-xl text-xs text-slate-700 flex items-start gap-3 animate-fade-in shadow-2xs">
-                <Icons.Sparkles className="w-4 h-4 text-[#F97316] shrink-0 mt-0.5" />
+              <div className="p-4 bg-emerald-50/80 border border-emerald-200 rounded-xl text-xs text-slate-700 flex items-start gap-3 animate-fade-in shadow-2xs">
+                <Icons.Sparkles className="w-4 h-4 text-emerald-700 shrink-0 mt-0.5" />
                 <div className="space-y-1">
-                  <span className="font-bold text-[#0B1F4B] block">Requirement Guidance</span>
+                  <span className="font-bold text-[#051F16] block">Requirement Guidance</span>
                   <p className="leading-relaxed whitespace-pre-line">{step1Guidance}</p>
                 </div>
               </div>
@@ -2898,7 +2927,7 @@ export default function StartupFlow({
         {builderStep === 2 && (
           <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-5 animate-fade-in">
             <div>
-              <h3 className="text-lg font-bold text-[#0B1F4B]">
+              <h3 className="text-lg font-bold text-[#051F16]">
                 Step 2a: Category & Technical Specifications
               </h3>
               <p className="text-xs text-slate-500 mt-0.5">
@@ -2911,8 +2940,8 @@ export default function StartupFlow({
             <div className="bg-linear-to-br from-slate-900 to-blue-950 text-white rounded-2xl p-5 shadow-xs space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-3">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-lg bg-[#F97316]/20 text-[#F97316] flex items-center justify-center">
-                    <Icons.Sparkles className="w-4 h-4 text-[#F97316]" />
+                  <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-800 flex items-center justify-center">
+                    <Icons.Sparkles className="w-4 h-4 text-emerald-700" />
                   </div>
                   <div>
                     <h4 className="text-sm font-bold text-white flex items-center gap-2">
@@ -2932,14 +2961,14 @@ export default function StartupFlow({
                   disabled={isAuditingReadiness}
                   className="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer self-start sm:self-auto shrink-0 border border-white/10"
                 >
-                  <Icons.Sparkles className="w-3.5 h-3.5 text-[#F97316]" />
+                  <Icons.Sparkles className="w-3.5 h-3.5 text-emerald-700" />
                   <span>{isAuditingReadiness ? "Auditing with MPI AI..." : readinessResult ? "Re-Audit Specs" : "Run AI Readiness Audit"}</span>
                 </button>
               </div>
 
               {isAuditingReadiness ? (
                 <div className="py-6 flex flex-col items-center justify-center space-y-2">
-                  <div className="w-6 h-6 border-2 border-[#F97316] border-t-transparent rounded-full animate-spin" />
+                  <div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
                   <span className="text-xs text-blue-200">Testing specification tolerances and clarity with MPI AI...</span>
                 </div>
               ) : readinessResult ? (
@@ -3002,7 +3031,7 @@ export default function StartupFlow({
                   {/* AI Suggestions */}
                   {readinessResult.aiSuggestions.length > 0 && (
                     <div className="text-[11px] text-blue-200 flex items-start gap-1.5 pt-1">
-                      <Icons.Sparkles className="w-3.5 h-3.5 text-[#F97316] shrink-0 mt-0.5" />
+                      <Icons.Sparkles className="w-3.5 h-3.5 text-emerald-700 shrink-0 mt-0.5" />
                       <span><strong>AI Tip:</strong> {readinessResult.aiSuggestions.join(" · ")}</span>
                     </div>
                   )}
@@ -3013,7 +3042,7 @@ export default function StartupFlow({
                   <button
                     type="button"
                     onClick={() => handleAuditRFQReadiness()}
-                    className="font-bold text-white underline hover:text-[#F97316] cursor-pointer"
+                    className="font-bold text-white underline hover:text-[#A3F65C] cursor-pointer"
                   >
                     Run Audit Now →
                   </button>
@@ -3033,7 +3062,7 @@ export default function StartupFlow({
                     onClick={() => setSelectedCategory(cat)}
                     className={`text-left p-2.5 rounded-xl border text-xs font-semibold transition-all cursor-pointer ${
                       selectedCategory === cat
-                        ? "bg-blue-50 border-[#0B1F4B] text-[#0B1F4B] ring-1 ring-[#0B1F4B]"
+                        ? "bg-emerald-50 border-[#051F16] text-[#051F16] ring-1 ring-[#051F16]"
                         : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
                     }`}
                   >
@@ -3048,7 +3077,7 @@ export default function StartupFlow({
                 <label className="text-xs font-bold text-slate-700">
                   Extracted Technical Specifications ({specifications.length}):
                 </label>
-                <span className="text-[11px] text-[#0B1F4B] font-bold">
+                <span className="text-[11px] text-[#051F16] font-bold">
                   96% AI Parsed
                 </span>
               </div>
@@ -3076,7 +3105,7 @@ export default function StartupFlow({
                   value={newSpecInput}
                   onChange={(e) => setNewSpecInput(e.target.value)}
                   placeholder="Add custom specification (e.g., Gold hot-foil stamping on logo)..."
-                  className="flex-1 text-xs px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:border-[#0B1F4B]"
+                  className="flex-1 text-xs px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:border-[#051F16]"
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
                       addSpecification(newSpecInput)
@@ -3112,7 +3141,7 @@ export default function StartupFlow({
         {builderStep === 3 && (
           <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-5 animate-fade-in">
             <div>
-              <h3 className="text-lg font-bold text-[#0B1F4B]">
+              <h3 className="text-lg font-bold text-[#051F16]">
                 Step 2b: Quantities, Timelines & Target Budget
               </h3>
               <p className="text-xs text-slate-500 mt-0.5">
@@ -3130,7 +3159,7 @@ export default function StartupFlow({
                   type="number"
                   value={quantity}
                   onChange={(e) => setQuantity(Number(e.target.value))}
-                  className="w-full text-sm p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0B1F4B]"
+                  className="w-full text-sm p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#051F16]"
                 />
               </div>
 
@@ -3143,7 +3172,7 @@ export default function StartupFlow({
                   step={1000}
                   value={targetBudget}
                   onChange={(e) => setTargetBudget(Number(e.target.value))}
-                  className="w-full text-sm p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0B1F4B]"
+                  className="w-full text-sm p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#051F16]"
                 />
               </div>
 
@@ -3155,7 +3184,7 @@ export default function StartupFlow({
                   type="date"
                   value={deadlineDate}
                   onChange={(e) => setDeadlineDate(e.target.value)}
-                  className="w-full text-sm p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0B1F4B]"
+                  className="w-full text-sm p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#051F16]"
                 />
               </div>
 
@@ -3168,7 +3197,7 @@ export default function StartupFlow({
                   value={deliveryLocation}
                   onChange={(e) => setDeliveryLocation(e.target.value)}
                   placeholder="e.g. Bengaluru, Karnataka"
-                  className="w-full text-sm p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0B1F4B]"
+                  className="w-full text-sm p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#051F16]"
                 />
               </div>
             </div>
@@ -3188,7 +3217,7 @@ export default function StartupFlow({
         {builderStep === 4 && (
           <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-5 animate-fade-in">
             <div>
-              <h3 className="text-lg font-bold text-[#0B1F4B]">
+              <h3 className="text-lg font-bold text-[#051F16]">
                 Step 3: Statutory Compliance & Quality Gates
               </h3>
               <p className="text-xs text-slate-500 mt-0.5">
@@ -3233,14 +3262,14 @@ export default function StartupFlow({
                     }}
                     className={`p-3.5 rounded-xl border flex items-start gap-3 cursor-pointer transition-all ${
                       isChecked
-                        ? "bg-blue-50/60 border-[#0B1F4B]"
+                        ? "bg-emerald-50/60 border-[#051F16]"
                         : "bg-white border-slate-200 hover:bg-slate-50"
                     }`}
                   >
                     <div
                       className={`w-5 h-5 rounded-md flex items-center justify-center text-xs mt-0.5 shrink-0 ${
                         isChecked
-                          ? "bg-[#0B1F4B] text-white"
+                          ? "bg-[#051F16] text-white"
                           : "border border-slate-300"
                       }`}
                     >
@@ -3275,7 +3304,7 @@ export default function StartupFlow({
           <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-5 animate-fade-in">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-bold text-[#0B1F4B]">
+                <h3 className="text-lg font-bold text-[#051F16]">
                   Step 4: Verified Supplier Discovery
                 </h3>
                 <p className="text-xs text-slate-500 mt-0.5">
@@ -3283,7 +3312,7 @@ export default function StartupFlow({
                   identities remain anonymized for quote integrity.
                 </p>
               </div>
-              <span className="text-xs font-bold text-[#0B1F4B] bg-blue-50 px-2.5 py-1 rounded-lg">
+              <span className="text-xs font-bold text-[#051F16] bg-emerald-50 px-2.5 py-1 rounded-lg">
                 {shortlistedSupplierIds.length} Shortlisted
               </span>
             </div>
@@ -3297,16 +3326,16 @@ export default function StartupFlow({
                     key={sup.id}
                     className={`p-4 rounded-xl border flex flex-col justify-between transition-all relative ${
                       isRecommended
-                        ? "border-2 border-[#F97316] bg-linear-to-b from-orange-50/40 via-white to-blue-50/20 shadow-md ring-2 ring-orange-300/40 md:-translate-y-1"
+                        ? "border-2 border-emerald-500 bg-linear-to-b from-emerald-50/40 via-white to-slate-50 shadow-md ring-2 ring-orange-300/40 md:-translate-y-1"
                         : isShortlisted
-                          ? "border-[#0B1F4B] bg-blue-50/30 shadow-xs"
+                          ? "border-[#051F16] bg-emerald-50/30 shadow-xs"
                           : "border-slate-200 bg-white hover:border-slate-300 shadow-xs"
                     }`}
                   >
                     <div className="flex flex-col flex-1">
                       {isRecommended ? (
                         <div className="mb-2">
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#F97316] text-white shadow-xs">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#051F16] text-white shadow-xs">
                             <Icons.Sparkles className="w-3 h-3 text-white" />
                             MPI Recommendation
                           </span>
@@ -3320,7 +3349,7 @@ export default function StartupFlow({
                           <div className="text-xs font-bold text-slate-900 truncate flex items-center gap-1.5">
                             <span className="truncate">{sup.displayName}</span>
                             {isRecommended && (
-                              <span className="text-[9px] font-bold text-[#F97316] bg-orange-50 border border-orange-200 px-1 py-0.2 rounded shrink-0">
+                              <span className="text-[9px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1 py-0.2 rounded shrink-0">
                                 Preferred
                               </span>
                             )}
@@ -3332,8 +3361,8 @@ export default function StartupFlow({
                         <span
                           className={`text-[11px] font-bold px-2 py-0.5 rounded-md border shrink-0 ${
                             isRecommended
-                              ? "text-[#F97316] bg-orange-50 border-orange-200"
-                              : "text-[#0B1F4B] bg-blue-50 border-blue-200"
+                              ? "text-emerald-700 bg-emerald-50 border-emerald-200"
+                              : "text-[#051F16] bg-emerald-50 border-emerald-200"
                           }`}
                         >
                           {sup.matchScore}% Match
@@ -3366,12 +3395,12 @@ export default function StartupFlow({
                       <div
                         className={`p-2.5 rounded-lg border text-[10px] text-slate-700 mb-3 ${
                           isRecommended
-                            ? "bg-orange-50/60 border-orange-200/80"
-                            : "bg-blue-50/60 border-blue-100"
+                            ? "bg-emerald-50/60 border-emerald-200/80"
+                            : "bg-emerald-50/60 border-emerald-200"
                         }`}
                       >
-                        <div className="flex items-center gap-1 font-bold text-[#0B1F4B] mb-0.5 text-[10px]">
-                          <Icons.Sparkles className="w-3 h-3 text-[#F97316]" />
+                        <div className="flex items-center gap-1 font-bold text-[#051F16] mb-0.5 text-[10px]">
+                          <Icons.Sparkles className="w-3 h-3 text-emerald-700" />
                           <span>Grounded Match:</span>
                         </div>
                         <p className="text-slate-600 text-[10px] leading-snug line-clamp-3">
@@ -3383,7 +3412,7 @@ export default function StartupFlow({
                     <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between gap-1.5 mt-auto">
                       <button
                         onClick={() => setSelectedSupplierDetail(sup)}
-                        className="text-xs text-[#0B1F4B] hover:underline font-semibold cursor-pointer"
+                        className="text-xs text-[#051F16] hover:underline font-semibold cursor-pointer"
                       >
                         View Details
                       </button>
@@ -3391,9 +3420,9 @@ export default function StartupFlow({
                         onClick={() => toggleShortlistSupplier(sup.id)}
                         className={`text-xs px-2.5 py-1.5 rounded-lg font-semibold transition-colors cursor-pointer ${
                           isShortlisted
-                            ? "bg-[#0B1F4B] text-white"
+                            ? "bg-[#051F16] text-white"
                             : isRecommended
-                              ? "bg-[#F97316] text-white hover:bg-orange-600"
+                              ? "bg-[#051F16] text-white hover:bg-[#083A28]"
                               : "border border-slate-200 text-slate-700 hover:bg-slate-100"
                         }`}
                       >
@@ -3421,7 +3450,7 @@ export default function StartupFlow({
           <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-5 animate-fade-in">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-bold text-[#0B1F4B]">
+                <h3 className="text-lg font-bold text-[#051F16]">
                   Step 5: Institutional AI RFQ Document
                 </h3>
                 <p className="text-xs text-slate-500 mt-0.5">
@@ -3440,7 +3469,7 @@ export default function StartupFlow({
               </div>
 
               <div>
-                <div className="font-bold text-[#0B1F4B]">
+                <div className="font-bold text-[#051F16]">
                   PROJECT OVERVIEW:
                 </div>
                 <div>
@@ -3455,7 +3484,7 @@ export default function StartupFlow({
               </div>
 
               <div>
-                <div className="font-bold text-[#0B1F4B]">
+                <div className="font-bold text-[#051F16]">
                   TECHNICAL SPECIFICATIONS:
                 </div>
                 <ul className="list-disc pl-5 space-y-0.5">
@@ -3466,7 +3495,7 @@ export default function StartupFlow({
               </div>
 
               <div>
-                <div className="font-bold text-[#0B1F4B]">
+                <div className="font-bold text-[#051F16]">
                   QUALITY & COMPLIANCE CLAUSES:
                 </div>
                 <div>Mandatory: {complianceChecks.join(" • ")}</div>
@@ -3498,12 +3527,12 @@ export default function StartupFlow({
         {/* STEP 6: DISPATCH & VERIFY CONFIRMATION */}
         {builderStep === 7 && (
           <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-xs text-center space-y-5 animate-fade-in">
-            <div className="w-16 h-16 rounded-full bg-blue-100 text-[#0B1F4B] flex items-center justify-center mx-auto">
+            <div className="w-16 h-16 rounded-full bg-emerald-100/60 text-[#051F16] flex items-center justify-center mx-auto">
               <Icons.Check className="w-8 h-8" />
             </div>
 
             <h3
-              className="text-xl font-extrabold text-[#0B1F4B]"
+              className="text-xl font-extrabold text-[#051F16]"
               style={{ fontFamily: "Plus Jakarta Sans" }}
             >
               Step 6: RFQ Transmitted Successfully!
@@ -3516,7 +3545,7 @@ export default function StartupFlow({
 
             <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl max-w-md mx-auto text-xs text-slate-700 flex justify-between">
               <span>Dispatched Suppliers:</span>
-              <span className="font-bold text-[#0B1F4B]">
+              <span className="font-bold text-[#051F16]">
                 {shortlistedSupplierIds
                   .map(
                     (id) =>
@@ -3561,20 +3590,33 @@ export default function StartupFlow({
           {/* Header */}
           <div className="p-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between gap-3 flex-wrap">
             <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-7 h-7 rounded-lg bg-[#F97316] text-white flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
+              <div className="w-7 h-7 rounded-lg bg-[#051F16] text-[#A3F65C] flex items-center justify-center font-bold text-xs border border-emerald-800 shadow-xs shrink-0">
                 AI
               </div>
               <div className="min-w-0">
                 <div className="text-xs sm:text-sm font-bold text-slate-900 whitespace-nowrap">
                   MPI Procurement Copilot
                 </div>
-                <div className="text-[10px] text-[#0B1F4B] font-semibold flex items-center gap-1 whitespace-nowrap">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#0B1F4B] animate-pulse shrink-0" />
+                <div className="text-[10px] text-[#051F16] font-semibold flex items-center gap-1 whitespace-nowrap">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#051F16] animate-pulse shrink-0" />
                   Active session · RFQ-2026-0891
                 </div>
               </div>
             </div>
             <div className="flex items-center gap-2 shrink-0">
+              <select
+                value={selectedLanguage}
+                onChange={(e) => setSelectedLanguage(e.target.value as any)}
+                className="text-[11px] font-semibold bg-white border border-slate-200 rounded-full px-2.5 py-1 text-slate-700 outline-none cursor-pointer hover:bg-slate-50"
+                title="Voice & Transcription Language"
+              >
+                <option value="en">English (IN)</option>
+                <option value="hi">हिंदी (Hindi)</option>
+                <option value="ta">தமிழ் (Tamil)</option>
+                <option value="te">తెలుగు (Telugu)</option>
+                <option value="mr">मराठी (Marathi)</option>
+                <option value="gu">ગુજરાતી (Gujarati)</option>
+              </select>
               <button
                 type="button"
                 onClick={handleResetCopilotChat}
@@ -3586,7 +3628,7 @@ export default function StartupFlow({
               </button>
               <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200/80 shadow-2xs">
                 <span>MPI AI</span>
-                <Icons.Sparkles className="w-3.5 h-3.5 text-[#F97316]" />
+                <Icons.Sparkles className="w-3.5 h-3.5 text-emerald-700" />
               </div>
             </div>
           </div>
@@ -3619,7 +3661,7 @@ export default function StartupFlow({
                 <div
                   className={`max-w-[90%] text-xs p-3.5 sm:p-4 rounded-2xl shadow-xs leading-relaxed ${
                     msg.role === "user"
-                      ? "bg-[#0B1F4B] text-white rounded-br-xs"
+                      ? "bg-[#051F16] text-white rounded-br-xs"
                       : "bg-white border border-slate-200/90 text-slate-800 rounded-bl-xs"
                   }`}
                 >
@@ -3631,7 +3673,7 @@ export default function StartupFlow({
                       {msg.role === "ai" && (
                         <div className="mt-2.5 pt-2 border-t border-slate-100">
                           <div className="text-[10px] uppercase font-bold text-slate-500 mb-1.5 flex items-center gap-1.5 tracking-wider">
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#F97316]" />
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#A3F65C]" />
                             <span>What I recommend next:</span>
                           </div>
 
@@ -3656,17 +3698,17 @@ export default function StartupFlow({
                                     navigate(action.screen as Screen)
                                   }
                                 }}
-                                className="group/action text-left px-2.5 py-1.5 rounded-lg bg-slate-50/80 hover:bg-white border border-slate-200/80 hover:border-[#F97316]/50 transition-all cursor-pointer flex items-center justify-between gap-2 shadow-2xs"
+                                className="group/action text-left px-2.5 py-1.5 rounded-lg bg-slate-50/80 hover:bg-white border border-slate-200/80 hover:border-emerald-500/50 transition-all cursor-pointer flex items-center justify-between gap-2 shadow-2xs"
                               >
                                 <div className="min-w-0 flex items-center gap-1.5">
                                   {action.icon && (
                                     <span className="text-[11px] shrink-0">{action.icon}</span>
                                   )}
-                                  <span className="text-[10.5px] font-semibold text-slate-700 group-hover/action:text-[#0B1F4B] truncate leading-tight">
+                                  <span className="text-[10.5px] font-semibold text-slate-700 group-hover/action:text-[#051F16] truncate leading-tight">
                                     {action.label}
                                   </span>
                                 </div>
-                                <Icons.ArrowRight className="w-3 h-3 text-slate-400 group-hover/action:text-[#F97316] shrink-0 transition-transform group-hover/action:translate-x-0.5" />
+                                <Icons.ArrowRight className="w-3 h-3 text-slate-400 group-hover/action:text-emerald-700 shrink-0 transition-transform group-hover/action:translate-x-0.5" />
                               </button>
                             ))}
                           </div>
@@ -3687,10 +3729,10 @@ export default function StartupFlow({
                         onClick={() =>
                           navigate(msg.suggestedNavigation!.screen as Screen)
                         }
-                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#0B1F4B] text-white hover:bg-black transition-colors cursor-pointer shadow-xs"
+                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#051F16] text-white hover:bg-black transition-colors cursor-pointer shadow-xs"
                       >
                         <span>👉 {msg.suggestedNavigation.label}</span>
-                        <Icons.ArrowRight className="w-3 h-3 text-[#F97316]" />
+                        <Icons.ArrowRight className="w-3 h-3 text-emerald-700" />
                       </button>
                     </div>
                   )}
@@ -3714,9 +3756,9 @@ export default function StartupFlow({
             ))}
             {isCopilotTyping && (
               <div className="flex items-center gap-2 text-xs text-slate-500 bg-slate-50 p-3 rounded-xl border border-slate-200 w-fit animate-pulse">
-                <span className="w-2 h-2 rounded-full bg-[#F97316] animate-bounce" />
-                <span className="w-2 h-2 rounded-full bg-[#F97316] animate-bounce [animation-delay:0.2s]" />
-                <span className="w-2 h-2 rounded-full bg-[#F97316] animate-bounce [animation-delay:0.4s]" />
+                <span className="w-2 h-2 rounded-full bg-[#A3F65C] animate-bounce" />
+                <span className="w-2 h-2 rounded-full bg-[#A3F65C] animate-bounce [animation-delay:0.2s]" />
+                <span className="w-2 h-2 rounded-full bg-[#A3F65C] animate-bounce [animation-delay:0.4s]" />
                 <span className="font-medium text-[11px]">
                   MPI procurement support is analyzing market benchmarks & Indian MSME
                   capacity...
@@ -3729,7 +3771,10 @@ export default function StartupFlow({
           {isCopilotVoiceActive && (
             <div className="px-4 py-2 bg-gradient-to-r from-purple-50 via-indigo-50 to-purple-50 border-t border-purple-200 text-purple-900 flex items-center justify-between text-xs animate-fade-in">
               <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping" />
+                <span
+                  className="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping"
+                  style={{ transform: `scale(${1 + copilotAudioLevel / 100})` }}
+                />
                 <span className="font-semibold text-[11px]">
                   {copilotVoiceStatus || "Listening to voice command... Speak clearly."}
                 </span>
@@ -3777,7 +3822,7 @@ export default function StartupFlow({
                 if (e.key === "Enter" && !isCopilotTyping) handleCopilotSend()
               }}
               placeholder="Ask about pricing benchmarks, specs, or speak using the mic..."
-              className="flex-1 text-xs px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-[#0B1F4B] disabled:opacity-60 font-medium"
+              className="flex-1 text-xs px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-[#051F16] disabled:opacity-60 font-medium"
             />
 
             <MPIButton
@@ -3839,7 +3884,7 @@ export default function StartupFlow({
                       key={i}
                       className="flex items-start gap-2 bg-slate-50 p-2 rounded-lg border border-slate-200 text-[11px]"
                     >
-                      <span className="text-[#F97316] font-bold">•</span>
+                      <span className="text-emerald-700 font-bold">•</span>
                       <span>{s}</span>
                     </li>
                   ))}
@@ -3914,7 +3959,7 @@ export default function StartupFlow({
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
           <div>
             <div className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-              <Icons.Award className="w-4 h-4 text-[#0B1F4B]" />
+              <Icons.Award className="w-4 h-4 text-[#051F16]" />
               <span>Multi-Criteria Decision Engine & Formal Award Record</span>
             </div>
             <div className="text-[11px] text-slate-500 mt-0.5">
@@ -3950,7 +3995,7 @@ export default function StartupFlow({
               },
               {
                 name: "Best",
-                badge: "bg-blue-100 text-[#0B1F4B] border-blue-300 font-bold",
+                badge: "bg-emerald-100/60 text-[#051F16] border-emerald-300 font-bold",
                 accent: "Fastest Turnaround",
               },
             ]
@@ -3961,17 +4006,17 @@ export default function StartupFlow({
                 key={q.id}
                 className={`bg-white rounded-2xl border flex flex-col justify-between overflow-hidden transition-all duration-300 shadow-2xs hover:shadow-xl hover:-translate-y-1.5 ${
                   isSelected
-                    ? "border-[#0B1F4B] ring-2 ring-[#0B1F4B] shadow-lg shadow-blue-900/10"
+                    ? "border-[#051F16] ring-2 ring-[#051F16] shadow-lg shadow-blue-900/10"
                     : isTopRecommended
-                      ? "border-[#F97316] ring-2 ring-orange-400/50 shadow-lg shadow-orange-500/10"
+                      ? "border-emerald-500 ring-2 ring-emerald-400/40 shadow-lg shadow-emerald-500/10"
                       : "border-slate-200 hover:border-slate-300"
                 }`}
               >
                 <div>
                   {/* Top recommendation pill */}
                   {isTopRecommended ? (
-                    <div className="bg-[#0B1F4B] text-white text-[10px] font-bold uppercase tracking-wider py-1.5 px-3 text-center flex items-center justify-center gap-1.5">
-                      <Icons.Sparkles className="w-3.5 h-3.5 text-[#F97316]" />
+                    <div className="bg-[#051F16] text-white text-[10px] font-bold uppercase tracking-wider py-1.5 px-3 text-center flex items-center justify-center gap-1.5">
+                      <Icons.Sparkles className="w-3.5 h-3.5 text-emerald-700" />
                       <span>MPI AI Recommended</span>
                     </div>
                   ) : (
@@ -3989,8 +4034,8 @@ export default function StartupFlow({
                             {currentTier.name}
                           </span>
                           {isTopRecommended && (
-                            <span className="text-[10px] font-bold text-[#F97316] bg-orange-50 border border-orange-200 px-1.5 py-0.5 rounded-md flex items-center gap-1">
-                              <Icons.Sparkles className="w-3 h-3 text-[#F97316]" /> Recommended
+                            <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-md flex items-center gap-1">
+                              <Icons.Sparkles className="w-3 h-3 text-emerald-700" /> Recommended
                             </span>
                           )}
                         </div>
@@ -4019,7 +4064,7 @@ export default function StartupFlow({
                     {/* Quoted Total Price */}
                     <div className="mt-3">
                       <div
-                        className="text-2xl font-extrabold text-[#0B1F4B] tracking-tight"
+                        className="text-2xl font-extrabold text-[#051F16] tracking-tight"
                         style={{ fontFamily: "Plus Jakarta Sans" }}
                       >
                         ₹{q.finalLandedCost.toLocaleString("en-IN")}
@@ -4037,7 +4082,7 @@ export default function StartupFlow({
                           ₹{q.baselineCost.toLocaleString("en-IN")}
                         </span>
                       </div>
-                      <div className="flex justify-between font-bold text-[#0B1F4B]">
+                      <div className="flex justify-between font-bold text-[#051F16]">
                         <span>Total Savings:</span>
                         <span className="text-[#D9A400]">
                           ₹{q.totalSavings.toLocaleString("en-IN")} (
@@ -4046,7 +4091,7 @@ export default function StartupFlow({
                       </div>
                       <div className="flex justify-between text-[11px] text-slate-600">
                         <span>Est. Time Saved:</span>
-                        <span className="font-semibold text-[#F97316]">
+                        <span className="font-semibold text-emerald-700">
                           {q.estimatedTimeSaved}
                         </span>
                       </div>
@@ -4108,7 +4153,7 @@ export default function StartupFlow({
                       </div>
                       <div className="bg-slate-50 p-2 rounded-lg">
                         <div className="text-slate-400">Quality Score</div>
-                        <div className="font-bold text-[#0B1F4B]">
+                        <div className="font-bold text-[#051F16]">
                           {q.qualityScore}%
                         </div>
                       </div>
@@ -4152,7 +4197,7 @@ export default function StartupFlow({
                         `Clarification channel opened with ${q.supplierDisplayName} via MPI Escrow Desk. Direct buyer identity remains masked.`,
                       )
                     }
-                    className="w-full text-center text-[11px] text-slate-500 hover:text-[#0B1F4B] py-1 transition-colors cursor-pointer"
+                    className="w-full text-center text-[11px] text-slate-500 hover:text-[#051F16] py-1 transition-colors cursor-pointer"
                   >
                     Ask Clarification (Masked)
                   </button>
@@ -4199,14 +4244,14 @@ export default function StartupFlow({
             value="3"
             change="100% on schedule"
             trend="neutral"
-            icon={<Icons.FileText className="w-4 h-4 text-[#0B1F4B]" />}
+            icon={<Icons.FileText className="w-4 h-4 text-[#051F16]" />}
           />
           <MPIStatCard
             title="Quotes Received"
             value="12"
             change="Avg 4 quotes/RFQ"
             trend="up"
-            icon={<Icons.ShieldCheck className="w-4 h-4 text-[#0B1F4B]" />}
+            icon={<Icons.ShieldCheck className="w-4 h-4 text-[#051F16]" />}
           />
           <MPIStatCard
             title="Total Baseline Savings"
@@ -4220,14 +4265,14 @@ export default function StartupFlow({
             value="5.8 Days"
             change="vs market cycles"
             trend="up"
-            icon={<Icons.Clock className="w-4 h-4 text-[#F97316]" />}
+            icon={<Icons.Clock className="w-4 h-4 text-emerald-700" />}
           />
           <MPIStatCard
             title="Orders in Flight"
             value={ordersList.length.toString()}
             change="2 in production"
             trend="neutral"
-            icon={<Icons.Coins className="w-4 h-4 text-[#0B1F4B]" />}
+            icon={<Icons.Coins className="w-4 h-4 text-[#051F16]" />}
           />
           <MPIStatCard
             title="Escrow Protected"
@@ -4284,7 +4329,7 @@ export default function StartupFlow({
                 <Bar
                   dataKey="landed"
                   name="MPI Landed Price (₹)"
-                  fill="#0B1F4B"
+                  fill="#051F16"
                   radius={[4, 4, 0, 0]}
                 />
               </BarChart>
@@ -4298,7 +4343,7 @@ export default function StartupFlow({
                 <h3 className="text-sm font-bold text-slate-900">
                   Turnaround Velocity Metrics
                 </h3>
-                <span className="text-xs text-[#F97316] font-bold">
+                <span className="text-xs text-emerald-700 font-bold">
                   MPI Fast-Track
                 </span>
               </div>
@@ -4307,13 +4352,13 @@ export default function StartupFlow({
                 <div>
                   <div className="flex justify-between text-xs font-semibold text-slate-700 mb-1">
                     <span>RFQ Specification & Structuring</span>
-                    <span className="text-[#0B1F4B] font-bold">
+                    <span className="text-[#051F16] font-bold">
                       2.4 mins vs 4.5 days
                     </span>
                   </div>
                   <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
                     <div
-                      className="bg-[#0B1F4B] h-full rounded-full"
+                      className="bg-[#051F16] h-full rounded-full"
                       style={{ width: "92%" }}
                     />
                   </div>
@@ -4322,13 +4367,13 @@ export default function StartupFlow({
                 <div>
                   <div className="flex justify-between text-xs font-semibold text-slate-700 mb-1">
                     <span>Verified Supplier Quoting</span>
-                    <span className="text-[#0B1F4B] font-bold">
+                    <span className="text-[#051F16] font-bold">
                       36 hrs vs 14 days
                     </span>
                   </div>
                   <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
                     <div
-                      className="bg-[#F97316] h-full rounded-full"
+                      className="bg-[#051F16] h-full rounded-full"
                       style={{ width: "78%" }}
                     />
                   </div>
@@ -4337,7 +4382,7 @@ export default function StartupFlow({
                 <div>
                   <div className="flex justify-between text-xs font-semibold text-slate-700 mb-1">
                     <span>Commercial PO & Escrow Signoff</span>
-                    <span className="text-[#0B1F4B] font-bold">
+                    <span className="text-[#051F16] font-bold">
                       1 click vs 8 emails
                     </span>
                   </div>
@@ -4386,7 +4431,7 @@ export default function StartupFlow({
                   onClick={() => setOrderFilter(tab)}
                   className={`px-3 py-1 rounded-lg font-semibold transition-all cursor-pointer whitespace-nowrap ${
                     orderFilter === tab
-                      ? "bg-white text-[#0B1F4B] shadow-xs"
+                      ? "bg-white text-[#051F16] shadow-xs"
                       : "text-slate-600 hover:text-slate-900"
                   }`}
                 >
@@ -4417,7 +4462,7 @@ export default function StartupFlow({
                     key={order.id}
                     className="hover:bg-slate-50/60 transition-colors"
                   >
-                    <td className="py-3 px-3 font-mono font-bold text-[#0B1F4B]">
+                    <td className="py-3 px-3 font-mono font-bold text-[#051F16]">
                       {order.id}
                     </td>
                     <td className="py-3 px-3 font-semibold text-slate-900 max-w-xs truncate">
@@ -4427,7 +4472,7 @@ export default function StartupFlow({
                       {order.category}
                     </td>
                     <td className="py-3 px-3">
-                      <span className="font-bold text-[#0B1F4B]">
+                      <span className="font-bold text-[#051F16]">
                         {order.supplierDisplayName}
                       </span>
                     </td>
@@ -4470,11 +4515,11 @@ export default function StartupFlow({
                 <div key={c.cat} className="space-y-1">
                   <div className="flex justify-between text-xs font-semibold text-slate-700">
                     <span>{c.cat}</span>
-                    <span className="text-[#0B1F4B] font-bold">{c.spend}%</span>
+                    <span className="text-[#051F16] font-bold">{c.spend}%</span>
                   </div>
                   <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
                     <div
-                      className="bg-[#0B1F4B] h-full rounded-full"
+                      className="bg-[#051F16] h-full rounded-full"
                       style={{ width: `${c.spend * 2}%` }}
                     />
                   </div>
@@ -4483,9 +4528,9 @@ export default function StartupFlow({
             </div>
           </div>
 
-          <div className="bg-[#0B1F4B] text-white rounded-2xl p-6 shadow-xs flex flex-col justify-between space-y-4">
+          <div className="bg-[#051F16] text-white rounded-2xl p-6 shadow-xs flex flex-col justify-between space-y-4">
             <div>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#123B7A] text-orange-400 text-[10px] font-bold uppercase tracking-wider mb-2">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#0A3525] text-orange-400 text-[10px] font-bold uppercase tracking-wider mb-2">
                 <Icons.Sparkles className="w-3.5 h-3.5" />
                 Sourcing Intelligence
               </div>
@@ -4503,7 +4548,7 @@ export default function StartupFlow({
               </p>
             </div>
 
-            <div className="pt-3 border-t border-[#123B7A] flex justify-between items-center">
+            <div className="pt-3 border-t border-[#0A3525] flex justify-between items-center">
               <span className="text-xs text-slate-400">MPI Algorithm v2.4</span>
               <MPIButton
                 variant="ai"
@@ -4596,7 +4641,7 @@ export default function StartupFlow({
             <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
               ORDER CONTRACT #MPI-PO-8910
             </span>
-            <h3 className="text-lg font-bold text-[#0B1F4B] mt-0.5">
+            <h3 className="text-lg font-bold text-[#051F16] mt-0.5">
               500x Custom Rigid Boxes — MPI Verified Supplier #001
             </h3>
             <div className="text-xs text-slate-500 mt-1 flex items-center gap-3">
@@ -4607,7 +4652,7 @@ export default function StartupFlow({
               <span>•</span>
               <span>
                 Escrow Status:{" "}
-                <strong className="text-[#0B1F4B] font-bold">
+                <strong className="text-[#051F16] font-bold">
                   Funded & Protected
                 </strong>
               </span>
@@ -4666,9 +4711,9 @@ export default function StartupFlow({
                   <div
                     className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-all ${
                       isDone
-                        ? "bg-[#0B1F4B] text-white"
+                        ? "bg-[#051F16] text-white"
                         : isCurrent
-                          ? "bg-[#F97316] text-white ring-4 ring-orange-100 scale-105"
+                          ? "bg-[#051F16] text-white ring-4 ring-orange-100 scale-105"
                           : "bg-white text-slate-400 border-2 border-slate-300"
                     }`}
                   >
@@ -4679,7 +4724,7 @@ export default function StartupFlow({
                     onClick={() => setMilestone(m.step)}
                     className={`flex-1 p-3.5 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-2 cursor-pointer transition-all ${
                       isCurrent
-                        ? "bg-orange-50/40 border-[#F97316]"
+                        ? "bg-emerald-50/40 border-emerald-500"
                         : isDone
                           ? "bg-slate-50/70 border-slate-200"
                           : "bg-white border-slate-200 opacity-60"
@@ -4782,7 +4827,7 @@ export default function StartupFlow({
                     <td className="py-3.5 px-3 font-bold text-[#D9A400]">
                       ₹{item.savingsAmount.toLocaleString("en-IN")}
                     </td>
-                    <td className="py-3.5 px-3 font-semibold text-[#F97316]">
+                    <td className="py-3.5 px-3 font-semibold text-emerald-700">
                       {item.timeSaved}
                     </td>
                     <td className="py-3.5 px-3">
@@ -4818,7 +4863,7 @@ export default function StartupFlow({
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200">
           <div>
             <h3
-              className="text-lg font-extrabold text-[#0B1F4B]"
+              className="text-lg font-extrabold text-[#051F16]"
               style={{ fontFamily: "Plus Jakarta Sans" }}
             >
               My Pre-Production Samples Tracker
@@ -4887,14 +4932,14 @@ export default function StartupFlow({
                   isApproved
                     ? "border-2 border-emerald-500 bg-emerald-50/10"
                     : isUnderReview
-                      ? "border-2 border-[#F97316] bg-orange-50/10"
+                      ? "border-2 border-emerald-500 bg-emerald-50/20"
                       : "border border-slate-200 bg-white"
                 }`}
               >
                 <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                   <div className="space-y-1">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-xs font-mono font-bold text-[#0B1F4B] bg-slate-100 px-2 py-0.5 rounded">
+                      <span className="text-xs font-mono font-bold text-[#051F16] bg-slate-100 px-2 py-0.5 rounded">
                         {sample.id}
                       </span>
                       <span className="text-xs font-bold text-slate-700">
@@ -4906,7 +4951,7 @@ export default function StartupFlow({
                       </span>
                     </div>
 
-                    <h4 className="text-base font-extrabold text-[#0B1F4B]">
+                    <h4 className="text-base font-extrabold text-[#051F16]">
                       {sample.productTitle} ({sample.sampleQuantity} Sample
                       Units)
                     </h4>
@@ -4926,7 +4971,7 @@ export default function StartupFlow({
                             : sample.status === "Dispatched"
                               ? "bg-indigo-100 text-indigo-800 border-indigo-200"
                               : sample.status === "Preparing"
-                                ? "bg-blue-100 text-blue-800 border-blue-200"
+                                ? "bg-emerald-100/60 text-emerald-900 border-emerald-200"
                                 : "bg-slate-100 text-slate-700 border-slate-200"
                       }`}
                     >
@@ -4942,7 +4987,7 @@ export default function StartupFlow({
                 {sample.trackingNumber && (
                   <div className="mt-4 p-3 rounded-xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
                     <div className="flex items-center gap-2">
-                      <Icons.Package className="w-4 h-4 text-blue-600" />
+                      <Icons.Package className="w-4 h-4 text-emerald-700" />
                       <span>
                         Carrier: <strong>{sample.carrierName}</strong> ·
                         Tracking:{" "}
@@ -4956,7 +5001,7 @@ export default function StartupFlow({
                         Delivered on {sample.deliveredDate} ✓
                       </span>
                     ) : (
-                      <span className="text-blue-700 font-bold">
+                      <span className="text-emerald-800 font-bold">
                         Dispatched on {sample.dispatchedDate} (In Transit)
                       </span>
                     )}
@@ -5029,7 +5074,7 @@ export default function StartupFlow({
               Personalized Statutory Scheme Matching
             </span>
             <h3
-              className="text-lg font-extrabold text-[#0B1F4B] mt-1"
+              className="text-lg font-extrabold text-[#051F16] mt-1"
               style={{ fontFamily: "Plus Jakarta Sans" }}
             >
               Government Subsidies & Sourcing Grants for Your Startup
@@ -5051,16 +5096,16 @@ export default function StartupFlow({
 
         {/* Schemes Match Summary */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <div className="bg-white p-6 rounded-2xl border-2 border-[#F97316] ring-2 ring-orange-50 shadow-xs space-y-4">
+          <div className="bg-white p-6 rounded-2xl border-2 border-emerald-500 ring-2 ring-emerald-50 shadow-xs space-y-4">
             <div className="flex justify-between items-start">
-              <span className="text-xs font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+              <span className="text-xs font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
                 O/o DC-MSME · Quality Support
               </span>
-              <span className="text-sm font-extrabold text-[#F97316] bg-orange-50 px-2.5 py-1 rounded-xl border border-orange-200">
+              <span className="text-sm font-extrabold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-xl border border-emerald-200">
                 98% Match
               </span>
             </div>
-            <h4 className="text-base font-extrabold text-[#0B1F4B]">
+            <h4 className="text-base font-extrabold text-[#051F16]">
               ZED Certification Quality Reimbursement Scheme
             </h4>
             <p className="text-xs text-slate-600 leading-relaxed">
@@ -5093,7 +5138,7 @@ export default function StartupFlow({
                   href="https://zed.msme.gov.in"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-xs font-bold text-blue-700 hover:underline flex items-center gap-1 p-1"
+                  className="text-xs font-bold text-emerald-800 hover:underline flex items-center gap-1 p-1"
                 >
                   <Icons.ExternalLink className="w-3.5 h-3.5" />
                 </a>
@@ -5103,14 +5148,14 @@ export default function StartupFlow({
 
           <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-4">
             <div className="flex justify-between items-start">
-              <span className="text-xs font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+              <span className="text-xs font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
                 DC-MSME · Design Clinic
               </span>
-              <span className="text-sm font-extrabold text-[#0B1F4B] bg-blue-50 px-2.5 py-1 rounded-xl border border-blue-200">
+              <span className="text-sm font-extrabold text-[#051F16] bg-emerald-50 px-2.5 py-1 rounded-xl border border-emerald-200">
                 92% Match
               </span>
             </div>
-            <h4 className="text-base font-extrabold text-[#0B1F4B]">
+            <h4 className="text-base font-extrabold text-[#051F16]">
               Design Clinic Sourcing Assistance Scheme
             </h4>
             <p className="text-xs text-slate-600 leading-relaxed">
@@ -5142,7 +5187,7 @@ export default function StartupFlow({
                   href="https://designclinicsmsme.org"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-xs font-bold text-blue-700 hover:underline flex items-center gap-1 p-1"
+                  className="text-xs font-bold text-emerald-800 hover:underline flex items-center gap-1 p-1"
                 >
                   <Icons.ExternalLink className="w-3.5 h-3.5" />
                 </a>
@@ -5162,10 +5207,10 @@ export default function StartupFlow({
   return renderShell(
     <div className="space-y-6">
       {/* ─── TRY A SAMPLE BEFORE YOUR BULK ORDER CARD ───────────────────────── */}
-      <div className="bg-linear-to-r from-[#0B1F4B] to-[#123B7A] rounded-2xl p-6 text-white shadow-lg border border-blue-400/20 flex flex-col md:flex-row md:items-center justify-between gap-5">
+      <div className="bg-linear-to-r from-[#051F16] to-[#0A3525] rounded-2xl p-6 text-white shadow-lg border border-blue-400/20 flex flex-col md:flex-row md:items-center justify-between gap-5">
         <div className="space-y-1.5">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-[10px] font-extrabold uppercase tracking-wider bg-[#F97316] text-white px-2.5 py-0.5 rounded-full">
+            <span className="text-[10px] font-extrabold uppercase tracking-wider bg-[#051F16] text-white px-2.5 py-0.5 rounded-full">
               Zero Production Risk
             </span>
             <span className="text-xs text-[#FFF7D6] font-semibold">
@@ -5244,7 +5289,7 @@ export default function StartupFlow({
                     {sup.category} · {sup.city}, {sup.state}
                   </div>
                 </div>
-                <span className="text-xs font-bold text-[#0B1F4B] bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                <span className="text-xs font-bold text-[#051F16] bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
                   {sup.matchScore}% Fit
                 </span>
               </div>
@@ -5276,7 +5321,7 @@ export default function StartupFlow({
             <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
               <button
                 onClick={() => setSelectedSupplierDetail(sup)}
-                className="text-xs text-[#0B1F4B] font-semibold hover:underline cursor-pointer"
+                className="text-xs text-[#051F16] font-semibold hover:underline cursor-pointer"
               >
                 View Match
               </button>

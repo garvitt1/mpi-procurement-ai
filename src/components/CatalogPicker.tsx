@@ -60,7 +60,7 @@ export function CatalogPicker({
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Filter solutions (e.g., custom cartons, 3D printing, QA testing)..."
-          className="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-200 text-sm outline-none transition-all focus:border-blue-600 focus:ring-2 focus:ring-blue-100 bg-white text-slate-900 placeholder:text-slate-400"
+          className="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-200 text-sm outline-none transition-all focus:border-[#051F16] focus:ring-2 focus:ring-emerald-100 bg-white text-slate-900 placeholder:text-slate-400"
         />
       </div>
 
@@ -75,7 +75,7 @@ export function CatalogPicker({
               onClick={() => setCategory(cat)}
               className={`text-xs px-3 py-1 rounded-md border font-medium transition-all ${
                 isActive
-                  ? "bg-slate-900 text-white border-slate-900 shadow-2xs font-semibold"
+                  ? "bg-[#051F16] text-[#A3F65C] border-[#051F16] shadow-2xs font-semibold"
                   : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900"
               }`}
             >
@@ -96,7 +96,7 @@ export function CatalogPicker({
               onClick={() => onToggle(service.id)}
               className={`text-left p-3.5 rounded-xl border transition-all ${
                 isSelected
-                  ? "border-blue-600 bg-blue-50/50 shadow-xs ring-1 ring-blue-600/30"
+                  ? "border-[#051F16] bg-emerald-50/50 shadow-xs ring-1 ring-[#051F16]/30"
                   : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/60"
               }`}
             >
@@ -107,7 +107,7 @@ export function CatalogPicker({
                 <div
                   className={`w-5 h-5 rounded-md flex items-center justify-center shrink-0 border transition-colors ${
                     isSelected
-                      ? "bg-blue-600 border-blue-600 text-white"
+                      ? "bg-[#051F16] border-[#051F16] text-[#A3F65C]"
                       : "bg-white border-slate-300"
                   }`}
                 >

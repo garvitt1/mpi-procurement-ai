@@ -24,9 +24,9 @@ export default function Landing({ navigate, goBack, canGoBack }: NavProps) {
         "Verified supplier directory",
       ],
       cta: "Enter as Startup",
-      color: "#0F2744",
-      badgeClass: "bg-blue-50 text-blue-700 border-blue-200",
-      btnClass: "bg-[#0F2744] hover:bg-[#1E3A8A] text-white",
+      color: "#051F16",
+      badgeClass: "bg-emerald-50 text-emerald-800 border-emerald-200",
+      btnClass: "bg-[#051F16] hover:bg-[#083A28] text-white",
     },
     {
       key: "msme",
@@ -41,9 +41,9 @@ export default function Landing({ navigate, goBack, canGoBack }: NavProps) {
         "Real-time proposal tracker",
       ],
       cta: "Enter as MSME",
-      color: "#EA580C",
-      badgeClass: "bg-orange-50 text-orange-700 border-orange-200",
-      btnClass: "bg-[#EA580C] hover:bg-[#C2410C] text-white",
+      color: "#051F16",
+      badgeClass: "bg-emerald-50 text-emerald-800 border-emerald-200",
+      btnClass: "bg-[#051F16] hover:bg-[#083A28] text-white",
     },
     {
       key: "admin",
@@ -109,8 +109,8 @@ export default function Landing({ navigate, goBack, canGoBack }: NavProps) {
         <div
           className={`animate-fade-in-up delay-100 ${show ? "" : "opacity-0"}`}
         >
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200/80 text-blue-700 text-xs font-semibold mb-6 shadow-2xs">
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse" />
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold mb-6 shadow-2xs">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
             AI-Powered B2B Procurement Intelligence
           </div>
         </div>
@@ -126,7 +126,7 @@ export default function Landing({ navigate, goBack, canGoBack }: NavProps) {
             style={{ fontFamily: "Plus Jakarta Sans" }}
           >
             Enterprise Procurement,{" "}
-            <span className="text-blue-600">Accelerated by AI.</span>
+            <span className="text-emerald-700">Accelerated by AI.</span>
           </h1>
           <p className="text-base md:text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed">
             Connect high-growth startups with vetted MSME manufacturers and

@@ -20,7 +20,6 @@ import {
 const Cell = (RechartsModule as unknown as { Cell: React.ComponentType<{ key?: string; fill?: string; stroke?: string; strokeWidth?: number }> }).Cell
 import {
   runAIAnalyticsSynthesis,
-  hasLiveAIConfigured,
   forecastDemandAndPriceWithAI,
   MacroForecastResult,
 } from "../../services/aiService"
@@ -236,7 +235,7 @@ export function AIInsightsDetailPage({ goBack }: DetailPageProps) {
             <div className="neo-card-sage p-6 relative overflow-hidden">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
-                  <div className="w-2.5 h-2.5 rounded-full bg-[#0B1F4B] animate-pulse" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-[#051F16] animate-pulse" />
                   <span className="text-xs font-semibold uppercase tracking-wider text-stone-700">
                     Generative AI Engine Active
                   </span>
@@ -334,7 +333,7 @@ export function AIInsightsDetailPage({ goBack }: DetailPageProps) {
                   </div>
                   <div className="w-full h-2 bg-stone-100 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-[#0B1F4B] rounded-full"
+                      className="h-full bg-[#051F16] rounded-full"
                       style={{ width: "98.1%" }}
                     />
                   </div>
@@ -349,7 +348,7 @@ export function AIInsightsDetailPage({ goBack }: DetailPageProps) {
                   </div>
                   <div className="w-full h-2 bg-stone-100 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-blue-500 rounded-full"
+                      className="h-full bg-emerald-500 rounded-full"
                       style={{ width: "92.8%" }}
                     />
                   </div>
@@ -462,7 +461,7 @@ export function AIInsightsDetailPage({ goBack }: DetailPageProps) {
                     title: "Implement Automated RFQ Clustering for Packaging",
                     desc: "Group carton and label orders into bi-weekly batches to reduce freight and tooling setup charges.",
                     tag: "Quick Win",
-                    color: "text-blue-700 bg-blue-50 border-blue-200",
+                    color: "text-emerald-800 bg-emerald-50 border-emerald-200",
                   },
                   {
                     title:
@@ -510,7 +509,7 @@ export function AIInsightsDetailPage({ goBack }: DetailPageProps) {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-3xl border border-stone-200/80 shadow-xs">
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-extrabold uppercase tracking-wider bg-[#0B1F4B] text-white px-2.5 py-0.5 rounded-full">
+                <span className="text-[10px] font-extrabold uppercase tracking-wider bg-[#051F16] text-white px-2.5 py-0.5 rounded-full">
                   Blueprint Items 49, 50, 56, 57
                 </span>
                 <span className="text-xs font-bold text-stone-500">
@@ -571,12 +570,12 @@ export function AIInsightsDetailPage({ goBack }: DetailPageProps) {
               <div>
                 <div className="flex items-center justify-between pb-3 border-b border-stone-100">
                   <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-blue-600" />
+                    <div className="w-2 h-2 rounded-full bg-emerald-600" />
                     <h3 className="text-sm font-bold text-stone-900">
                       Demand Forecasting (Item 49)
                     </h3>
                   </div>
-                  <span className="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200">
+                  <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
                     Quarterly ML Bands
                   </span>
                 </div>
@@ -648,7 +647,7 @@ export function AIInsightsDetailPage({ goBack }: DetailPageProps) {
                             pf.trendDirection === "Softening"
                               ? "bg-emerald-50 text-emerald-800 border-emerald-200"
                               : pf.trendDirection === "Stable"
-                              ? "bg-blue-50 text-blue-800 border-blue-200"
+                              ? "bg-emerald-50 text-blue-800 border-emerald-200"
                               : "bg-amber-50 text-amber-800 border-amber-200"
                           }`}
                         >
@@ -765,7 +764,7 @@ export function AIInsightsDetailPage({ goBack }: DetailPageProps) {
                     <span className="text-[10px] font-semibold text-stone-500 uppercase tracking-wider block">
                       Avoided Costs
                     </span>
-                    <div className="text-base font-extrabold text-blue-700 mt-1">
+                    <div className="text-base font-extrabold text-emerald-800 mt-1">
                       ₹{macroForecast.savingsMeasurement.avoidedNegotiationCosts.toLocaleString("en-IN")}
                     </div>
                     <span className="text-[10px] text-stone-400 mt-0.5 block">
@@ -931,7 +930,7 @@ export function TotalSalesDetailPage({ goBack }: DetailPageProps) {
             <div className="text-2xl md:text-3xl font-extrabold text-stone-900 mt-1">
               90,744
             </div>
-            <span className="text-[11px] font-semibold text-[#0B1F4B] flex items-center gap-1 mt-1">
+            <span className="text-[11px] font-semibold text-[#051F16] flex items-center gap-1 mt-1">
               ↑ +14.2% YoY
             </span>
           </div>
@@ -955,7 +954,7 @@ export function TotalSalesDetailPage({ goBack }: DetailPageProps) {
             <div className="text-2xl md:text-3xl font-extrabold text-stone-900 mt-1">
               ₹1.57 Lakh
             </div>
-            <span className="text-[11px] font-semibold text-blue-600 mt-1">
+            <span className="text-[11px] font-semibold text-emerald-700 mt-1">
               Stable margin
             </span>
           </div>
@@ -967,7 +966,7 @@ export function TotalSalesDetailPage({ goBack }: DetailPageProps) {
             <div className="text-2xl md:text-3xl font-extrabold text-stone-900 mt-1">
               98.6%
             </div>
-            <span className="text-[11px] font-semibold text-[#0B1F4B] mt-1">
+            <span className="text-[11px] font-semibold text-[#051F16] mt-1">
               On-time delivery
             </span>
           </div>
@@ -1015,7 +1014,7 @@ export function TotalSalesDetailPage({ goBack }: DetailPageProps) {
                           <p className="font-bold">
                             {payload[0].payload.month}
                           </p>
-                          <p className="text-[#F97316] font-bold">
+                          <p className="text-[#A3F65C] font-bold">
                             {payload[0].value} units
                           </p>
                         </div>
@@ -1108,7 +1107,7 @@ export function TotalSalesDetailPage({ goBack }: DetailPageProps) {
                           row.status === "Delivered"
                             ? "bg-[#FFF7D6] text-[#8C6B00] border border-yellow-300"
                             : row.status === "In Transit"
-                              ? "bg-blue-50 text-blue-700 border border-blue-200"
+                              ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
                               : "bg-amber-50 text-amber-700 border border-amber-200"
                         }`}
                       >
@@ -1199,7 +1198,7 @@ export function RevenueComparisonDetailPage({ goBack }: DetailPageProps) {
             </div>
             <div className="flex items-center gap-4 text-xs">
               <span className="flex items-center gap-1.5 font-medium text-stone-700">
-                <span className="w-3 h-3 rounded-full bg-blue-600" /> 2023
+                <span className="w-3 h-3 rounded-full bg-emerald-600" /> 2023
                 Actual
               </span>
               <span className="flex items-center gap-1.5 font-medium text-stone-500">
@@ -1413,7 +1412,7 @@ export function SalesTrendDetailPage({ goBack }: DetailPageProps) {
                             Index: {payload[0].value}
                           </p>
                           {payload[0].payload.highlight && (
-                            <p className="text-[#F97316] font-bold">
+                            <p className="text-[#A3F65C] font-bold">
                               10,230 Max Peak
                             </p>
                           )}
@@ -1431,7 +1430,7 @@ export function SalesTrendDetailPage({ goBack }: DetailPageProps) {
                   dot={{ r: 3, fill: "#0F172A" }}
                   activeDot={{
                     r: 6,
-                    fill: "#F97316",
+                    fill: "#A3F65C",
                     stroke: "#0F172A",
                     strokeWidth: 2,
                   }}
@@ -1443,7 +1442,7 @@ export function SalesTrendDetailPage({ goBack }: DetailPageProps) {
           {/* Scrubber Gradient Line */}
           <div className="mt-4 pt-4 border-t border-stone-100 flex items-center justify-between text-xs text-stone-500">
             <span>Low Volatility Zone</span>
-            <div className="w-1/2 h-2 rounded-full bg-gradient-to-r from-[#D9A400] via-[#F97316] to-[#0B1F4B]" />
+            <div className="w-1/2 h-2 rounded-full bg-gradient-to-r from-emerald-400 via-emerald-600 to-[#051F16]" />
             <span>Optimal Procurement Band</span>
           </div>
         </div>
@@ -1904,7 +1903,7 @@ export function PulseLiveFeedPage({ goBack }: DetailPageProps) {
               <div className="flex items-center justify-between mt-2 text-xs">
                 <span
                   className={`font-bold ${
-                    t.trend === "up" ? "text-[#0B1F4B]" : "text-rose-600"
+                    t.trend === "up" ? "text-[#051F16]" : "text-rose-600"
                   }`}
                 >
                   {t.change}
@@ -1954,7 +1953,7 @@ export function PulseLiveFeedPage({ goBack }: DetailPageProps) {
                       <strong className="text-stone-800">{item.budget}</strong>
                     </span>
                     <span>•</span>
-                    <span className="text-blue-600 font-semibold">
+                    <span className="text-emerald-700 font-semibold">
                       {item.bids}
                     </span>
                   </div>
@@ -1994,7 +1993,7 @@ export function DataCatalogPage({ goBack }: DetailPageProps) {
             <div className="text-3xl font-extrabold text-stone-900 mt-1">
               1,420
             </div>
-            <span className="text-xs text-[#0B1F4B] font-bold">
+            <span className="text-xs text-[#051F16] font-bold">
               100% ZED / ISO Audited
             </span>
           </div>
@@ -2018,7 +2017,7 @@ export function DataCatalogPage({ goBack }: DetailPageProps) {
             <div className="text-3xl font-extrabold text-stone-900 mt-1">
               94.8%
             </div>
-            <span className="text-xs text-blue-600 font-semibold">
+            <span className="text-xs text-emerald-700 font-semibold">
               Ready for Global Sourcing
             </span>
           </div>
@@ -2297,14 +2296,14 @@ export function MessagesPage({ goBack }: DetailPageProps) {
           {/* Chat Header */}
           <div className="flex items-center justify-between pb-4 border-b border-stone-100">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-full bg-[#0B1F4B] text-white font-bold flex items-center justify-center text-xs">
+              <div className="w-8 h-8 rounded-full bg-[#051F16] text-white font-bold flex items-center justify-center text-xs">
                 PC
               </div>
               <div>
                 <h3 className="text-sm font-bold text-stone-900">
                   PrecisionCraft CNC Solutions
                 </h3>
-                <span className="text-[10px] text-[#0B1F4B] font-semibold">
+                <span className="text-[10px] text-[#051F16] font-semibold">
                   ● Online • Verified MSME
                 </span>
               </div>
@@ -2482,13 +2481,13 @@ export function SupportPage({ goBack }: DetailPageProps) {
             </p>
             <div className="space-y-2 text-xs text-stone-700 mb-6">
               <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-[#0B1F4B]" />
+                <span className="w-2 h-2 rounded-full bg-[#051F16]" />
                 <span>
                   Average Response Time: <strong>&lt; 3 minutes</strong>
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-blue-500" />
+                <span className="w-2 h-2 rounded-full bg-emerald-500" />
                 <span>
                   Dedicated Technical Escalation: <strong>Available</strong>
                 </span>
@@ -2588,7 +2587,7 @@ export function AccountProfilePage({ goBack }: DetailPageProps) {
             </div>
             <div className="p-3.5 rounded-2xl bg-stone-50 border border-stone-200/60">
               <span className="text-stone-500">Escrow Security Status</span>
-              <div className="font-bold text-[#0B1F4B] mt-0.5">
+              <div className="font-bold text-[#051F16] mt-0.5">
                 Active & Insured (ICICI Bank)
               </div>
             </div>

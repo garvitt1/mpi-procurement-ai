@@ -29,7 +29,6 @@ import {
   AdminCopilotContext,
   analyzeModelFairnessWithAI,
   ModelFairnessReport,
-  hasLiveAIConfigured,
 } from "../../services/aiService"
 import MaterialIcon from "../../components/ui/MaterialIcon"
 import { MPI_AI_CAPABILITIES } from "../../services/ai/capabilityRegistry"
@@ -117,7 +116,7 @@ export default function AdminFlow({
 
   // ─── BLUEPRINT AI CAPABILITIES ─────────────────────────────────────────────
   // Items 54 & 55: Risk & Suspicious Pattern Flags & Duplicate Invoice Detection
-  const [adminTransactions, setAdminTransactions] = useState([
+  const [adminTransactions] = useState([
     {
       id: "TXN-0918",
       startup: "TechNova Innovations",
@@ -246,13 +245,6 @@ Select a quick analysis pill below or ask me any question!`,
   ])
   const [adminCopilotInput, setAdminCopilotInput] = useState("")
   const [isAdminCopilotTyping, setIsAdminCopilotTyping] = useState(false)
-  const [adminCopilotActions, setAdminCopilotActions] = useState<AdminCopilotReply["prioritizedActions"]>([
-    { title: "Review 4 incomplete MSME profiles in Peenya", category: "Audit Queue", urgency: "Immediate", targetId: "MSME-002", actionScreen: "admin.msmes", actionLabel: "Review MSMEs" },
-    { title: "Escrow release check for TechNova (TXN-0918)", category: "Escrow Triage", urgency: "High", targetId: "TXN-0918", actionScreen: "admin.transactions", actionLabel: "Forensic Audit" },
-  ])
-  const [adminBottlenecks, setAdminBottlenecks] = useState<string[]>([
-    "Sample drop-test QA reviews averaging 3.8 days vs 2-day target SLA",
-  ])
 
   const handleResetAdminCopilot = () => {
     setAdminCopilotMessages([
@@ -410,12 +402,6 @@ Select a quick analysis pill below or ask me any question!`,
           suggestions: res.suggestedQueries,
         },
       ])
-      if (res.prioritizedActions && res.prioritizedActions.length > 0) {
-        setAdminCopilotActions(res.prioritizedActions)
-      }
-      if (res.bottlenecksIdentified && res.bottlenecksIdentified.length > 0) {
-        setAdminBottlenecks(res.bottlenecksIdentified)
-      }
     } catch (err) {
       console.warn("Admin copilot error:", err)
       setAdminCopilotMessages((prev) => [
@@ -792,7 +778,7 @@ Select a quick analysis pill below or ask me any question!`,
                 {currentScreen !== "admin.home" && (
                   <>
                     <span>/</span>
-                    <span className="text-[#0B1220] font-semibold truncate max-w-[120px] sm:max-w-[200px]">
+                    <span className="text-[#0B1220] font-semibold truncate max-w-30 sm:max-w-[200px]">
                       {title}
                     </span>
                   </>
@@ -805,6 +791,11 @@ Select a quick analysis pill below or ask me any question!`,
               >
                 {title}
               </div>
+              {subtitle && (
+                <div className="text-[11px] text-slate-500 truncate hidden sm:block">
+                  {subtitle}
+                </div>
+              )}
             </div>
           </div>
 
@@ -837,9 +828,9 @@ Select a quick analysis pill below or ask me any question!`,
 
             <button
               onClick={() => setIsAdminCopilotOpen(true)}
-              className="flex items-center gap-1.5 bg-[#0B1F4B] hover:bg-[#123B7A] text-white px-3 py-1.5 rounded-full text-xs font-bold transition-colors cursor-pointer shadow-xs border border-blue-400/20"
+              className="flex items-center gap-1.5 bg-[#051F16] hover:bg-[#083A28] text-white px-3 py-1.5 rounded-full text-xs font-bold transition-colors cursor-pointer shadow-xs border border-emerald-500/20"
             >
-              <Icons.Sparkles className="w-3.5 h-3.5 text-[#F97316]" />
+              <Icons.Sparkles className="w-3.5 h-3.5 text-[#A3F65C]" />
               <span className="hidden sm:inline">Admin Copilot</span>
             </button>
 
@@ -872,7 +863,7 @@ Select a quick analysis pill below or ask me any question!`,
 
         {/* Action notification toast */}
         {actionSuccessMessage && (
-          <div className="bg-[#0B1F4B] text-white text-xs py-2.5 px-4 text-center font-semibold animate-fade-in shadow-md border-b border-orange-500">
+          <div className="bg-[#051F16] text-white text-xs py-2.5 px-4 text-center font-semibold animate-fade-in shadow-md border-b border-emerald-600">
             {actionSuccessMessage}
           </div>
         )}
@@ -939,18 +930,122 @@ Select a quick analysis pill below or ask me any question!`,
         </div>
       )}
 
+      {/* FORENSIC RISK AUDIT MODAL */}
+      {selectedTxForAudit && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs animate-fade-in">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+            <div className="flex items-start justify-between pb-2 border-b border-slate-100">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold uppercase tracking-wider text-rose-800 bg-rose-100 px-2 py-0.5 rounded-full border border-rose-300">
+                    AI Forensic Audit
+                  </span>
+                  <span className="text-xs font-mono text-slate-500">{selectedTxForAudit.id}</span>
+                </div>
+                <h3 className="text-base font-bold text-slate-900 mt-1">
+                  Transaction Anomaly Inspection
+                </h3>
+              </div>
+              <button
+                onClick={() => {
+                  setSelectedTxForAudit(null)
+                  setRiskAuditResult(null)
+                }}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 cursor-pointer"
+              >
+                <Icons.Close className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-3 text-xs">
+              <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
+                <div className="flex justify-between">
+                  <span className="text-slate-500">Startup Buyer:</span>
+                  <span className="font-bold text-slate-900">{selectedTxForAudit.startup}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-500">MSME Supplier:</span>
+                  <span className="font-bold text-slate-900">{selectedTxForAudit.msme}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-500">Escrow Value:</span>
+                  <span className="font-bold text-slate-900">₹{selectedTxForAudit.amount.toLocaleString("en-IN")}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-500">Invoice ID:</span>
+                  <span className="font-mono text-slate-700">{selectedTxForAudit.invoiceId}</span>
+                </div>
+              </div>
+
+              {isAuditingRisk ? (
+                <div className="p-6 text-center space-y-2">
+                  <div className="w-8 h-8 border-3 border-emerald-600 border-t-transparent rounded-full animate-spin mx-auto" />
+                  <p className="text-slate-600 font-semibold">Running forensic anomaly detection models...</p>
+                </div>
+              ) : riskAuditResult ? (
+                <div className="space-y-3">
+                  <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-rose-900">Forensic Risk Score:</span>
+                      <span className="font-extrabold text-sm text-rose-700">
+                        {riskAuditResult.fraudRiskScore} / 100 ({riskAuditResult.overallRiskLevel} Risk)
+                      </span>
+                    </div>
+                    <p className="text-slate-700">{riskAuditResult.auditSummary}</p>
+                    {riskAuditResult.suspiciousFlags && riskAuditResult.suspiciousFlags.length > 0 && (
+                      <div className="pt-2 border-t border-rose-200/80 space-y-1.5">
+                        <span className="font-bold text-rose-900 text-[11px]">Identified Anomaly Flags:</span>
+                        <div className="space-y-1 text-[11px] text-slate-700">
+                          {riskAuditResult.suspiciousFlags.map((flag, idx) => (
+                            <div key={idx} className="bg-white/80 p-2 rounded-lg border border-rose-100">
+                              <span className="font-semibold text-rose-800">[{flag.severity}] </span>
+                              <span>{flag.description}</span>
+                              <div className="text-[10px] text-emerald-800 font-medium mt-0.5">
+                                → Action: {flag.recommendation}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  {riskAuditResult.duplicateInvoiceDetected && (
+                    <div className="p-2.5 bg-purple-50 border border-purple-200 rounded-xl text-purple-900 font-semibold text-xs">
+                      ⚠ Duplicate Invoice Match Flagged: Requires statutory clearance before payout.
+                    </div>
+                  )}
+                </div>
+              ) : null}
+            </div>
+
+            <div className="pt-3 border-t border-slate-100 flex items-center justify-end">
+              <MPIButton
+                variant="primary"
+                size="sm"
+                onClick={() => {
+                  setSelectedTxForAudit(null)
+                  setRiskAuditResult(null)
+                }}
+              >
+                Close Audit
+              </MPIButton>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* PERSISTENT FLOATING ADMIN COPILOT TRIGGER */}
       <button
         type="button"
         onClick={() => setIsAdminCopilotOpen(true)}
-        className="fixed bottom-6 right-6 z-40 flex items-center gap-2.5 bg-[#0B1F4B] hover:bg-[#123B7A] text-white px-4 py-3 rounded-full shadow-2xl border border-blue-400/40 hover:scale-105 transition-all cursor-pointer group"
+        className="fixed bottom-6 right-6 z-40 flex items-center gap-2.5 bg-[#051F16] hover:bg-[#083A28] text-white px-4 py-3 rounded-full shadow-2xl border border-emerald-500/30 hover:scale-105 transition-all cursor-pointer group"
         title="Open MPI Admin Operations Copilot"
       >
         <div className="relative">
-          <Icons.Sparkles className="w-5 h-5 text-[#F97316]" />
+          <Icons.Sparkles className="w-5 h-5 text-[#A3F65C]" />
         </div>
         <span className="text-xs font-bold pr-1">Admin Copilot</span>
-        <span className="text-[10px] font-mono bg-blue-900/80 text-orange-300 px-2 py-0.5 rounded-full border border-blue-400/20">
+        <span className="text-[10px] font-mono bg-blue-900/80 text-orange-300 px-2 py-0.5 rounded-full border border-emerald-500/20">
           ⚡ MPI AI
         </span>
       </button>
@@ -960,9 +1055,9 @@ Select a quick analysis pill below or ask me any question!`,
         <div className="fixed inset-0 z-50 flex justify-end bg-slate-950/60 backdrop-blur-xs animate-fade-in">
           <div className="w-full max-w-2xl bg-white h-full shadow-2xl flex flex-col border-l border-slate-200 animate-slide-left">
             {/* Drawer Header */}
-            <div className="bg-[#0B1F4B] text-white p-5 border-b border-[#123B7A] flex items-center justify-between shrink-0">
+            <div className="bg-[#051F16] text-white p-5 border-b border-[#0A3525] flex items-center justify-between shrink-0">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-[#F97316] text-white flex items-center justify-center font-bold shadow-md">
+                <div className="w-9 h-9 rounded-xl bg-[#A3F65C] text-[#051F16] flex items-center justify-center font-bold shadow-md">
                   <Icons.Sparkles className="w-5 h-5" />
                 </div>
                 <div>
@@ -987,7 +1082,7 @@ Select a quick analysis pill below or ask me any question!`,
                 <button
                   type="button"
                   onClick={handleResetAdminCopilot}
-                  className="text-[11px] text-slate-300 hover:text-white px-2.5 py-1 rounded-lg hover:bg-[#123B7A] transition-colors cursor-pointer border border-blue-400/20"
+                  className="text-[11px] text-slate-300 hover:text-white px-2.5 py-1 rounded-lg hover:bg-[#083A28] transition-colors cursor-pointer border border-emerald-500/20"
                   title="Reset conversation"
                 >
                   Clear Session
@@ -995,7 +1090,7 @@ Select a quick analysis pill below or ask me any question!`,
                 <button
                   type="button"
                   onClick={() => setIsAdminCopilotOpen(false)}
-                  className="p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-[#123B7A] cursor-pointer"
+                  className="p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-[#083A28] cursor-pointer"
                   aria-label="Close Admin Copilot"
                 >
                   <Icons.Close className="w-5 h-5" />
@@ -1024,7 +1119,7 @@ Select a quick analysis pill below or ask me any question!`,
                   }}
                   className={`text-xs px-2.5 py-1 rounded-lg font-semibold whitespace-nowrap transition-all cursor-pointer border ${
                     adminCopilotTab === pill.id
-                      ? "bg-[#0B1F4B] text-white border-[#0B1F4B] shadow-xs"
+                      ? "bg-[#051F16] text-white border-[#051F16] shadow-xs"
                       : "bg-white text-slate-700 border-slate-200 hover:border-slate-300 hover:bg-slate-100"
                   }`}
                 >
@@ -1049,14 +1144,14 @@ Select a quick analysis pill below or ask me any question!`,
                   <div
                     className={`max-w-[92%] rounded-2xl p-4 text-xs ${
                       msg.role === "user"
-                        ? "bg-[#0B1F4B] text-white rounded-tr-xs"
+                        ? "bg-[#051F16] text-white rounded-tr-xs"
                         : "bg-slate-50 border border-slate-200 text-slate-800 rounded-tl-xs space-y-3"
                     }`}
                   >
                     {/* Category pill if AI message */}
                     {msg.role === "ai" && msg.category && (
                       <div className="flex items-center justify-between pb-1 border-b border-slate-200/80">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#0B1F4B] bg-blue-100/70 px-2 py-0.5 rounded-md">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#051F16] bg-emerald-100/60/70 px-2 py-0.5 rounded-md">
                           {msg.category}
                         </span>
                         {msg.isLive && (
@@ -1085,7 +1180,7 @@ Select a quick analysis pill below or ask me any question!`,
                             <span className="text-[10px] text-slate-500 font-medium block truncate">
                               {met.label}
                             </span>
-                            <span className="text-sm font-bold text-[#0B1F4B] block mt-0.5">
+                            <span className="text-sm font-bold text-[#051F16] block mt-0.5">
                               {met.value}
                             </span>
                             {met.change && (
@@ -1118,7 +1213,7 @@ Select a quick analysis pill below or ask me any question!`,
                                         ? "bg-rose-100 text-rose-800 border border-rose-200"
                                         : act.urgency === "High"
                                           ? "bg-amber-100 text-amber-800 border border-amber-200"
-                                          : "bg-blue-100 text-blue-800 border border-blue-200"
+                                          : "bg-emerald-100/60 text-blue-800 border border-emerald-200"
                                     }`}
                                   >
                                     {act.urgency}
@@ -1139,7 +1234,7 @@ Select a quick analysis pill below or ask me any question!`,
                                     navigate(act.actionScreen as Screen)
                                     setIsAdminCopilotOpen(false)
                                   }}
-                                  className="shrink-0 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-[#0B1F4B] text-white hover:bg-black transition-colors cursor-pointer"
+                                  className="shrink-0 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-[#051F16] text-white hover:bg-black transition-colors cursor-pointer"
                                 >
                                   {act.actionLabel || "Execute →"}
                                 </button>
@@ -1177,7 +1272,7 @@ Select a quick analysis pill below or ask me any question!`,
                               key={sIdx}
                               type="button"
                               onClick={() => handleSendAdminCopilot(sug)}
-                              className="text-[10px] font-medium bg-white text-slate-700 px-2.5 py-1 rounded-lg border border-slate-200 hover:border-[#0B1F4B] hover:text-[#0B1F4B] transition-all cursor-pointer text-left"
+                              className="text-[10px] font-medium bg-white text-slate-700 px-2.5 py-1 rounded-lg border border-slate-200 hover:border-[#051F16] hover:text-[#051F16] transition-all cursor-pointer text-left"
                             >
                               👉 {sug}
                             </button>
@@ -1191,10 +1286,10 @@ Select a quick analysis pill below or ask me any question!`,
 
               {isAdminCopilotTyping && (
                 <div className="flex items-center gap-2 text-xs text-slate-500 bg-slate-50 p-3 rounded-xl border border-slate-200 w-fit animate-pulse">
-                  <span className="w-2 h-2 rounded-full bg-[#F97316] animate-bounce" />
-                  <span className="w-2 h-2 rounded-full bg-[#F97316] animate-bounce [animation-delay:0.2s]" />
-                  <span className="w-2 h-2 rounded-full bg-[#F97316] animate-bounce [animation-delay:0.4s]" />
-                  <span className="font-semibold text-[11px] text-[#0B1F4B]">
+                  <span className="w-2 h-2 rounded-full bg-[#A3F65C] animate-bounce" />
+                  <span className="w-2 h-2 rounded-full bg-[#A3F65C] animate-bounce [animation-delay:0.2s]" />
+                  <span className="w-2 h-2 rounded-full bg-[#A3F65C] animate-bounce [animation-delay:0.4s]" />
+                  <span className="font-semibold text-[11px] text-[#051F16]">
                     Synthesizing ecosystem telemetry via MPI AI Engine...
                   </span>
                 </div>
@@ -1215,16 +1310,16 @@ Select a quick analysis pill below or ask me any question!`,
                   value={adminCopilotInput}
                   onChange={(e) => setAdminCopilotInput(e.target.value)}
                   placeholder="Ask about buyers, suppliers, RFQs, SLA rates, or audit queue..."
-                  className="flex-1 text-xs px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#0B1F4B] focus:border-transparent"
+                  className="flex-1 text-xs px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#051F16] focus:border-transparent"
                   disabled={isAdminCopilotTyping}
                 />
                 <button
                   type="submit"
                   disabled={isAdminCopilotTyping || !adminCopilotInput.trim()}
-                  className="px-4 py-2.5 bg-[#0B1F4B] hover:bg-[#123B7A] text-white text-xs font-bold rounded-xl transition-all disabled:opacity-50 cursor-pointer flex items-center gap-1.5 shrink-0"
+                  className="px-4 py-2.5 bg-[#051F16] hover:bg-[#083A28] text-white text-xs font-bold rounded-xl transition-all disabled:opacity-50 cursor-pointer flex items-center gap-1.5 shrink-0"
                 >
                   <span>Query</span>
-                  <Icons.ArrowRight className="w-3.5 h-3.5 text-[#F97316]" />
+                  <Icons.ArrowRight className="w-3.5 h-3.5 text-[#A3F65C]" />
                 </button>
               </div>
               <div className="flex items-center justify-between text-[10px] text-slate-400 px-1">
@@ -1251,28 +1346,28 @@ Select a quick analysis pill below or ask me any question!`,
             value="₹48.6 Cr"
             change="+₹3.7 Cr this month"
             trend="up"
-            icon={<Icons.Coins className="w-4 h-4 text-[#0B1F4B]" />}
+            icon={<Icons.Coins className="w-4 h-4 text-[#051F16]" />}
           />
           <MPIStatCard
             title="Active Startups"
             value={`${demoStartups.length} Registered`}
             change="55 Demo Records"
             trend="up"
-            icon={<Icons.Users className="w-4 h-4 text-[#0B1F4B]" />}
+            icon={<Icons.Users className="w-4 h-4 text-[#051F16]" />}
           />
           <MPIStatCard
             title="Verified MSMEs"
             value={`${demoMSMEs.length} Suppliers`}
             change="55 Demo Records"
             trend="up"
-            icon={<Icons.ShieldCheck className="w-4 h-4 text-[#0B1F4B]" />}
+            icon={<Icons.ShieldCheck className="w-4 h-4 text-[#051F16]" />}
           />
           <MPIStatCard
             title="Pending Audits"
             value={(pendingStartups.length + pendingMSMEs.length).toString()}
             change="Action required"
             trend="down"
-            icon={<Icons.AlertCircle className="w-4 h-4 text-[#F97316]" />}
+            icon={<Icons.AlertCircle className="w-4 h-4 text-emerald-700" />}
           />
           <MPIStatCard
             title="Fulfillment Multiplier"
@@ -1286,15 +1381,15 @@ Select a quick analysis pill below or ask me any question!`,
             value="96.4%"
             change="Model v2.4 Active"
             trend="up"
-            icon={<Icons.Sparkles className="w-4 h-4 text-[#0B1F4B]" />}
+            icon={<Icons.Sparkles className="w-4 h-4 text-[#051F16]" />}
           />
         </div>
 
         {/* 1 MSME : 50 ORDERS FULFILLMENT RATIO CARD */}
-        <div className="bg-[#0B1F4B] text-white rounded-2xl p-6 shadow-md border border-[#123B7A]">
+        <div className="bg-[#051F16] text-white rounded-2xl p-6 shadow-md border border-[#0A3525]">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
             <div className="max-w-xl space-y-2">
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#123B7A] text-[#F97316] text-[10px] font-bold uppercase tracking-wider">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#0A3525] text-[#A3F65C] text-[10px] font-bold uppercase tracking-wider">
                 <Icons.Sparkles className="w-3.5 h-3.5" />
                 Network Multiplier Metric
               </div>
@@ -1314,9 +1409,9 @@ Select a quick analysis pill below or ask me any question!`,
             </div>
 
             {/* Visual Diagram */}
-            <div className="bg-[#123B7A]/70 border border-blue-400/20 p-5 rounded-2xl flex flex-col items-center justify-center min-w-65 text-center space-y-3">
-              <div className="flex items-center gap-2 bg-[#0B1F4B] px-3.5 py-2 rounded-xl border border-blue-400/30">
-                <div className="w-7 h-7 rounded-lg bg-[#F97316] text-white flex items-center justify-center font-bold text-xs">
+            <div className="bg-[#0A3525]/70 border border-emerald-500/20 p-5 rounded-2xl flex flex-col items-center justify-center min-w-65 text-center space-y-3">
+              <div className="flex items-center gap-2 bg-[#051F16] px-3.5 py-2 rounded-xl border border-emerald-500/30">
+                <div className="w-7 h-7 rounded-lg bg-[#A3F65C] text-[#051F16] flex items-center justify-center font-bold text-xs">
                   1
                 </div>
                 <div className="text-xs font-bold text-white text-left">
@@ -1344,7 +1439,7 @@ Select a quick analysis pill below or ask me any question!`,
                 </span>
               </div>
 
-              <div className="flex items-center gap-2 bg-[#0B1F4B] px-3.5 py-2 rounded-xl border border-blue-400/30">
+              <div className="flex items-center gap-2 bg-[#051F16] px-3.5 py-2 rounded-xl border border-emerald-500/30">
                 <div className="w-7 h-7 rounded-lg bg-[#D9A400] text-slate-950 flex items-center justify-center font-bold text-xs">
                   50
                 </div>
@@ -1363,13 +1458,13 @@ Select a quick analysis pill below or ask me any question!`,
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div
             onClick={() => navigate("admin.startup-management")}
-            className="p-5 bg-white rounded-2xl border border-slate-200 hover:border-[#0B1F4B] cursor-pointer transition-all shadow-xs group"
+            className="p-5 bg-white rounded-2xl border border-slate-200 hover:border-[#051F16] cursor-pointer transition-all shadow-xs group"
           >
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-bold text-[#0B1F4B] bg-blue-50 px-2.5 py-1 rounded-md">
+              <span className="text-xs font-bold text-[#051F16] bg-emerald-50 px-2.5 py-1 rounded-md">
                 Demo Startup Data (55 Records)
               </span>
-              <Icons.ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-[#0B1F4B] transition-colors" />
+              <Icons.ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-[#051F16] transition-colors" />
             </div>
             <h4 className="text-base font-bold text-slate-900">
               Manage Startups Directory →
@@ -1382,13 +1477,13 @@ Select a quick analysis pill below or ask me any question!`,
 
           <div
             onClick={() => navigate("admin.msme-management")}
-            className="p-5 bg-white rounded-2xl border border-slate-200 hover:border-[#0B1F4B] cursor-pointer transition-all shadow-xs group"
+            className="p-5 bg-white rounded-2xl border border-slate-200 hover:border-[#051F16] cursor-pointer transition-all shadow-xs group"
           >
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-bold text-[#0B1F4B] bg-blue-50 px-2.5 py-1 rounded-md">
+              <span className="text-xs font-bold text-[#051F16] bg-emerald-50 px-2.5 py-1 rounded-md">
                 Demo Supplier Data (55 Records)
               </span>
-              <Icons.ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-[#0B1F4B] transition-colors" />
+              <Icons.ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-[#051F16] transition-colors" />
             </div>
             <h4 className="text-base font-bold text-slate-900">
               Manage Verified MSMEs Directory →
@@ -1412,7 +1507,7 @@ Select a quick analysis pill below or ask me any question!`,
                   Monthly gross transaction value in ₹ Crores
                 </p>
               </div>
-              <span className="text-xs font-bold text-[#0B1F4B] bg-blue-50 px-2 py-0.5 rounded">
+              <span className="text-xs font-bold text-[#051F16] bg-emerald-50 px-2 py-0.5 rounded">
                 +41% MoM
               </span>
             </div>
@@ -1421,8 +1516,8 @@ Select a quick analysis pill below or ask me any question!`,
               <AreaChart data={growthTrend}>
                 <defs>
                   <linearGradient id="adminGrd" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#0B1F4B" stopOpacity={0.2} />
-                    <stop offset="95%" stopColor="#0B1F4B" stopOpacity={0} />
+                    <stop offset="5%" stopColor="#051F16" stopOpacity={0.2} />
+                    <stop offset="95%" stopColor="#051F16" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <XAxis
@@ -1435,7 +1530,7 @@ Select a quick analysis pill below or ask me any question!`,
                 <Area
                   type="monotone"
                   dataKey="gmv"
-                  stroke="#0B1F4B"
+                  stroke="#051F16"
                   strokeWidth={2.5}
                   fill="url(#adminGrd)"
                 />
@@ -1460,7 +1555,7 @@ Select a quick analysis pill below or ask me any question!`,
                   </div>
                   <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
                     <div
-                      className="bg-[#0B1F4B] h-full rounded-full"
+                      className="bg-[#051F16] h-full rounded-full"
                       style={{ width: `${c.volume * 2}%` }}
                     />
                   </div>
@@ -1488,21 +1583,21 @@ Select a quick analysis pill below or ask me any question!`,
             value="₹48.6 Cr"
             change="+₹3.7 Cr this month"
             trend="up"
-            icon={<Icons.Coins className="w-4 h-4 text-[#0B1F4B]" />}
+            icon={<Icons.Coins className="w-4 h-4 text-[#051F16]" />}
           />
           <MPIStatCard
             title="Startups Count"
             value="55"
             change="Demo Startup Data"
             trend="up"
-            icon={<Icons.Users className="w-4 h-4 text-[#0B1F4B]" />}
+            icon={<Icons.Users className="w-4 h-4 text-[#051F16]" />}
           />
           <MPIStatCard
             title="Verified MSMEs"
             value="55"
             change="Demo Supplier Data"
             trend="up"
-            icon={<Icons.ShieldCheck className="w-4 h-4 text-[#0B1F4B]" />}
+            icon={<Icons.ShieldCheck className="w-4 h-4 text-[#051F16]" />}
           />
           <MPIStatCard
             title="Fulfillment Ratio"
@@ -1516,22 +1611,22 @@ Select a quick analysis pill below or ask me any question!`,
             value="₹42.1 Cr"
             change="100% Protected"
             trend="neutral"
-            icon={<Icons.Award className="w-4 h-4 text-[#0B1F4B]" />}
+            icon={<Icons.Award className="w-4 h-4 text-[#051F16]" />}
           />
           <MPIStatCard
             title="AI Match Score"
             value="96.4%"
             change="Model v2.4"
             trend="up"
-            icon={<Icons.Sparkles className="w-4 h-4 text-[#F97316]" />}
+            icon={<Icons.Sparkles className="w-4 h-4 text-emerald-700" />}
           />
         </div>
 
         {/* 1 MSME : 50 ORDERS FULFILLMENT RATIO CARD */}
-        <div className="bg-[#0B1F4B] text-white rounded-2xl p-6 shadow-md border border-[#123B7A]">
+        <div className="bg-[#051F16] text-white rounded-2xl p-6 shadow-md border border-[#0A3525]">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
             <div className="max-w-xl space-y-2">
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#123B7A] text-[#F97316] text-[10px] font-bold uppercase tracking-wider">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#0A3525] text-[#A3F65C] text-[10px] font-bold uppercase tracking-wider">
                 <Icons.Sparkles className="w-3.5 h-3.5" />
                 Network Multiplier Metric
               </div>
@@ -1551,9 +1646,9 @@ Select a quick analysis pill below or ask me any question!`,
             </div>
 
             {/* Visual Diagram */}
-            <div className="bg-[#123B7A]/70 border border-blue-400/20 p-5 rounded-2xl flex flex-col items-center justify-center min-w-[260px] text-center space-y-3">
-              <div className="flex items-center gap-2 bg-[#0B1F4B] px-3.5 py-2 rounded-xl border border-blue-400/30">
-                <div className="w-7 h-7 rounded-lg bg-[#F97316] text-white flex items-center justify-center font-bold text-xs">
+            <div className="bg-[#0A3525]/70 border border-emerald-500/20 p-5 rounded-2xl flex flex-col items-center justify-center min-w-65 text-center space-y-3">
+              <div className="flex items-center gap-2 bg-[#051F16] px-3.5 py-2 rounded-xl border border-emerald-500/30">
+                <div className="w-7 h-7 rounded-lg bg-[#A3F65C] text-[#051F16] flex items-center justify-center font-bold text-xs">
                   1
                 </div>
                 <div className="text-xs font-bold text-white text-left">
@@ -1581,7 +1676,7 @@ Select a quick analysis pill below or ask me any question!`,
                 </span>
               </div>
 
-              <div className="flex items-center gap-2 bg-[#0B1F4B] px-3.5 py-2 rounded-xl border border-blue-400/30">
+              <div className="flex items-center gap-2 bg-[#051F16] px-3.5 py-2 rounded-xl border border-emerald-500/30">
                 <div className="w-7 h-7 rounded-lg bg-[#D9A400] text-slate-950 flex items-center justify-center font-bold text-xs">
                   50
                 </div>
@@ -1600,13 +1695,13 @@ Select a quick analysis pill below or ask me any question!`,
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div
             onClick={() => navigate("admin.startup-management")}
-            className="p-5 bg-white rounded-2xl border border-slate-200 hover:border-[#0B1F4B] cursor-pointer transition-all shadow-xs group"
+            className="p-5 bg-white rounded-2xl border border-slate-200 hover:border-[#051F16] cursor-pointer transition-all shadow-xs group"
           >
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-bold text-[#0B1F4B] bg-blue-50 px-2.5 py-1 rounded-md">
+              <span className="text-xs font-bold text-[#051F16] bg-emerald-50 px-2.5 py-1 rounded-md">
                 Demo Startup Data (55 Records)
               </span>
-              <Icons.ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-[#0B1F4B] transition-colors" />
+              <Icons.ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-[#051F16] transition-colors" />
             </div>
             <h4 className="text-base font-bold text-slate-900">
               Manage Startups Directory →
@@ -1619,13 +1714,13 @@ Select a quick analysis pill below or ask me any question!`,
 
           <div
             onClick={() => navigate("admin.msme-management")}
-            className="p-5 bg-white rounded-2xl border border-slate-200 hover:border-[#0B1F4B] cursor-pointer transition-all shadow-xs group"
+            className="p-5 bg-white rounded-2xl border border-slate-200 hover:border-[#051F16] cursor-pointer transition-all shadow-xs group"
           >
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-bold text-[#0B1F4B] bg-blue-50 px-2.5 py-1 rounded-md">
+              <span className="text-xs font-bold text-[#051F16] bg-emerald-50 px-2.5 py-1 rounded-md">
                 Demo Supplier Data (55 Records)
               </span>
-              <Icons.ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-[#0B1F4B] transition-colors" />
+              <Icons.ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-[#051F16] transition-colors" />
             </div>
             <h4 className="text-base font-bold text-slate-900">
               Manage Verified MSMEs Directory →
@@ -1656,7 +1751,7 @@ Select a quick analysis pill below or ask me any question!`,
                 onClick={() => setAuditTab("startups")}
                 className={`px-3 py-1 rounded-lg font-semibold transition-all cursor-pointer ${
                   auditTab === "startups"
-                    ? "bg-white text-[#0B1F4B] shadow-xs"
+                    ? "bg-white text-[#051F16] shadow-xs"
                     : "text-slate-600"
                 }`}
               >
@@ -1666,7 +1761,7 @@ Select a quick analysis pill below or ask me any question!`,
                 onClick={() => setAuditTab("msmes")}
                 className={`px-3 py-1 rounded-lg font-semibold transition-all cursor-pointer ${
                   auditTab === "msmes"
-                    ? "bg-white text-[#0B1F4B] shadow-xs"
+                    ? "bg-white text-[#051F16] shadow-xs"
                     : "text-slate-600"
                 }`}
               >
@@ -1691,7 +1786,7 @@ Select a quick analysis pill below or ask me any question!`,
                       <span className="text-[10px] font-mono text-slate-400">
                         {s.id}
                       </span>
-                      <span className="text-[10px] bg-blue-50 text-[#0B1F4B] px-1.5 py-0.2 rounded font-semibold">
+                      <span className="text-[10px] bg-emerald-50 text-[#051F16] px-1.5 py-0.2 rounded font-semibold">
                         {s.industry}
                       </span>
                     </div>
@@ -1750,7 +1845,7 @@ Select a quick analysis pill below or ask me any question!`,
                       <span className="text-[10px] font-mono text-slate-400">
                         {m.udyamNumber}
                       </span>
-                      <span className="text-[10px] bg-blue-50 text-[#0B1F4B] px-1.5 py-0.2 rounded font-semibold">
+                      <span className="text-[10px] bg-emerald-50 text-[#051F16] px-1.5 py-0.2 rounded font-semibold">
                         {m.category}
                       </span>
                     </div>
@@ -1814,7 +1909,7 @@ Select a quick analysis pill below or ask me any question!`,
               <h3 className="text-base font-bold text-slate-900">
                 Startups Directory
               </h3>
-              <span className="text-xs font-bold bg-blue-50 text-[#0B1F4B] px-2.5 py-0.5 rounded-full border border-blue-200">
+              <span className="text-xs font-bold bg-emerald-50 text-[#051F16] px-2.5 py-0.5 rounded-full border border-emerald-200">
                 Demo Startup Data ({filteredStartups.length} /{" "}
                 {demoStartups.length} Records)
               </span>
@@ -1833,7 +1928,7 @@ Select a quick analysis pill below or ask me any question!`,
             value={startupSearch}
             onChange={(e) => setStartupSearch(e.target.value)}
             placeholder="Search startups by name, ID, city, or industry..."
-            className="flex-1 text-xs px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-[#0B1F4B]"
+            className="flex-1 text-xs px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-[#051F16]"
           />
           <div className="flex items-center gap-2 overflow-x-auto text-xs">
             {([
@@ -1848,7 +1943,7 @@ Select a quick analysis pill below or ask me any question!`,
                 onClick={() => setStartupStatusFilter(tab)}
                 className={`px-3 py-1.5 rounded-xl font-semibold transition-all cursor-pointer whitespace-nowrap ${
                   startupStatusFilter === tab
-                    ? "bg-[#0B1F4B] text-white"
+                    ? "bg-[#051F16] text-white"
                     : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                 }`}
               >
@@ -1860,7 +1955,7 @@ Select a quick analysis pill below or ask me any question!`,
 
         {/* Table of 55 Demo Startups */}
         <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
-          <div className="overflow-x-auto max-h-[600px] overflow-y-auto">
+          <div className="overflow-x-auto max-h-150 overflow-y-auto">
             <table className="w-full text-left text-xs">
               <thead className="sticky top-0 bg-slate-50/95 backdrop-blur-xs border-b border-slate-200 z-10 text-slate-400 font-bold uppercase tracking-wider text-[10px]">
                 <tr>
@@ -1883,7 +1978,7 @@ Select a quick analysis pill below or ask me any question!`,
                     key={s.id}
                     className="hover:bg-slate-50/70 transition-colors"
                   >
-                    <td className="py-3 px-4 font-mono font-bold text-[#0B1F4B]">
+                    <td className="py-3 px-4 font-mono font-bold text-[#051F16]">
                       {s.id}
                     </td>
                     <td className="py-3 px-3 font-bold text-slate-900">
@@ -1899,7 +1994,7 @@ Select a quick analysis pill below or ask me any question!`,
                       </span>
                     </td>
                     <td className="py-3 px-3">
-                      <span className="text-[10px] font-semibold text-[#0B1F4B] bg-blue-50 px-2 py-0.5 rounded">
+                      <span className="text-[10px] font-semibold text-[#051F16] bg-emerald-50 px-2 py-0.5 rounded">
                         {s.registrationStatus}
                       </span>
                     </td>
@@ -1933,7 +2028,7 @@ Select a quick analysis pill below or ask me any question!`,
                           Approve
                         </MPIButton>
                       ) : (
-                        <span className="text-xs text-[#0B1F4B] font-semibold">
+                        <span className="text-xs text-[#051F16] font-semibold">
                           Active
                         </span>
                       )}
@@ -1962,7 +2057,7 @@ Select a quick analysis pill below or ask me any question!`,
               <h3 className="text-base font-bold text-slate-900">
                 Verified MSME Manufacturers
               </h3>
-              <span className="text-xs font-bold bg-blue-50 text-[#0B1F4B] px-2.5 py-0.5 rounded-full border border-blue-200">
+              <span className="text-xs font-bold bg-emerald-50 text-[#051F16] px-2.5 py-0.5 rounded-full border border-emerald-200">
                 Demo Supplier Data ({filteredMSMEs.length} / {demoMSMEs.length}{" "}
                 Records)
               </span>
@@ -1981,7 +2076,7 @@ Select a quick analysis pill below or ask me any question!`,
             value={msmeSearch}
             onChange={(e) => setMsmeSearch(e.target.value)}
             placeholder="Search MSMEs by name, ID, city, or Udyam number..."
-            className="flex-1 text-xs px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-[#0B1F4B]"
+            className="flex-1 text-xs px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-[#051F16]"
           />
           <div className="flex items-center gap-2 overflow-x-auto text-xs">
             <select
@@ -2001,7 +2096,7 @@ Select a quick analysis pill below or ask me any question!`,
 
         {/* Table of 55 Demo MSMEs */}
         <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
-          <div className="overflow-x-auto max-h-[600px] overflow-y-auto">
+          <div className="overflow-x-auto max-h-150 overflow-y-auto">
             <table className="w-full text-left text-xs">
               <thead className="sticky top-0 bg-slate-50/95 backdrop-blur-xs border-b border-slate-200 z-10 text-slate-400 font-bold uppercase tracking-wider text-[10px]">
                 <tr>
@@ -2024,7 +2119,7 @@ Select a quick analysis pill below or ask me any question!`,
                     key={m.id}
                     className="hover:bg-slate-50/70 transition-colors"
                   >
-                    <td className="py-3 px-4 font-mono font-bold text-[#0B1F4B]">
+                    <td className="py-3 px-4 font-mono font-bold text-[#051F16]">
                       {m.id}
                     </td>
                     <td className="py-3 px-3 font-bold text-slate-900">
@@ -2043,7 +2138,7 @@ Select a quick analysis pill below or ask me any question!`,
                     <td className="py-3 px-3 font-semibold text-slate-800">
                       {m.ordersCount}
                     </td>
-                    <td className="py-3 px-3 font-bold text-[#0B1F4B]">
+                    <td className="py-3 px-3 font-bold text-[#051F16]">
                       {m.fulfillmentRate}%
                     </td>
                     <td className="py-3 px-3 font-bold text-slate-900">
@@ -2070,7 +2165,7 @@ Select a quick analysis pill below or ask me any question!`,
                           Approve
                         </MPIButton>
                       ) : (
-                        <span className="text-xs text-[#0B1F4B] font-semibold">
+                        <span className="text-xs text-[#051F16] font-semibold">
                           Verified
                         </span>
                       )}
@@ -2168,7 +2263,7 @@ Select a quick analysis pill below or ask me any question!`,
                 Real-time parameters governing startup-to-MSME matching weights.
               </p>
             </div>
-            <span className="text-xs font-mono font-bold bg-blue-50 text-blue-800 px-2.5 py-1 rounded-lg">
+            <span className="text-xs font-mono font-bold bg-emerald-50 text-blue-800 px-2.5 py-1 rounded-lg">
               Model v2.4-Production
             </span>
           </div>
@@ -2178,7 +2273,7 @@ Select a quick analysis pill below or ask me any question!`,
             <div>
               <div className="flex justify-between text-xs font-bold text-slate-700 mb-1">
                 <span>Technical Tolerances & Machine Fit Weight:</span>
-                <span className="text-[#0B1F4B]">{weights.tolerances}%</span>
+                <span className="text-[#051F16]">{weights.tolerances}%</span>
               </div>
               <input
                 type="range"
@@ -2188,14 +2283,14 @@ Select a quick analysis pill below or ask me any question!`,
                 onChange={(e) =>
                   setWeights({ ...weights, tolerances: Number(e.target.value) })
                 }
-                className="w-full accent-[#0B1F4B] cursor-pointer"
+                className="w-full accent-[#051F16] cursor-pointer"
               />
             </div>
 
             <div>
               <div className="flex justify-between text-xs font-bold text-slate-700 mb-1">
                 <span>Turnaround & Lead Time Feasibility:</span>
-                <span className="text-[#0B1F4B]">{weights.leadTime}%</span>
+                <span className="text-[#051F16]">{weights.leadTime}%</span>
               </div>
               <input
                 type="range"
@@ -2205,14 +2300,14 @@ Select a quick analysis pill below or ask me any question!`,
                 onChange={(e) =>
                   setWeights({ ...weights, leadTime: Number(e.target.value) })
                 }
-                className="w-full accent-[#0B1F4B] cursor-pointer"
+                className="w-full accent-[#051F16] cursor-pointer"
               />
             </div>
 
             <div>
               <div className="flex justify-between text-xs font-bold text-slate-700 mb-1">
                 <span>Price Competitiveness & Reverse Margin:</span>
-                <span className="text-[#0B1F4B]">{weights.pricing}%</span>
+                <span className="text-[#051F16]">{weights.pricing}%</span>
               </div>
               <input
                 type="range"
@@ -2222,14 +2317,14 @@ Select a quick analysis pill below or ask me any question!`,
                 onChange={(e) =>
                   setWeights({ ...weights, pricing: Number(e.target.value) })
                 }
-                className="w-full accent-[#0B1F4B] cursor-pointer"
+                className="w-full accent-[#051F16] cursor-pointer"
               />
             </div>
 
             <div>
               <div className="flex justify-between text-xs font-bold text-slate-700 mb-1">
                 <span>ZED & Statutory Compliance Pass:</span>
-                <span className="text-[#0B1F4B]">{weights.compliance}%</span>
+                <span className="text-[#051F16]">{weights.compliance}%</span>
               </div>
               <input
                 type="range"
@@ -2239,7 +2334,7 @@ Select a quick analysis pill below or ask me any question!`,
                 onChange={(e) =>
                   setWeights({ ...weights, compliance: Number(e.target.value) })
                 }
-                className="w-full accent-[#0B1F4B] cursor-pointer"
+                className="w-full accent-[#051F16] cursor-pointer"
               />
             </div>
           </div>
@@ -2274,7 +2369,7 @@ Select a quick analysis pill below or ask me any question!`,
                 </span>
                 <span className="text-xs text-slate-400 font-mono">Statistical Drift & Quota Governance</span>
               </div>
-              <h3 className="text-base font-extrabold text-[#0B1F4B] mt-1">
+              <h3 className="text-base font-extrabold text-[#051F16] mt-1">
                 Model Fairness, Drift & Supplier Outcome Governance
               </h3>
               <p className="text-xs text-slate-500">
@@ -2286,7 +2381,7 @@ Select a quick analysis pill below or ask me any question!`,
               size="sm"
               onClick={handleRunFairnessAudit}
               isLoading={isAuditingFairness}
-              icon={<Icons.Sparkles className="w-3.5 h-3.5 text-[#F97316]" />}
+              icon={<Icons.Sparkles className="w-3.5 h-3.5 text-[#A3F65C]" />}
             >
               {fairnessReport ? "Re-Run Fairness Audit" : "Run AI Fairness Audit"}
             </MPIButton>
@@ -2295,7 +2390,7 @@ Select a quick analysis pill below or ask me any question!`,
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
             <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
               <span className="text-slate-400 text-[10px] block">Fairness Index</span>
-              <div className="text-xl font-extrabold text-[#0B1F4B] mt-0.5">
+              <div className="text-xl font-extrabold text-[#051F16] mt-0.5">
                 {fairnessReport ? `${fairnessReport.fairnessIndex}%` : "96%"}
               </div>
               <span className="text-[10px] text-emerald-700 font-bold">✓ Audit Pass</span>
@@ -2332,36 +2427,36 @@ Select a quick analysis pill below or ask me any question!`,
               <div>
                 <div className="flex justify-between text-[11px] text-slate-600 mb-0.5">
                   <span>Micro Enterprises (Turnover &lt; ₹5 Cr)</span>
-                  <span className="font-bold text-[#0B1F4B]">38% (Statutory Target: 35%)</span>
+                  <span className="font-bold text-[#051F16]">38% (Statutory Target: 35%)</span>
                 </div>
                 <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
-                  <div className="bg-[#0B1F4B] h-2 rounded-full" style={{ width: "38%" }} />
+                  <div className="bg-[#051F16] h-2 rounded-full" style={{ width: "38%" }} />
                 </div>
               </div>
               <div>
                 <div className="flex justify-between text-[11px] text-slate-600 mb-0.5">
                   <span>Small Enterprises (Turnover ₹5 Cr – ₹50 Cr)</span>
-                  <span className="font-bold text-[#0B1F4B]">44% (Statutory Target: 45%)</span>
+                  <span className="font-bold text-[#051F16]">44% (Statutory Target: 45%)</span>
                 </div>
                 <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
-                  <div className="bg-blue-600 h-2 rounded-full" style={{ width: "44%" }} />
+                  <div className="bg-emerald-600 h-2 rounded-full" style={{ width: "44%" }} />
                 </div>
               </div>
               <div>
                 <div className="flex justify-between text-[11px] text-slate-600 mb-0.5">
                   <span>Medium Enterprises (Turnover ₹50 Cr – ₹250 Cr)</span>
-                  <span className="font-bold text-[#0B1F4B]">18% (Statutory Target: 20%)</span>
+                  <span className="font-bold text-[#051F16]">18% (Statutory Target: 20%)</span>
                 </div>
                 <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
-                  <div className="bg-blue-400 h-2 rounded-full" style={{ width: "18%" }} />
+                  <div className="bg-emerald-400 h-2 rounded-full" style={{ width: "18%" }} />
                 </div>
               </div>
             </div>
           </div>
 
           {fairnessReport && (
-            <div className="p-3.5 bg-blue-50/70 border border-blue-200 rounded-xl text-xs space-y-1">
-              <span className="font-bold text-[#0B1F4B]">AI Governance Directive:</span>
+            <div className="p-3.5 bg-emerald-50/70 border border-emerald-200 rounded-xl text-xs space-y-1">
+              <span className="font-bold text-[#051F16]">AI Governance Directive:</span>
               <p className="text-slate-700 leading-relaxed">{fairnessReport.governanceRecommendation}</p>
             </div>
           )}
@@ -2389,7 +2484,7 @@ Select a quick analysis pill below or ask me any question!`,
               <span className="text-xs font-mono bg-emerald-100/80 text-emerald-800 font-bold px-2.5 py-1 rounded-lg">
                 38 Available
               </span>
-              <span className="text-xs font-mono bg-blue-100/80 text-blue-800 font-bold px-2.5 py-1 rounded-lg">
+              <span className="text-xs font-mono bg-emerald-100/60/80 text-blue-800 font-bold px-2.5 py-1 rounded-lg">
                 12 Beta
               </span>
               <span className="text-xs font-mono bg-slate-100 text-slate-700 font-bold px-2.5 py-1 rounded-lg">
@@ -2438,7 +2533,7 @@ Select a quick analysis pill below or ask me any question!`,
           </div>
 
           {/* Capabilities Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[500px] overflow-y-auto pr-1">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-125 overflow-y-auto pr-1">
             {Object.values(MPI_AI_CAPABILITIES)
               .filter((cap) => {
                 if (capCategoryFilter !== "all" && cap.category !== capCategoryFilter) return false
@@ -2476,7 +2571,7 @@ Select a quick analysis pill below or ask me any question!`,
                           isAvailable
                             ? "bg-emerald-100 text-emerald-800"
                             : isBeta
-                            ? "bg-blue-100 text-blue-800"
+                            ? "bg-emerald-100/60 text-blue-800"
                             : "bg-slate-200 text-slate-700"
                         }`}
                       >
@@ -2532,7 +2627,7 @@ Select a quick analysis pill below or ask me any question!`,
             settlements
           </p>
         </div>
-        <span className="text-xs text-[#0B1F4B] font-mono font-bold bg-blue-50 px-2.5 py-1 rounded-md">
+        <span className="text-xs text-[#051F16] font-mono font-bold bg-emerald-50 px-2.5 py-1 rounded-md">
           100% Escrow Protected
         </span>
       </div>
@@ -2579,7 +2674,7 @@ Select a quick analysis pill below or ask me any question!`,
                   variant="outline"
                   size="sm"
                   onClick={() => handleRunRiskAudit(tx)}
-                  icon={<Icons.ShieldCheck className="w-3.5 h-3.5 text-[#F97316]" />}
+                  icon={<Icons.ShieldCheck className="w-3.5 h-3.5 text-emerald-700" />}
                 >
                   AI Forensic Audit
                 </MPIButton>

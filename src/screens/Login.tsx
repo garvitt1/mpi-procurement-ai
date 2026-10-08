@@ -32,9 +32,9 @@ const ROLE_META: Record<RoleKey, RoleMeta> = {
     shortLabel: "Startup",
     sub: "Buyers & Procurers",
     desc: "Find verified MPI suppliers, compare quotes, and generate decision-ready RFQs.",
-    color: "#0F2744",
-    bg: "#F8FAFC",
-    softBg: "#EFF6FF",
+    color: "#051F16",
+    bg: "#FAFAFC",
+    softBg: "#ECFDF5",
     panelTitle: "Turn specifications into verified procurement.",
     panelCopy:
       "Use MPI AI to convert natural-language project needs into verified MSME matches, automated quote comparisons, and structured RFQs.",
@@ -47,17 +47,17 @@ const ROLE_META: Record<RoleKey, RoleMeta> = {
       <svg width="22" height="22" viewBox="0 0 28 28" fill="none">
         <path
           d="M14 4L22 9V19L14 24L6 19V9L14 4Z"
-          stroke="#0F2744"
+          stroke="#051F16"
           strokeWidth="2"
           fill="none"
         />
         <path
           d="M14 4V24M6 9L22 9M6 19L22 19"
-          stroke="#2563EB"
+          stroke="#A3F65C"
           strokeWidth="1.4"
           strokeDasharray="2 2"
         />
-        <circle cx="14" cy="14" r="3" fill="#0F2744" />
+        <circle cx="14" cy="14" r="3" fill="#051F16" />
       </svg>
     ),
   },
@@ -66,9 +66,9 @@ const ROLE_META: Record<RoleKey, RoleMeta> = {
     shortLabel: "MSME",
     sub: "Manufacturers & Providers",
     desc: "Manage your verified profile, showcase capabilities, and respond to high-intent opportunities.",
-    color: "#EA580C",
-    bg: "#FFFBF5",
-    softBg: "#FFF7ED",
+    color: "#051F16",
+    bg: "#FAFAFC",
+    softBg: "#F0FDF4",
     panelTitle: "Make your production capacity discoverable.",
     panelCopy:
       "Showcase your machinery, earn the MPI Verified trust badge, and receive matched procurement inquiries from ambitious startups.",
@@ -85,17 +85,17 @@ const ROLE_META: Record<RoleKey, RoleMeta> = {
           width="20"
           height="14"
           rx="2"
-          stroke="#EA580C"
+          stroke="#051F16"
           strokeWidth="2"
           fill="none"
         />
         <path
           d="M9 10V7C9 5.34 11.24 4 14 4C16.76 4 19 5.34 19 7V10"
-          stroke="#EA580C"
+          stroke="#051F16"
           strokeWidth="2"
           strokeLinecap="round"
         />
-        <circle cx="14" cy="17" r="2.5" fill="#EA580C" />
+        <circle cx="14" cy="17" r="2.5" fill="#A3F65C" />
       </svg>
     ),
   },
@@ -167,7 +167,7 @@ function FieldShell({
 }
 
 const inputClass = (hasError?: string) =>
-  `w-full px-3.5 py-2.5 rounded-lg border text-sm text-slate-900 placeholder:text-slate-400 outline-none transition-all focus:border-blue-600 focus:ring-2 focus:ring-blue-100 bg-white ${
+  `w-full px-3.5 py-2.5 rounded-lg border text-sm text-slate-900 placeholder:text-slate-400 outline-none transition-all focus:border-[#051F16] focus:ring-2 focus:ring-emerald-100 bg-white ${
     hasError ? "border-rose-300 ring-1 ring-rose-300" : "border-slate-200"
   }`
 
@@ -333,8 +333,8 @@ function LoginCard({
         {/* Left Side: Enterprise Visual & Value Prop */}
         <div className="md:col-span-5 p-8 bg-slate-900 text-white flex flex-col justify-between border-r border-slate-800">
           <div>
-            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-slate-800 border border-slate-700 text-[11px] font-semibold text-blue-400">
-              <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-slate-800 border border-slate-700 text-[11px] font-semibold text-emerald-400">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
               MPI {meta.shortLabel} Portal
             </div>
 
@@ -359,7 +359,7 @@ function LoginCard({
                     height="14"
                     viewBox="0 0 16 16"
                     fill="none"
-                    className="text-blue-400 shrink-0"
+                    className="text-emerald-400 shrink-0"
                   >
                     <circle
                       cx="8"
@@ -370,7 +370,7 @@ function LoginCard({
                     />
                     <path
                       d="M5 8L7 10L11 6"
-                      stroke="#60A5FA"
+                      stroke="#A3F65C"
                       strokeWidth="1.8"
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -406,7 +406,7 @@ function LoginCard({
           <RoleTabs activeRole={role} navigate={navigate} />
 
           <div className="flex items-center gap-2 mt-4 px-3 py-2 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-600">
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-600" />
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
             <span>{meta.desc}</span>
           </div>
 
@@ -498,7 +498,7 @@ function LoginCard({
               <button
                 type="button"
                 onClick={() => setShowForgotNote(true)}
-                className="font-semibold text-blue-600 hover:underline"
+                className="font-semibold text-emerald-700 hover:underline"
               >
                 Forgot password?
               </button>
@@ -514,7 +514,7 @@ function LoginCard({
             <button
               type="submit"
               disabled={submitting}
-              className="w-full py-2.5 rounded-lg text-sm font-semibold bg-[#0F2744] hover:bg-[#1E3A8A] text-white flex items-center justify-center gap-2 transition-all shadow-xs disabled:opacity-60 cursor-pointer"
+              className="w-full py-2.5 rounded-lg text-sm font-semibold bg-[#051F16] hover:bg-[#083A28] text-white flex items-center justify-center gap-2 transition-all shadow-xs disabled:opacity-60 cursor-pointer"
             >
               <span>
                 {submitting ? "Authenticating…" : `Enter as ${meta.shortLabel}`}
@@ -536,7 +536,7 @@ function LoginCard({
               New to the platform?{" "}
               <button
                 onClick={() => navigate(`register.${role}` as Screen)}
-                className="font-semibold text-blue-600 hover:underline ml-1"
+                className="font-semibold text-emerald-700 hover:underline ml-1"
               >
                 Create an account →
               </button>
@@ -764,7 +764,7 @@ function RegisterCard({
           Already have an account?{" "}
           <button
             onClick={() => navigate(`login.${role}` as Screen)}
-            className="font-semibold text-blue-600 hover:underline ml-1"
+            className="font-semibold text-emerald-700 hover:underline ml-1"
           >
             Sign in
           </button>

@@ -3,22 +3,31 @@ import { NavProps, Screen } from "../App"
 import { useProcurement } from "../context/ProcurementContext"
 import {
   MPI_CATALOG,
-  CATALOG_CATEGORIES,
   CatalogCategory,
   searchCatalog,
 } from "../lib/mpiCatalog"
 import {
   Icons,
-  MPIButton,
-  MPIVerifiedBadge,
 } from "../components/design-system/MPIDesignSystem"
-import { hasLiveAIConfigured, type ExtractedProcurementSpecs } from "../services/aiService"
-import AuthModal from "../components/auth/AuthModal"
+import AuthModal, { AuthPortalContext } from "../components/auth/AuthModal"
+import RoleMismatchModal from "../components/auth/RoleMismatchModal"
+import { RoleKey } from "../lib/mockAuth"
+import {
+  isAuthenticated,
+  getUserRole,
+  getActiveUser,
+  isProfileComplete,
+  savePendingAction,
+  PendingActionContext,
+  logUserJourney,
+  logoutUserSession,
+} from "../lib/sessionManager"
 import GlobalNavBar from "../components/navigation/GlobalNavBar"
 import ProductCatalogue from "../components/catalogue/ProductCatalogue"
 import useScrollReveal from "../hooks/useScrollReveal"
 import MaterialIcon from "../components/ui/MaterialIcon"
 import CountUpNumber from "../components/ui/CountUpNumber"
+import { openCookiePreferencesModal } from "../services/cookieConsentService"
 
 export function formatScopeDisplay(category: CatalogCategory, qty: number): string {
   if (category === "Packaging & Printing") {
@@ -74,42 +83,228 @@ export default function Home({
   canGoBack = false,
 }: NavProps) {
   const {
-    requirementText,
     setRequirementText,
     setSelectedCategory,
     setQuantity,
     setTargetBudget,
-    quantity,
-    targetBudget,
-    aiConfidenceScore,
     runAIExtraction,
-    schemes,
   } = useProcurement()
 
   // Viewport scroll reveal observer
   useScrollReveal()
 
-  // Auth modal state for Login and Sign In
-  const [authModal, setAuthModal] = useState<{ open: boolean; mode: "login" | "signin" }>({
+  // Auth modal state for Login and Sign In with contextual portal gates
+  const [authModal, setAuthModal] = useState<{
+    open: boolean
+    mode: "login" | "signin"
+    initialRole?: RoleKey
+    targetScreen?: Screen
+    portalContext?: AuthPortalContext
+  }>({
     open: false,
     mode: "login",
+    initialRole: "startup",
+    targetScreen: "startup.home",
   })
+
+  // Role mismatch modal state for incompatible user accounts
+  const [roleMismatch, setRoleMismatch] = useState<{
+    open: boolean
+    currentRole: RoleKey | null
+    requiredRole: RoleKey
+    actionName: string
+  }>({
+    open: false,
+    currentRole: null,
+    requiredRole: "startup",
+    actionName: "",
+  })
+
+  const handleOpenAuth = (options?: {
+    mode?: "login" | "signin"
+    defaultRole?: RoleKey
+    targetScreen?: Screen
+    portalContext?: AuthPortalContext
+  }) => {
+    setAuthModal({
+      open: true,
+      mode: options?.mode || "login",
+      initialRole: options?.defaultRole || "startup",
+      targetScreen: options?.targetScreen || "startup.home",
+      portalContext: options?.portalContext,
+    })
+  }
+
+  /**
+   * Centralized Homepage CTA Router & User Journey Orchestrator
+   * 
+   * Enforces production flow:
+   * 1. Check if authenticated
+   * 2. If authenticated and role compatible: proceed directly to destination
+   * 3. If authenticated with wrong role: display RoleMismatchModal
+   * 4. If unauthenticated: preserve pending action context & open contextual AuthModal
+   */
+  type HomeActionType =
+    | PendingActionContext["actionType"]
+    | "experience_intake"
+    | "inspect_suppliers"
+    | "view_bidding"
+    | "explore_savings"
+    | "catalog_quote"
+    | "ask_ai"
+
+  const handleProtectedJourney = (config: {
+    targetScreen: Screen
+    actionType: HomeActionType
+    actionLabel: string
+    requiredRole?: RoleKey
+    productContext?: PendingActionContext["productContext"]
+    procurementContext?: PendingActionContext["procurementContext"]
+    portalContext?: AuthPortalContext
+    onExecuteIfAuthenticated?: () => void
+  }) => {
+    logUserJourney("CTA_CLICKED", {
+      actionLabel: config.actionLabel,
+      targetScreen: config.targetScreen,
+      requiredRole: config.requiredRole,
+      isAuthenticated: isAuthenticated(),
+    })
+
+    const authed = isAuthenticated()
+    const activeRole = getUserRole()
+
+    // 1. Role mismatch check for authenticated users
+    if (authed && config.requiredRole && activeRole && activeRole !== "admin" && activeRole !== config.requiredRole) {
+      logUserJourney("ROLE_MISMATCH_DETECTED", {
+        activeRole,
+        requiredRole: config.requiredRole,
+        actionLabel: config.actionLabel,
+      })
+      setRoleMismatch({
+        open: true,
+        currentRole: activeRole,
+        requiredRole: config.requiredRole,
+        actionName: config.actionLabel,
+      })
+      return
+    }
+
+    // 2. If authenticated with compatible role
+    if (authed) {
+      if (config.onExecuteIfAuthenticated) {
+        config.onExecuteIfAuthenticated()
+        return
+      }
+
+      // Check if profile is complete for startups entering procurement
+      if (config.requiredRole === "startup" && config.targetScreen === "startup.procurement") {
+        if (!isProfileComplete("startup")) {
+          logUserJourney("STARTUP_PROFILE_INCOMPLETE_REDIRECT", { to: "startup.onboarding" })
+          navigate("startup.onboarding")
+          return
+        }
+      }
+
+      navigate(config.targetScreen)
+      return
+    }
+
+    // 3. If unauthenticated: preserve context and request authentication
+    savePendingAction({
+      targetScreen: config.targetScreen,
+      actionType: config.actionType,
+      requiredRole: config.requiredRole,
+      productContext: config.productContext,
+      procurementContext: config.procurementContext,
+      origin: "homepage",
+    })
+
+    setAuthModal({
+      open: true,
+      mode: config.actionType === "register_msme" ? "signin" : "login",
+      initialRole: config.requiredRole || "startup",
+      targetScreen: config.targetScreen,
+      portalContext: config.portalContext,
+    })
+  }
+
+  /**
+   * Return-path fulfillment handler after successful authentication
+   */
+  const handleAuthSuccess = (detectedRole: RoleKey, pending: PendingActionContext | null) => {
+    logUserJourney("HANDLE_AUTH_SUCCESS_FULFILLMENT", {
+      detectedRole,
+      hasPending: Boolean(pending),
+      pendingActionType: pending?.actionType,
+    })
+
+    if (!pending) {
+      if (detectedRole === "admin") navigate("admin.home")
+      else if (detectedRole === "msme") navigate("msme.home")
+      else navigate("startup.home")
+      return
+    }
+
+    // Restore product / procurement context
+    if (pending.productContext) {
+      const prod = pending.productContext
+      setRequirementText(
+        pending.procurementContext?.requirementText ||
+          `Need sourcing quote for ${prod.name} (${prod.category}) with standard institutional specifications`,
+      )
+      setSelectedCategory(prod.category as CatalogCategory)
+      logUserJourney("RESTORED_PRODUCT_CONTEXT", {
+        productId: prod.id,
+        name: prod.name,
+        category: prod.category,
+      })
+    } else if (pending.procurementContext?.requirementText) {
+      setRequirementText(pending.procurementContext.requirementText)
+      if (pending.procurementContext.category) {
+        setSelectedCategory(pending.procurementContext.category as CatalogCategory)
+      }
+    }
+
+    // Check profile completion for startups entering procurement
+    if (pending.requiredRole === "startup" && pending.targetScreen === "startup.procurement") {
+      if (!isProfileComplete("startup")) {
+        navigate("startup.onboarding")
+        return
+      }
+    }
+
+    navigate(pending.targetScreen)
+  }
+
+  const handleSwitchAccountFromMismatch = (targetRole: RoleKey) => {
+    setRoleMismatch((prev) => ({ ...prev, open: false }))
+    logoutUserSession().then(() => {
+      setAuthModal({
+        open: true,
+        mode: targetRole === "msme" ? "signin" : "login",
+        initialRole: targetRole,
+        targetScreen: targetRole === "msme" ? "msme.onboarding" : "startup.home",
+        portalContext: {
+          badge: targetRole === "msme" ? "MSME Supplier Network" : "Startup Buyer Portal",
+          title: targetRole === "msme" ? "Join as MSME Manufacturer" : "Log in as Startup Buyer",
+          description: "Sign in with your credentials for this role.",
+          icon: targetRole === "msme" ? "precision_manufacturing" : "rocket_launch",
+        },
+      })
+    })
+  }
+
+  const handleContinueCurrentRoleFromMismatch = (role: RoleKey) => {
+    setRoleMismatch((prev) => ({ ...prev, open: false }))
+    if (role === "msme") navigate("msme.home")
+    else if (role === "admin") navigate("admin.home")
+    else navigate("startup.home")
+  }
 
   // Command palette & search modal (⌘K)
   const [showSearchModal, setShowSearchModal] = useState(false)
   const [paletteQuery, setPaletteQuery] = useState("")
-
-  // Product detail modal state for quick views
-  const [selectedProductDetail, setSelectedProductDetail] = useState<any | null>(null)
-
-  // Government schemes detail modal state
-  const [showSchemeDetailModal, setShowSchemeDetailModal] = useState(false)
-
-  // Interactive AI hero showcase state
-  const [activeHeroTab, setActiveHeroTab] = useState<"spec" | "suppliers" | "comparison" | "escrow">("spec")
   const [heroPromptIndex, setHeroPromptIndex] = useState(0)
-  const [isSynthesizingHero, setIsSynthesizingHero] = useState(false)
-  const [heroExtractionResult, setHeroExtractionResult] = useState<ExtractedProcurementSpecs | null>(null)
 
   // Government scheme interactive calculator state
   const [calcBudget, setCalcBudget] = useState(120000)
@@ -181,8 +376,6 @@ export default function Home({
       }
       if (e.key === "Escape") {
         setShowSearchModal(false)
-        setSelectedProductDetail(null)
-        setShowSchemeDetailModal(false)
       }
     }
     window.addEventListener("keydown", handleKeyDown)
@@ -206,12 +399,10 @@ export default function Home({
     setQuantity(item.qty)
     setTargetBudget(item.budget)
 
-    setIsSynthesizingHero(true)
     try {
-      const res = await runAIExtraction(item.text)
-      setHeroExtractionResult(res)
-    } finally {
-      setIsSynthesizingHero(false)
+      await runAIExtraction(item.text)
+    } catch {
+      // Background extraction for caching context
     }
   }
 
@@ -253,7 +444,7 @@ export default function Home({
   ]
 
   return (
-    <div className="min-h-screen bg-[#FAFAFC] text-slate-900 flex flex-col font-sans selection:bg-[#0B1F4B] selection:text-white antialiased">
+    <div className="min-h-screen bg-[#FAFAFC] text-slate-900 flex flex-col font-sans selection:bg-[#051F16] selection:text-white antialiased">
       {/* ─── STATUTORY TRUST STRIP ────────────────────────────────────────── */}
       <div className="bg-[#051F16] text-white text-xs py-2 px-4 border-b border-[#0A3525]">
         <div className="max-w-7xl mx-auto flex items-center justify-between text-[11px] sm:text-xs">
@@ -294,6 +485,7 @@ export default function Home({
         goBack={goBack}
         currentScreen={currentScreen}
         canGoBack={canGoBack}
+        onOpenAuth={handleOpenAuth}
       />
 
       {/* ─── 2. HERO SECTION (REFERENCE REIMAGINATION) ─────────────────────── */}
@@ -338,7 +530,20 @@ export default function Home({
             <div className="flex flex-wrap items-center justify-center gap-3.5 pt-2">
               <button
                 type="button"
-                onClick={() => navigate("startup.procurement")}
+                onClick={() =>
+                  handleProtectedJourney({
+                    targetScreen: "startup.procurement",
+                    actionType: "start_mpi",
+                    actionLabel: "Start with MPI",
+                    requiredRole: "startup",
+                    portalContext: {
+                      badge: "Startup Buyer Portal",
+                      title: "Start Sourcing on MPI",
+                      description: "Log in or register your startup to synthesize engineering specs and match verified factories.",
+                      icon: "rocket_launch",
+                    },
+                  })
+                }
                 className="group inline-flex items-center gap-2.5 px-6 py-3.5 text-sm font-bold rounded-xl bg-[#051F16] hover:bg-[#083A28] active:scale-[0.98] text-white shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer border border-[#0A3525]"
               >
                 <span>Start with MPI</span>
@@ -448,7 +653,29 @@ export default function Home({
                     <div className="absolute right-3 bottom-3 flex items-center gap-2">
                       <button
                         type="button"
-                        onClick={() => navigate("startup.procurement")}
+                        onClick={() =>
+                          handleProtectedJourney({
+                            targetScreen: "startup.rfq",
+                            actionType: "run_rfq",
+                            actionLabel: "Run Full RFQ",
+                            requiredRole: "startup",
+                            procurementContext: {
+                              requirementText: currentHeroPrompt.text,
+                              category: currentHeroPrompt.cat,
+                            },
+                            onExecuteIfAuthenticated: () => {
+                              setRequirementText(currentHeroPrompt.text)
+                              setSelectedCategory(currentHeroPrompt.cat)
+                              navigate("startup.rfq")
+                            },
+                            portalContext: {
+                              badge: "AI RFQ Generation",
+                              title: "Run Full RFQ",
+                              description: "Sign in to generate institutional RFQ documentation and dispatch to verified suppliers.",
+                              icon: "auto_awesome",
+                            },
+                          })
+                        }
                         className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg bg-[#051F16] hover:bg-[#083A28] text-white cursor-pointer shadow-2xs"
                       >
                         <MaterialIcon name="auto_awesome" size={14} className="text-[#A3F65C]" />
@@ -607,7 +834,20 @@ export default function Home({
                   </div>
                   <button
                     type="button"
-                    onClick={() => navigate("startup.procurement")}
+                    onClick={() =>
+                      handleProtectedJourney({
+                        targetScreen: "startup.home",
+                        actionType: "launch_workspace",
+                        actionLabel: "Launch in Workspace",
+                        requiredRole: "startup",
+                        portalContext: {
+                          badge: "Startup Workspace",
+                          title: "Launch Procurement Workspace",
+                          description: "Access your active RFQs, supplier bids, and milestone escrow ledgers.",
+                          icon: "rocket_launch",
+                        },
+                      })
+                    }
                     className="inline-flex items-center gap-1.5 font-bold text-[#A3F65C] hover:text-[#92E64B] cursor-pointer text-xs"
                   >
                     <span>Launch in Workspace</span>
@@ -857,7 +1097,20 @@ export default function Home({
               <div className="pt-2">
                 <button
                   type="button"
-                  onClick={() => navigate("startup.procurement")}
+                  onClick={() =>
+                    handleProtectedJourney({
+                      targetScreen: "startup.procurement",
+                      actionType: "experience_intake",
+                      actionLabel: "Experience Natural Language Intake",
+                      requiredRole: "startup",
+                      portalContext: {
+                        badge: "AI Sourcing Intake",
+                        title: "Natural Language Requirement Engine",
+                        description: "Sign in to convert conversational requests into institutional manufacturing specs.",
+                        icon: "psychology",
+                      },
+                    })
+                  }
                   className="group inline-flex items-center gap-2 text-xs font-bold text-[#051F16] hover:text-[#083A28] cursor-pointer"
                 >
                   <span>Experience Natural Language Intake</span>
@@ -938,7 +1191,25 @@ export default function Home({
               <div className="pt-2">
                 <button
                   type="button"
-                  onClick={() => navigate("msme.home")}
+                  onClick={() => {
+                    const user = getActiveUser()
+                    if (user?.role === "msme") {
+                      navigate("msme.home")
+                    } else {
+                      handleProtectedJourney({
+                        targetScreen: "startup.match-results",
+                        actionType: "inspect_suppliers",
+                        actionLabel: "Inspect Verified Suppliers",
+                        requiredRole: "startup",
+                        portalContext: {
+                          badge: "Supplier Verification",
+                          title: "Inspect Verified MSME Suppliers",
+                          description: "Access audited factory dossiers, ZED Gold certifications, and live machine capacity.",
+                          icon: "verified",
+                        },
+                      })
+                    }
+                  }}
                   className="group inline-flex items-center gap-2 text-xs font-bold text-[#051F16] hover:text-[#083A28] cursor-pointer"
                 >
                   <span>Inspect Verified Supplier Standards</span>
@@ -971,7 +1242,20 @@ export default function Home({
               <div className="pt-2">
                 <button
                   type="button"
-                  onClick={() => navigate("startup.procurement")}
+                  onClick={() =>
+                    handleProtectedJourney({
+                      targetScreen: "startup.comparison",
+                      actionType: "view_bidding",
+                      actionLabel: "View Side-by-Side Bidding Engine",
+                      requiredRole: "startup",
+                      portalContext: {
+                        badge: "Comparative Bidding",
+                        title: "Side-by-Side Bidding Engine",
+                        description: "Sign in to compare factory quotes, tooling fees, and turnaround SLAs.",
+                        icon: "compare_arrows",
+                      },
+                    })
+                  }
                   className="group inline-flex items-center gap-2 text-xs font-bold text-[#051F16] hover:text-[#083A28] cursor-pointer"
                 >
                   <span>View Side-by-Side Bidding Engine</span>
@@ -1076,7 +1360,20 @@ export default function Home({
               <div className="pt-2">
                 <button
                   type="button"
-                  onClick={() => navigate("startup.procurement")}
+                  onClick={() =>
+                    handleProtectedJourney({
+                      targetScreen: "startup.analytics",
+                      actionType: "explore_savings",
+                      actionLabel: "Explore Sourcing Savings",
+                      requiredRole: "startup",
+                      portalContext: {
+                        badge: "Savings Intelligence",
+                        title: "Reverse Margin Analytics",
+                        description: "Analyze direct factory cost breakdowns, tax credits, and net landed savings.",
+                        icon: "savings",
+                      },
+                    })
+                  }
                   className="group inline-flex items-center gap-2 text-xs font-bold text-[#051F16] hover:text-[#083A28] cursor-pointer"
                 >
                   <span>Explore Direct Sourcing Savings</span>
@@ -1091,18 +1388,68 @@ export default function Home({
       {/* ─── 7. FLAGSHIP CATALOGUE DISCOVERY SECTION ───────────────────────── */}
       <ProductCatalogue
         onQuoteProduct={(prod) => {
-          setRequirementText(
-            `Need sourcing quote for ${prod.name} (${prod.category}) with standard institutional specifications`,
-          )
-          setSelectedCategory(prod.category)
-          navigate("startup.procurement")
+          handleProtectedJourney({
+            targetScreen: "startup.procurement",
+            actionType: "catalog_quote",
+            actionLabel: `Request Quote for ${prod.name}`,
+            requiredRole: "startup",
+            productContext: prod,
+            procurementContext: {
+              requirementText: `Need sourcing quote for ${prod.name} (${prod.category}) with standard institutional specifications`,
+              category: prod.category,
+            },
+            onExecuteIfAuthenticated: () => {
+              setRequirementText(
+                `Need sourcing quote for ${prod.name} (${prod.category}) with standard institutional specifications`,
+              )
+              setSelectedCategory(prod.category as CatalogCategory)
+              navigate("startup.procurement")
+            },
+            portalContext: {
+              badge: "Instant Factory Quote",
+              title: `Source ${prod.name}`,
+              description: `Sign in as a startup buyer to request factory quotes and specifications for ${prod.name}.`,
+              icon: "request_quote",
+            },
+          })
         }}
         onAskAI={(query, cat) => {
-          if (query) setRequirementText(query)
-          if (cat) setSelectedCategory(cat as CatalogCategory)
-          navigate("startup.procurement")
+          handleProtectedJourney({
+            targetScreen: "startup.procurement",
+            actionType: "ask_ai",
+            actionLabel: "AI Sourcing Assistant",
+            requiredRole: "startup",
+            procurementContext: {
+              requirementText: query,
+              category: cat,
+            },
+            onExecuteIfAuthenticated: () => {
+              if (query) setRequirementText(query)
+              if (cat) setSelectedCategory(cat as CatalogCategory)
+              navigate("startup.procurement")
+            },
+            portalContext: {
+              badge: "AI Specification Assistant",
+              title: "Procure with AI Assistant",
+              description: "Sign in to parse your custom procurement query into machine-readable specs.",
+              icon: "psychology",
+            },
+          })
         }}
-        onExploreWorkspace={() => navigate("startup.procurement")}
+        onExploreWorkspace={() => {
+          handleProtectedJourney({
+            targetScreen: "startup.procurement",
+            actionType: "start_mpi",
+            actionLabel: "Explore Procurement Workspace",
+            requiredRole: "startup",
+            portalContext: {
+              badge: "Startup Workspace",
+              title: "Launch Procurement Workspace",
+              description: "Access the full end-to-end procurement and quotation engine.",
+              icon: "rocket_launch",
+            },
+          })
+        }}
       />
 
       {/* ─── 8. PARTNER / ECOSYSTEM VISUALIZATION SECTION ──────────────────── */}
@@ -1394,7 +1741,19 @@ export default function Home({
               <div className="pt-2 flex flex-wrap gap-3">
                 <button
                   type="button"
-                  onClick={() => navigate("government-schemes.match")}
+                  onClick={() =>
+                    handleProtectedJourney({
+                      targetScreen: "government-schemes.match",
+                      actionType: "match_schemes",
+                      actionLabel: "Match My Business Schemes",
+                      portalContext: {
+                        badge: "Government Subsidies",
+                        title: "Match Eligible Government Schemes",
+                        description: "Sign in to calculate your enterprise eligibility for ZED, SISFS, and Design Clinic subsidies.",
+                        icon: "policy",
+                      },
+                    })
+                  }
                   className="inline-flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-lg bg-[#051F16] hover:bg-[#083A28] text-white cursor-pointer shadow-2xs"
                 >
                   <span>Match My Business Schemes</span>
@@ -1405,7 +1764,7 @@ export default function Home({
                   onClick={() => navigate("government-schemes.browse")}
                   className="px-4 py-2 text-xs font-semibold rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 cursor-pointer shadow-2xs"
                 >
-                  Browse All 30 Schemes
+                  Browse All Schemes
                 </button>
               </div>
             </div>
@@ -1423,6 +1782,21 @@ export default function Home({
               </div>
 
               <div className="space-y-4">
+                <div>
+                  <div className="flex justify-between items-center text-xs font-medium text-slate-300 mb-2">
+                    <span>Sourcing Category:</span>
+                    <select
+                      value={calcCategory}
+                      onChange={(e) => setCalcCategory(e.target.value as CatalogCategory)}
+                      className="text-xs bg-[#0A3525] text-white border border-emerald-900/60 rounded-lg px-2.5 py-1 outline-none cursor-pointer"
+                    >
+                      <option value="Packaging & Printing">Packaging & Printing (60%)</option>
+                      <option value="Prototyping & Product Development">Prototyping & Product Dev (70%)</option>
+                      <option value="Compliance & Legal Support">Compliance & Legal Support (80%)</option>
+                    </select>
+                  </div>
+                </div>
+
                 <div>
                   <div className="flex justify-between text-xs font-medium text-slate-300 mb-2">
                     <span>Estimated Sourcing Budget:</span>
@@ -1553,7 +1927,20 @@ export default function Home({
           <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
             <button
               type="button"
-              onClick={() => navigate("startup.procurement")}
+              onClick={() =>
+                handleProtectedJourney({
+                  targetScreen: "startup.procurement",
+                  actionType: "start_mpi",
+                  actionLabel: "Start with MPI",
+                  requiredRole: "startup",
+                  portalContext: {
+                    badge: "Startup Buyer Portal",
+                    title: "Start Sourcing with MPI",
+                    description: "Log in or register your startup to access verified Indian manufacturers.",
+                    icon: "rocket_launch",
+                  },
+                })
+              }
               className="group inline-flex items-center gap-2.5 px-8 py-4 text-sm font-extrabold rounded-xl bg-[#A3F65C] hover:bg-[#92E64B] active:scale-[0.98] text-[#051F16] shadow-[0_4px_24px_rgba(163,246,92,0.35)] hover:shadow-[0_8px_32px_rgba(163,246,92,0.5)] transition-all cursor-pointer"
             >
               <span>Start with MPI</span>
@@ -1562,7 +1949,20 @@ export default function Home({
 
             <button
               type="button"
-              onClick={() => navigate("register.msme")}
+              onClick={() =>
+                handleProtectedJourney({
+                  targetScreen: "msme.onboarding",
+                  actionType: "register_msme",
+                  actionLabel: "Register as MSME Supplier",
+                  requiredRole: "msme",
+                  portalContext: {
+                    badge: "MSME Supplier Network",
+                    title: "Join India's Verified MSME Network",
+                    description: "Register your manufacturing facility, Udyam registration, and machine capacity.",
+                    icon: "precision_manufacturing",
+                  },
+                })
+              }
               className="px-8 py-4 text-sm font-bold rounded-xl bg-white/10 hover:bg-white/15 active:scale-[0.98] text-white border border-white/25 hover:border-white/40 transition-all cursor-pointer backdrop-blur-xs"
             >
               Register as MSME Supplier
@@ -1601,17 +2001,65 @@ export default function Home({
                   </a>
                 </li>
                 <li>
-                  <button onClick={() => navigate("startup.home")} className="hover:text-[#051F16] transition-colors cursor-pointer">
+                  <button
+                    onClick={() =>
+                      handleOpenAuth({
+                        mode: "login",
+                        defaultRole: "startup",
+                        targetScreen: "startup.home",
+                        portalContext: {
+                          badge: "Startup Buyer Portal",
+                          title: "Log in for Startups",
+                          description:
+                            "Access verified MSME suppliers, AI procurement copilot, live RFQ generator & order escrow.",
+                          icon: "rocket_launch",
+                        },
+                      })
+                    }
+                    className="hover:text-[#051F16] transition-colors cursor-pointer"
+                  >
                     Startup Hub
                   </button>
                 </li>
                 <li>
-                  <button onClick={() => navigate("msme.home")} className="hover:text-[#051F16] transition-colors cursor-pointer">
+                  <button
+                    onClick={() =>
+                      handleOpenAuth({
+                        mode: "login",
+                        defaultRole: "msme",
+                        targetScreen: "msme.home",
+                        portalContext: {
+                          badge: "MSME Supplier Network",
+                          title: "Log in for MSMEs",
+                          description:
+                            "Access verified OEM purchase orders, active startup tenders, and escrow payments.",
+                          icon: "precision_manufacturing",
+                        },
+                      })
+                    }
+                    className="hover:text-[#051F16] transition-colors cursor-pointer"
+                  >
                     MSME Portal
                   </button>
                 </li>
                 <li>
-                  <button onClick={() => navigate("government-schemes.match")} className="hover:text-[#051F16] transition-colors cursor-pointer">
+                  <button
+                    onClick={() =>
+                      handleOpenAuth({
+                        mode: "login",
+                        defaultRole: "startup",
+                        targetScreen: "government-schemes.match",
+                        portalContext: {
+                          badge: "Government Schemes Engine",
+                          title: "Log in for Government Schemes",
+                          description:
+                            "Match your enterprise against 30+ central subsidies (SISFS, CGTMSE, ZED) & track disbursements.",
+                          icon: "policy",
+                        },
+                      })
+                    }
+                    className="hover:text-[#051F16] transition-colors cursor-pointer"
+                  >
                     Govt Schemes (30)
                   </button>
                 </li>
@@ -1673,18 +2121,31 @@ export default function Home({
                     Sign In
                   </button>
                 </li>
+                <li>
+                  <button onClick={openCookiePreferencesModal} className="hover:text-[#051F16] transition-colors cursor-pointer">
+                    Cookie Settings
+                  </button>
+                </li>
               </ul>
             </div>
           </div>
 
           <div className="border-t border-slate-200 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-500">
             <div>© {new Date().getFullYear()} MPI — Market Procurement Intelligence. All rights reserved.</div>
-            <div className="flex items-center gap-5">
+            <div className="flex flex-wrap items-center gap-4 sm:gap-5">
               <span>Privacy Policy</span>
               <span>•</span>
               <span>Terms of Procurement</span>
               <span>•</span>
               <span>Security & Telemetry</span>
+              <span>•</span>
+              <button
+                type="button"
+                onClick={openCookiePreferencesModal}
+                className="hover:text-[#051F16] transition-colors cursor-pointer underline-offset-2 hover:underline"
+              >
+                Cookie Settings
+              </button>
             </div>
           </div>
         </div>
@@ -1719,12 +2180,23 @@ export default function Home({
               <div
                 onClick={() => {
                   setShowSearchModal(false)
-                  navigate("startup.home")
+                  handleProtectedJourney({
+                    targetScreen: "startup.home",
+                    actionType: "launch_workspace",
+                    actionLabel: "Startup Procurement Command Center",
+                    requiredRole: "startup",
+                    portalContext: {
+                      badge: "Startup Workspace",
+                      title: "Startup Procurement Command Center",
+                      description: "Access active RFQs, quotes, and escrow ledgers.",
+                      icon: "rocket_launch",
+                    },
+                  })
                 }}
                 className="px-3 py-2 rounded-lg hover:bg-slate-50 flex items-center justify-between cursor-pointer"
               >
                 <div className="flex items-center gap-2.5">
-                  <div className="w-7 h-7 rounded-md bg-blue-100 text-blue-800 flex items-center justify-center font-bold text-xs">
+                  <div className="w-7 h-7 rounded-md bg-[#051F16] text-[#A3F65C] flex items-center justify-center font-bold text-xs">
                     ST
                   </div>
                   <div>
@@ -1742,12 +2214,23 @@ export default function Home({
               <div
                 onClick={() => {
                   setShowSearchModal(false)
-                  navigate("msme.home")
+                  handleProtectedJourney({
+                    targetScreen: "msme.home",
+                    actionType: "launch_workspace",
+                    actionLabel: "MSME Supplier Hub",
+                    requiredRole: "msme",
+                    portalContext: {
+                      badge: "MSME Supplier Hub",
+                      title: "MSME Supplier Command Center",
+                      description: "View live RFQs, submit quotes, and manage machine capacity.",
+                      icon: "precision_manufacturing",
+                    },
+                  })
                 }}
                 className="px-3 py-2 rounded-lg hover:bg-slate-50 flex items-center justify-between cursor-pointer"
               >
                 <div className="flex items-center gap-2.5">
-                  <div className="w-7 h-7 rounded-md bg-orange-100 text-orange-800 flex items-center justify-center font-bold text-xs">
+                  <div className="w-7 h-7 rounded-md bg-emerald-100 text-emerald-900 flex items-center justify-center font-bold text-xs">
                     MS
                   </div>
                   <div>
@@ -1765,7 +2248,7 @@ export default function Home({
               <div
                 onClick={() => {
                   setShowSearchModal(false)
-                  navigate("admin.home")
+                  navigate("login.admin")
                 }}
                 className="px-3 py-2 rounded-lg hover:bg-slate-50 flex items-center justify-between cursor-pointer"
               >
@@ -1793,23 +2276,40 @@ export default function Home({
                   key={item.id}
                   onClick={() => {
                     setShowSearchModal(false)
-                    setRequirementText(
-                      `Need sourcing quote for ${item.name} (${item.category})`,
-                    )
-                    setSelectedCategory(item.category as CatalogCategory)
-                    navigate("startup.procurement")
+                    handleProtectedJourney({
+                      targetScreen: "startup.procurement",
+                      actionType: "catalog_quote",
+                      actionLabel: `Source ${item.name}`,
+                      requiredRole: "startup",
+                      productContext: item,
+                      procurementContext: {
+                        requirementText: `Need sourcing quote for ${item.name} (${item.category})`,
+                        category: item.category,
+                      },
+                      onExecuteIfAuthenticated: () => {
+                        setRequirementText(`Need sourcing quote for ${item.name} (${item.category})`)
+                        setSelectedCategory(item.category as CatalogCategory)
+                        navigate("startup.procurement")
+                      },
+                      portalContext: {
+                        badge: "Instant Factory Quote",
+                        title: `Source ${item.name}`,
+                        description: `Sign in as a startup buyer to initiate RFQ for ${item.name}.`,
+                        icon: "request_quote",
+                      },
+                    })
                   }}
                   className="px-3 py-2 rounded-lg hover:bg-slate-50 flex items-center justify-between cursor-pointer group"
                 >
                   <div>
-                    <div className="text-xs font-bold text-slate-900 group-hover:text-[#0B1F4B]">
+                    <div className="text-xs font-bold text-slate-900 group-hover:text-[#051F16]">
                       {item.name}
                     </div>
                     <div className="text-[10px] text-slate-500">
                       {item.category}
                     </div>
                   </div>
-                  <span className="text-[10px] font-bold text-[#F97316] group-hover:underline">
+                  <span className="text-[10px] font-bold text-emerald-700 group-hover:underline">
                     Source →
                   </span>
                 </div>
@@ -1830,8 +2330,23 @@ export default function Home({
       <AuthModal
         isOpen={authModal.open}
         initialMode={authModal.mode}
+        initialRole={authModal.initialRole}
+        targetScreen={authModal.targetScreen}
+        portalContext={authModal.portalContext}
         onClose={() => setAuthModal((prev) => ({ ...prev, open: false }))}
+        onAuthSuccess={handleAuthSuccess}
         navigate={navigate}
+      />
+
+      {/* Role Mismatch Safeguard Modal */}
+      <RoleMismatchModal
+        isOpen={roleMismatch.open}
+        currentRole={roleMismatch.currentRole}
+        requiredRole={roleMismatch.requiredRole}
+        actionName={roleMismatch.actionName}
+        onClose={() => setRoleMismatch((prev) => ({ ...prev, open: false }))}
+        onSwitchAccount={handleSwitchAccountFromMismatch}
+        onContinueCurrentRole={handleContinueCurrentRoleFromMismatch}
       />
     </div>
   )

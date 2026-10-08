@@ -433,7 +433,7 @@ export default function MSMEFlow({
             className="w-full flex items-center justify-between text-xs text-slate-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-[#0A3525] cursor-pointer transition-colors"
           >
             <span className="flex items-center gap-2">
-              <MaterialIcon icon="home" size={14} className="text-slate-400" />
+              <MaterialIcon name="home" size={14} className="text-slate-400" />
               <span>Home Marketplace</span>
             </span>
             <span className="text-[10px] bg-[#0A3525] px-1.5 py-0.5 rounded text-slate-300 border border-emerald-900/50">
@@ -445,7 +445,7 @@ export default function MSMEFlow({
             className="w-full flex items-center justify-between text-xs text-slate-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-[#0A3525] cursor-pointer transition-colors"
           >
             <span className="flex items-center gap-2">
-              <MaterialIcon icon="policy" size={14} className="text-slate-400" />
+              <MaterialIcon name="policy" size={14} className="text-slate-400" />
               <span>Government Schemes</span>
             </span>
             <span className="text-[10px] bg-emerald-950 text-[#A3F65C] border border-emerald-800/50 px-1.5 py-0.5 rounded">
@@ -494,7 +494,7 @@ export default function MSMEFlow({
                 <button
                   onClick={() => navigate("msme.home")}
                   className={`hover:text-slate-900 hover:underline cursor-pointer shrink-0 ${
-                    currentScreen === "msme.home" ? "font-bold text-[#0B1F4B]" : ""
+                    currentScreen === "msme.home" ? "font-bold text-[#051F16]" : ""
                   }`}
                 >
                   MSME Portal
@@ -502,7 +502,7 @@ export default function MSMEFlow({
                 {currentScreen !== "msme.home" && (
                   <>
                     <span>/</span>
-                    <span className="text-[#0B1F4B] font-semibold truncate max-w-30 sm:max-w-[200px]">
+                    <span className="text-[#051F16] font-semibold truncate max-w-30 sm:max-w-[200px]">
                       {title}
                     </span>
                   </>
@@ -510,11 +510,16 @@ export default function MSMEFlow({
               </div>
 
               <div
-                className="text-sm sm:text-lg font-bold text-[#0B1F4B] tracking-tight truncate"
+                className="text-sm sm:text-lg font-bold text-[#051F16] tracking-tight truncate"
                 style={{ fontFamily: "Plus Jakarta Sans" }}
               >
                 {title}
               </div>
+              {subtitle && (
+                <div className="text-[11px] text-slate-500 truncate hidden sm:block">
+                  {subtitle}
+                </div>
+              )}
             </div>
           </div>
 
@@ -571,14 +576,14 @@ export default function MSMEFlow({
             value="3"
             change="+2 new matches"
             trend="up"
-            icon={<Icons.Search className="w-4 h-4 text-[#0B1F4B]" />}
+            icon={<Icons.Search className="w-4 h-4 text-[#051F16]" />}
           />
           <MPIStatCard
             title="Proposals Sent"
             value="14"
             change="64% win rate"
             trend="up"
-            icon={<Icons.FileText className="w-4 h-4 text-[#0B1F4B]" />}
+            icon={<Icons.FileText className="w-4 h-4 text-[#051F16]" />}
           />
           <MPIStatCard
             title="Won PO Sourcing"
@@ -592,14 +597,14 @@ export default function MSMEFlow({
             value="68%"
             change="32% capacity open"
             trend="neutral"
-            icon={<Icons.Package className="w-4 h-4 text-[#0B1F4B]" />}
+            icon={<Icons.Package className="w-4 h-4 text-[#051F16]" />}
           />
           <MPIStatCard
             title="Avg Response Speed"
             value="14 Hours"
             change="Top 5% in Pune cluster"
             trend="up"
-            icon={<Icons.Clock className="w-4 h-4 text-[#F97316]" />}
+            icon={<Icons.Clock className="w-4 h-4 text-emerald-700" />}
           />
         </div>
 
@@ -635,13 +640,13 @@ export default function MSMEFlow({
                     <span className="text-xs font-bold text-slate-900">
                       {opp.title}
                     </span>
-                    <span className="text-[10px] font-bold text-[#0B1F4B] bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                    <span className="text-[10px] font-bold text-[#051F16] bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
                       {opp.matchScore}% Match
                     </span>
                   </div>
                   <div className="text-xs text-slate-500">
                     Buyer:{" "}
-                    <strong className="text-[#0B1F4B]">{opp.buyer}</strong> ·
+                    <strong className="text-[#051F16]">{opp.buyer}</strong> ·
                     Target Budget: <strong>{opp.budget}</strong> · Lead:{" "}
                     <strong>{opp.leadTime}</strong>
                   </div>
@@ -695,13 +700,13 @@ export default function MSMEFlow({
                 className="p-4 rounded-xl border border-slate-200/80 bg-slate-50/50 hover:bg-white hover:shadow-md hover:border-slate-300 transition-all duration-300 hover:-translate-y-0.5 space-y-2"
               >
                 <div className="flex justify-between items-start">
-                  <span className="text-[10px] font-bold text-blue-700 bg-blue-50 px-1.5 py-0.2 rounded">
+                  <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-1.5 py-0.2 rounded">
                     {mch.category}
                   </span>
                   <span
                     className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
                       mch.status === "Available"
-                        ? "bg-blue-100 text-[#0B1F4B]"
+                        ? "bg-emerald-100/60 text-[#051F16]"
                         : "bg-amber-100 text-amber-800"
                     }`}
                   >
@@ -716,7 +721,7 @@ export default function MSMEFlow({
                 </div>
                 <div className="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
                   <div
-                    className="bg-[#0B1F4B] h-full"
+                    className="bg-[#051F16] h-full"
                     style={{ width: `${mch.utilization}%` }}
                   />
                 </div>
@@ -746,12 +751,12 @@ export default function MSMEFlow({
             <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
               SUBMITTING QUOTE FOR RFQ #{selectedOppId}
             </span>
-            <h3 className="text-lg font-bold text-[#0B1F4B] mt-0.5">
+            <h3 className="text-lg font-bold text-[#051F16] mt-0.5">
               500x Custom Rigid Skincare Packaging Boxes
             </h3>
             <div className="text-xs text-slate-500 mt-1">
               Buyer:{" "}
-              <strong className="text-[#0B1F4B]">
+              <strong className="text-[#051F16]">
                 MPI Verified Buyer #042 (Bengaluru, KA)
               </strong>{" "}
               · Target Budget: <strong>₹75,000</strong>
@@ -776,7 +781,7 @@ export default function MSMEFlow({
                     Gold Tier Account
                   </span>
                 </div>
-                <h4 className="text-sm font-extrabold text-[#0B1F4B]">
+                <h4 className="text-sm font-extrabold text-[#051F16]">
                   MPI Verified Buyer #042 · Bangalore Cluster
                 </h4>
               </div>
@@ -791,7 +796,7 @@ export default function MSMEFlow({
               <div className="h-6 w-px bg-slate-200" />
               <div>
                 <div className="text-[10px] text-slate-400">Cumulative GMV</div>
-                <div className="font-bold text-[#0B1F4B]">₹7,80,000</div>
+                <div className="font-bold text-[#051F16]">₹7,80,000</div>
               </div>
               <div className="h-6 w-px bg-slate-200" />
               <div>
@@ -821,7 +826,7 @@ export default function MSMEFlow({
                 voluntary and never platform-enforced.
               </span>
             </div>
-            <span className="text-xs font-bold text-[#0B1F4B] bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-200 shrink-0">
+            <span className="text-xs font-bold text-[#051F16] bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 shrink-0">
               {repeatDiscountPercent > 0
                 ? `${repeatDiscountPercent}% Loyalty Concession`
                 : "Standard Pricing (0%)"}
@@ -850,7 +855,7 @@ export default function MSMEFlow({
                 }}
                 className={`py-2.5 px-3 rounded-xl text-xs font-bold border transition-all cursor-pointer text-center ${
                   selectedDiscountMode === opt.id
-                    ? "bg-[#0B1F4B] text-white border-[#0B1F4B] shadow-xs"
+                    ? "bg-[#051F16] text-white border-[#051F16] shadow-xs"
                     : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100"
                 }`}
               >
@@ -875,7 +880,7 @@ export default function MSMEFlow({
                   const p = parseFloat(e.target.value) || 0
                   setRepeatDiscountPercent(p)
                 }}
-                className="w-24 text-xs p-2 bg-white border border-slate-300 rounded-lg outline-none focus:border-[#0B1F4B] font-bold text-slate-900"
+                className="w-24 text-xs p-2 bg-white border border-slate-300 rounded-lg outline-none focus:border-[#051F16] font-bold text-slate-900"
                 placeholder="2.5"
               />
               <span className="text-xs text-slate-500">
@@ -886,11 +891,11 @@ export default function MSMEFlow({
         </div>
 
         {/* ─── AI MSME RFQ RESPONSE COPILOT (Blueprint Item 24) ──────────── */}
-        <div className="bg-gradient-to-r from-[#0B1F4B] to-indigo-950 text-white rounded-2xl p-5 shadow-xs space-y-4">
+        <div className="bg-gradient-to-r from-[#051F16] to-[#0A3525] text-white rounded-2xl p-5 shadow-xs space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center font-bold shrink-0">
-                <Icons.Sparkles className="w-5 h-5 text-[#F97316]" />
+                <Icons.Sparkles className="w-5 h-5 text-[#A3F65C]" />
               </div>
               <div>
                 <h4 className="text-sm font-bold text-white flex items-center gap-2">
@@ -908,7 +913,7 @@ export default function MSMEFlow({
               type="button"
               onClick={handleAIDraftResponse}
               disabled={isDraftingAIResponse}
-              className="px-3.5 py-2 bg-[#F97316] hover:bg-[#ea580c] text-white rounded-xl text-xs font-bold flex items-center gap-2 transition-colors cursor-pointer shadow-xs self-start sm:self-auto shrink-0"
+              className="px-3.5 py-2 bg-[#A3F65C] hover:bg-[#92E64B] text-[#051F16] rounded-xl text-xs font-bold flex items-center gap-2 transition-colors cursor-pointer shadow-xs self-start sm:self-auto shrink-0"
             >
               <Icons.Sparkles className="w-4 h-4 text-white" />
               <span>
@@ -923,7 +928,7 @@ export default function MSMEFlow({
 
           {isDraftingAIResponse ? (
             <div className="py-6 flex flex-col items-center justify-center space-y-2">
-              <div className="w-6 h-6 border-2 border-[#F97316] border-t-transparent rounded-full animate-spin" />
+              <div className="w-6 h-6 border-2 border-[#A3F65C] border-t-transparent rounded-full animate-spin" />
               <span className="text-xs text-blue-200">
                 Analyzing RFQ tolerances and matching verified Heidelberg & Bobst machine capacities...
               </span>
@@ -956,7 +961,7 @@ export default function MSMEFlow({
 
               <div className="space-y-1">
                 <span className="font-bold text-white block">Competitive Edge Rationale:</span>
-                <p className="text-blue-100 text-xs italic bg-black/20 p-2.5 rounded-lg border border-white/5">
+                <p className="text-emerald-100 text-xs italic bg-black/20 p-2.5 rounded-lg border border-white/5">
                   "{aiDraftResult.competitiveEdge}"
                 </p>
               </div>
@@ -964,11 +969,11 @@ export default function MSMEFlow({
               <div className="space-y-1">
                 <div className="flex items-center justify-between">
                   <span className="font-bold text-white">Generated Bid Proposal Letter:</span>
-                  <span className="text-[10px] text-blue-200 font-mono">
+                  <span className="text-[10px] text-[#A3F65C] font-mono">
                     {aiDraftResult.isLive ? "✓ Live MPI AI Generation" : "Calibrated Industry Proposal"}
                   </span>
                 </div>
-                <pre className="p-3 bg-black/40 text-blue-50 rounded-lg text-[11px] font-mono whitespace-pre-wrap max-h-40 overflow-y-auto leading-relaxed border border-white/5">
+                <pre className="p-3 bg-black/40 text-emerald-50 rounded-lg text-[11px] font-mono whitespace-pre-wrap max-h-40 overflow-y-auto leading-relaxed border border-white/5">
                   {aiDraftResult.coverNote}
                 </pre>
               </div>
@@ -988,7 +993,7 @@ export default function MSMEFlow({
                       paymentTerms: `${aiDraftResult.coverNote.split("\n")[0]} — 30% Advance Escrow, 70% against delivery inspection.`,
                     }))
                   }}
-                  className="px-3.5 py-1.5 bg-[#F97316] hover:bg-[#ea580c] text-white rounded-lg font-bold text-xs shadow-xs transition-colors cursor-pointer self-start sm:self-auto"
+                  className="px-3.5 py-1.5 bg-[#A3F65C] hover:bg-[#92E64B] text-[#051F16] rounded-lg font-bold text-xs shadow-xs transition-colors cursor-pointer self-start sm:self-auto"
                 >
                   1-Click Apply AI Pricing & Terms to Quote
                 </button>
@@ -1017,7 +1022,7 @@ export default function MSMEFlow({
                     baseTooling: Number(e.target.value),
                   })
                 }
-                className="w-full text-xs p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0B1F4B]"
+                className="w-full text-xs p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#051F16]"
               />
               <span className="text-[10px] text-slate-400 mt-1 block">
                 One-time custom kappa cutting die
@@ -1037,7 +1042,7 @@ export default function MSMEFlow({
                     unitPrice: Number(e.target.value),
                   })
                 }
-                className="w-full text-xs p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0B1F4B]"
+                className="w-full text-xs p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#051F16]"
               />
               <span className="text-[10px] text-slate-400 mt-1 block">
                 500 units × ₹{quoteForm.unitPrice} = ₹
@@ -1058,7 +1063,7 @@ export default function MSMEFlow({
                     qaTesting: Number(e.target.value),
                   })
                 }
-                className="w-full text-xs p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0B1F4B]"
+                className="w-full text-xs p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#051F16]"
               />
               <span className="text-[10px] text-slate-400 mt-1 block">
                 ISTA-1A certified drop testing
@@ -1078,7 +1083,7 @@ export default function MSMEFlow({
                     logistics: Number(e.target.value),
                   })
                 }
-                className="w-full text-xs p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0B1F4B]"
+                className="w-full text-xs p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#051F16]"
               />
               <span className="text-[10px] text-slate-400 mt-1 block">
                 Pune to Bengaluru door dispatch
@@ -1101,7 +1106,7 @@ export default function MSMEFlow({
                     leadDays: Number(e.target.value),
                   })
                 }
-                className="w-full text-xs p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0B1F4B]"
+                className="w-full text-xs p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#051F16]"
               />
             </div>
 
@@ -1115,7 +1120,7 @@ export default function MSMEFlow({
                 onChange={(e) =>
                   setQuoteForm({ ...quoteForm, paymentTerms: e.target.value })
                 }
-                className="w-full text-xs p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0B1F4B]"
+                className="w-full text-xs p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#051F16]"
               />
             </div>
           </div>
@@ -1199,21 +1204,21 @@ export default function MSMEFlow({
               </div>
             )}
 
-            <div className="pt-2 border-t border-slate-200 flex justify-between text-sm font-extrabold text-[#0B1F4B]">
+            <div className="pt-2 border-t border-slate-200 flex justify-between text-sm font-extrabold text-[#051F16]">
               <span>Final Landed Cost to Startup Buyer:</span>
-              <span className="text-base text-[#0B1F4B]">
+              <span className="text-base text-[#051F16]">
                 ₹{netLandedCostToBuyer.toLocaleString("en-IN")}
               </span>
             </div>
           </div>
 
           {/* ─── MSME AI QUOTATION ASSISTANT CARD ──────────────────────────── */}
-          <div className="bg-linear-to-r from-blue-50/70 to-slate-50 border border-blue-200/80 rounded-2xl p-5 shadow-xs space-y-2">
+          <div className="bg-linear-to-r from-blue-50/70 to-slate-50 border border-emerald-200/80 rounded-2xl p-5 shadow-xs space-y-2">
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-md bg-[#F97316] text-white flex items-center justify-center shrink-0">
+              <div className="w-6 h-6 rounded-md bg-[#051F16] text-white flex items-center justify-center shrink-0">
                 <Icons.Sparkles className="w-3.5 h-3.5" />
               </div>
-              <span className="text-xs font-bold text-[#0B1F4B] uppercase tracking-wide">
+              <span className="text-xs font-bold text-[#051F16] uppercase tracking-wide">
                 MPI AI Repeat Buyer Strategy Advisor
               </span>
             </div>
@@ -1250,10 +1255,10 @@ export default function MSMEFlow({
         {quoteSubmittedModal && (
           <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-fade-in">
             <div className="bg-white rounded-2xl max-w-md w-full p-6 text-center space-y-4 shadow-2xl border border-slate-200">
-              <div className="w-14 h-14 rounded-full bg-blue-100 text-[#0B1F4B] flex items-center justify-center mx-auto">
+              <div className="w-14 h-14 rounded-full bg-emerald-100/60 text-[#051F16] flex items-center justify-center mx-auto">
                 <Icons.Check className="w-7 h-7" />
               </div>
-              <h3 className="text-lg font-bold text-[#0B1F4B]">
+              <h3 className="text-lg font-bold text-[#051F16]">
                 Quotation Successfully Transmitted!
               </h3>
               <p className="text-xs text-slate-600 leading-relaxed">
@@ -1296,7 +1301,7 @@ export default function MSMEFlow({
               onClick={() => setCapabilitiesTab("machinery")}
               className={`px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                 capabilitiesTab === "machinery"
-                  ? "bg-white text-[#0B1F4B] shadow-xs"
+                  ? "bg-white text-[#051F16] shadow-xs"
                   : "text-slate-600 hover:text-slate-900"
               }`}
             >
@@ -1310,11 +1315,11 @@ export default function MSMEFlow({
               }}
               className={`px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
                 capabilitiesTab === "inventory"
-                  ? "bg-[#0B1F4B] text-white shadow-xs"
+                  ? "bg-[#051F16] text-white shadow-xs"
                   : "text-slate-600 hover:text-slate-900"
               }`}
             >
-              <Icons.Sparkles className="w-3.5 h-3.5 text-[#F97316]" />
+              <Icons.Sparkles className="w-3.5 h-3.5 text-emerald-700" />
               <span>AI Inventory Reorder & Lead-Time Assistant (Items 51–53)</span>
             </button>
           </div>
@@ -1362,7 +1367,7 @@ export default function MSMEFlow({
                 >
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded">
+                      <span className="text-xs font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded">
                         {mch.category}
                       </span>
                       <button
@@ -1379,7 +1384,7 @@ export default function MSMEFlow({
                         }}
                         className={`text-xs px-2.5 py-0.5 rounded-full font-bold cursor-pointer transition-colors ${
                           mch.status === "Available"
-                            ? "bg-blue-100 text-[#0B1F4B]"
+                            ? "bg-emerald-100/60 text-[#051F16]"
                             : "bg-amber-100 text-amber-800"
                         }`}
                       >
@@ -1401,7 +1406,7 @@ export default function MSMEFlow({
                       </div>
                       <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
                         <div
-                          className="bg-[#0B1F4B] h-full"
+                          className="bg-[#051F16] h-full"
                           style={{ width: `${mch.utilization}%` }}
                         />
                       </div>
@@ -1410,7 +1415,7 @@ export default function MSMEFlow({
 
                   <div className="pt-4 border-t border-slate-100 mt-4 flex items-center justify-between text-xs text-slate-500">
                     <span>Verified by MSME Toolroom Audit</span>
-                    <span className="text-[#0B1F4B] font-semibold">
+                    <span className="text-[#051F16] font-semibold">
                       Active in RFQ Matching
                     </span>
                   </div>
@@ -1422,10 +1427,10 @@ export default function MSMEFlow({
           /* AI Smart Inventory, Reorder & Lead-Time Assistant (Blueprint Items 51, 52, 53) */
           <div className="space-y-6">
             {/* Header Banner */}
-            <div className="bg-gradient-to-r from-[#0B1F4B] to-slate-900 text-white rounded-2xl p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-5">
+            <div className="bg-gradient-to-r from-[#051F16] to-slate-900 text-white rounded-2xl p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-5">
               <div className="space-y-1.5">
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-bold uppercase tracking-wider bg-[#F97316] text-white px-2.5 py-0.5 rounded-full">
+                  <span className="text-[10px] font-bold uppercase tracking-wider bg-[#051F16] text-white px-2.5 py-0.5 rounded-full">
                     Blueprint Items 51, 52, 53
                   </span>
                   <span className="text-xs text-blue-200">
@@ -1474,7 +1479,7 @@ export default function MSMEFlow({
                       }}
                       className={`px-3.5 py-2 rounded-xl text-xs font-semibold border transition-all cursor-pointer flex items-center gap-2 ${
                         isSelected
-                          ? "bg-[#0B1F4B] text-white border-[#0B1F4B] shadow-xs"
+                          ? "bg-[#051F16] text-white border-[#051F16] shadow-xs"
                           : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100"
                       }`}
                     >
@@ -1495,7 +1500,7 @@ export default function MSMEFlow({
             {/* AI Calculation Results Grid */}
             {isCalculatingReorder ? (
               <div className="bg-white rounded-2xl border border-slate-200 p-12 flex flex-col items-center justify-center space-y-3">
-                <div className="w-8 h-8 border-3 border-[#0B1F4B] border-t-transparent rounded-full animate-spin" />
+                <div className="w-8 h-8 border-3 border-[#051F16] border-t-transparent rounded-full animate-spin" />
                 <p className="text-xs font-semibold text-slate-600">
                   MPI AI modeling consumption curves and supplier turnaround distribution...
                 </p>
@@ -1534,7 +1539,7 @@ export default function MSMEFlow({
                       </div>
                       <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
                         <span className="text-slate-400 block text-[10px]">Suggested Batch Qty</span>
-                        <strong className="text-[#0B1F4B] text-sm mt-0.5 block">
+                        <strong className="text-[#051F16] text-sm mt-0.5 block">
                           {reorderResult.reorderQuantity.toLocaleString("en-IN")} units
                         </strong>
                       </div>
@@ -1546,7 +1551,7 @@ export default function MSMEFlow({
                       </div>
                     </div>
 
-                    <div className="p-3.5 bg-blue-50/60 rounded-xl border border-blue-200 text-xs text-blue-950 leading-relaxed">
+                    <div className="p-3.5 bg-emerald-50/60 rounded-xl border border-emerald-200 text-xs text-blue-950 leading-relaxed">
                       <strong>Shop-Floor Guidance:</strong> {reorderResult.guidanceNotes}
                     </div>
                   </div>
@@ -1556,7 +1561,7 @@ export default function MSMEFlow({
                     <button
                       type="button"
                       onClick={() => alert(`Purchase requisition triggered for ${reorderResult.reorderQuantity} units of ${selectedInventoryMaterial}`)}
-                      className="px-3 py-1.5 bg-[#0B1F4B] text-white font-bold rounded-lg hover:bg-black transition-colors cursor-pointer text-xs"
+                      className="px-3 py-1.5 bg-[#051F16] text-white font-bold rounded-lg hover:bg-black transition-colors cursor-pointer text-xs"
                     >
                       Trigger Material PO →
                     </button>
@@ -1569,7 +1574,7 @@ export default function MSMEFlow({
                   <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs space-y-3">
                     <div className="flex items-center justify-between pb-2 border-b border-slate-100">
                       <div className="flex items-center gap-2">
-                        <Icons.Clock className="w-4 h-4 text-[#F97316]" />
+                        <Icons.Clock className="w-4 h-4 text-emerald-700" />
                         <span className="text-xs font-bold text-slate-900">
                           Supplier Lead-Time Prediction Intervals (Item 52)
                         </span>
@@ -1581,7 +1586,7 @@ export default function MSMEFlow({
 
                     <div className="flex items-center justify-between">
                       <div>
-                        <div className="text-2xl font-extrabold text-[#0B1F4B]">
+                        <div className="text-2xl font-extrabold text-[#051F16]">
                           {reorderResult.predictedLeadTimeDays} Business Days
                         </div>
                         <div className="text-[11px] text-slate-500 mt-0.5">
@@ -1600,7 +1605,7 @@ export default function MSMEFlow({
                   <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs space-y-3">
                     <div className="flex items-center justify-between pb-2 border-b border-slate-100">
                       <div className="flex items-center gap-2">
-                        <Icons.ShieldCheck className="w-4 h-4 text-[#0B1F4B]" />
+                        <Icons.ShieldCheck className="w-4 h-4 text-[#051F16]" />
                         <span className="text-xs font-bold text-slate-900">
                           Supplier Performance Scorecard (Item 53)
                         </span>
@@ -1621,7 +1626,7 @@ export default function MSMEFlow({
                       </div>
                       <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-100">
                         <span className="text-slate-400 block text-[10px]">Response Speed</span>
-                        <strong className="text-blue-700 text-sm">{reorderResult.scorecard.responseSpeedHours} Hours</strong>
+                        <strong className="text-emerald-800 text-sm">{reorderResult.scorecard.responseSpeedHours} Hours</strong>
                       </div>
                       <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-100">
                         <span className="text-slate-400 block text-[10px]">Cancellations</span>
@@ -1670,7 +1675,7 @@ export default function MSMEFlow({
                         <td className="py-3 text-slate-800 font-bold">{mat.stockUnits.toLocaleString("en-IN")} {mat.unit}</td>
                         <td className="py-3 text-slate-600">{mat.dailyConsumption} {mat.unit}/day</td>
                         <td className="py-3 text-slate-600">{mat.supplierTurnaroundDays} days</td>
-                        <td className="py-3 font-bold text-[#0B1F4B]">{mat.reorderPointUnits.toLocaleString("en-IN")} {mat.unit}</td>
+                        <td className="py-3 font-bold text-[#051F16]">{mat.reorderPointUnits.toLocaleString("en-IN")} {mat.unit}</td>
                         <td className="py-3">
                           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-semibold border ${
                             mat.status === "Healthy"
@@ -1689,7 +1694,7 @@ export default function MSMEFlow({
                               setSelectedInventoryMaterial(mat.materialName)
                               handleCalculateReorder(mat.materialName)
                             }}
-                            className="text-xs text-[#0B1F4B] hover:text-[#F97316] font-bold cursor-pointer transition-colors"
+                            className="text-xs text-[#051F16] hover:text-[#A3F65C] font-bold cursor-pointer transition-colors"
                           >
                             Analyze →
                           </button>
@@ -1716,14 +1721,14 @@ export default function MSMEFlow({
       <div className="max-w-4xl mx-auto space-y-6">
         <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-[#0B1F4B] text-white flex items-center justify-center font-bold">
+            <div className="w-12 h-12 rounded-xl bg-[#051F16] text-white flex items-center justify-center font-bold">
               <Icons.ShieldCheck className="w-7 h-7" />
             </div>
             <div>
               <div className="text-base font-bold text-slate-900">
                 MPI Statutory Compliance Audit Status
               </div>
-              <div className="text-xs text-[#0B1F4B] font-semibold">
+              <div className="text-xs text-[#051F16] font-semibold">
                 100% Verified · Gold Tier Sourcing Authorization
               </div>
             </div>
@@ -1776,7 +1781,7 @@ export default function MSMEFlow({
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="text-xs font-semibold text-[#0B1F4B] bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                  <span className="text-xs font-semibold text-[#051F16] bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
                     {c.status}
                   </span>
                   <span className="text-[11px] text-slate-400">{c.expiry}</span>
@@ -1874,10 +1879,10 @@ export default function MSMEFlow({
     return renderShell(
       <div className="space-y-6">
         {/* Header Strip */}
-        <div className="bg-linear-to-r from-[#0B1F4B] to-[#123B7A] rounded-2xl p-6 text-white shadow-lg border border-blue-400/20 flex flex-col md:flex-row md:items-center justify-between gap-5">
+        <div className="bg-linear-to-r from-[#051F16] to-[#0A3525] rounded-2xl p-6 text-white shadow-lg border border-blue-400/20 flex flex-col md:flex-row md:items-center justify-between gap-5">
           <div className="space-y-1.5">
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-extrabold uppercase tracking-wider bg-[#F97316] text-white px-2.5 py-0.5 rounded-full">
+              <span className="text-[10px] font-extrabold uppercase tracking-wider bg-[#051F16] text-white px-2.5 py-0.5 rounded-full">
                 MSME Central Scheme Registry
               </span>
               <span className="text-xs text-[#FFF7D6] font-semibold">
@@ -1922,7 +1927,7 @@ export default function MSMEFlow({
             <div className="text-xs text-slate-500 font-semibold uppercase tracking-wider">
               Identified Grant Potential
             </div>
-            <div className="text-2xl font-extrabold text-[#0B1F4B]">
+            <div className="text-2xl font-extrabold text-[#051F16]">
               ₹34.5 Lakhs
             </div>
             <div className="text-[11px] text-[#168A5B] font-semibold">
@@ -1962,15 +1967,15 @@ export default function MSMEFlow({
             >
               <div className="space-y-3">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                  <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
                     {sch.ministry}
                   </span>
-                  <span className="text-xs font-extrabold text-[#0B1F4B] bg-slate-100 px-2.5 py-1 rounded-xl">
+                  <span className="text-xs font-extrabold text-[#051F16] bg-slate-100 px-2.5 py-1 rounded-xl">
                     {sch.matchScore}% Match
                   </span>
                 </div>
                 <div>
-                  <h4 className="text-base font-extrabold text-[#0B1F4B]">
+                  <h4 className="text-base font-extrabold text-[#051F16]">
                     {sch.name}
                   </h4>
                   <div className="flex flex-wrap gap-1.5 mt-1.5">
@@ -2005,7 +2010,7 @@ export default function MSMEFlow({
                   href={sch.portalUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-bold text-blue-700 hover:underline flex items-center gap-1"
+                  className="font-bold text-emerald-800 hover:underline flex items-center gap-1"
                 >
                   <span>Official Portal</span>
                   <Icons.ExternalLink className="w-3.5 h-3.5" />
@@ -2058,7 +2063,7 @@ export default function MSMEFlow({
             value="32"
             change="+6 this cycle"
             trend="up"
-            icon={<Icons.FileText className="w-4 h-4 text-[#0B1F4B]" />}
+            icon={<Icons.FileText className="w-4 h-4 text-[#051F16]" />}
           />
           <MPIStatCard
             title="Quote Win Rate"
@@ -2072,21 +2077,21 @@ export default function MSMEFlow({
             value="₹38.4 Lakh"
             change="+28% MoM"
             trend="up"
-            icon={<Icons.Coins className="w-4 h-4 text-[#0B1F4B]" />}
+            icon={<Icons.Coins className="w-4 h-4 text-[#051F16]" />}
           />
           <MPIStatCard
             title="Avg Order Value"
             value="₹1.28 Lakh"
             change="Institutional contracts"
             trend="up"
-            icon={<Icons.Package className="w-4 h-4 text-[#F97316]" />}
+            icon={<Icons.Package className="w-4 h-4 text-emerald-700" />}
           />
           <MPIStatCard
             title="On-Time Delivery"
             value="98.5%"
             change="Zero SLA breaches"
             trend="up"
-            icon={<Icons.Clock className="w-4 h-4 text-[#0B1F4B]" />}
+            icon={<Icons.Clock className="w-4 h-4 text-[#051F16]" />}
           />
           <MPIStatCard
             title="MPI Trust Rating"
@@ -2109,7 +2114,7 @@ export default function MSMEFlow({
                   Gross landed revenue in ₹ Lakhs sourced via MPI
                 </p>
               </div>
-              <span className="text-xs font-bold text-[#0B1F4B] bg-blue-50 px-2.5 py-1 rounded-md border border-blue-200">
+              <span className="text-xs font-bold text-[#051F16] bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200">
                 +34% Growth
               </span>
             </div>
@@ -2118,8 +2123,8 @@ export default function MSMEFlow({
               <AreaChart data={monthlyRevenueData}>
                 <defs>
                   <linearGradient id="msmeRevGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#0B1F4B" stopOpacity={0.25} />
-                    <stop offset="95%" stopColor="#0B1F4B" stopOpacity={0} />
+                    <stop offset="5%" stopColor="#051F16" stopOpacity={0.25} />
+                    <stop offset="95%" stopColor="#051F16" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <XAxis
@@ -2137,7 +2142,7 @@ export default function MSMEFlow({
                 <Area
                   type="monotone"
                   dataKey="revenue"
-                  stroke="#0B1F4B"
+                  stroke="#051F16"
                   strokeWidth={2.5}
                   fill="url(#msmeRevGrad)"
                 />
@@ -2156,13 +2161,13 @@ export default function MSMEFlow({
                 <div key={f.stage} className="space-y-1">
                   <div className="flex justify-between text-xs font-semibold text-slate-700">
                     <span>{f.stage}</span>
-                    <span className="text-[#0B1F4B] font-bold">
+                    <span className="text-[#051F16] font-bold">
                       {f.count} ({f.pct}%)
                     </span>
                   </div>
                   <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
                     <div
-                      className="bg-[#0B1F4B] h-full rounded-full"
+                      className="bg-[#051F16] h-full rounded-full"
                       style={{ width: `${f.pct}%` }}
                     />
                   </div>
@@ -2189,7 +2194,7 @@ export default function MSMEFlow({
                   </span>
                   <div className="flex items-center gap-3">
                     <span className="text-slate-500">{b.orders} POs</span>
-                    <span className="font-bold text-[#0B1F4B] bg-blue-50 px-2 py-0.5 rounded">
+                    <span className="font-bold text-[#051F16] bg-emerald-50 px-2 py-0.5 rounded">
                       {b.share}
                     </span>
                   </div>
@@ -2198,9 +2203,9 @@ export default function MSMEFlow({
             </div>
           </div>
 
-          <div className="lg:col-span-6 bg-[#0B1F4B] text-white rounded-2xl p-6 shadow-xs flex flex-col justify-between space-y-4">
+          <div className="lg:col-span-6 bg-[#051F16] text-white rounded-2xl p-6 shadow-xs flex flex-col justify-between space-y-4">
             <div>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#123B7A] text-orange-400 text-[10px] font-bold uppercase tracking-wider mb-2">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#0A3525] text-[#A3F65C] border border-emerald-900/50 text-[10px] font-bold uppercase tracking-wider mb-2">
                 <Icons.Sparkles className="w-3.5 h-3.5" />
                 Capacity & Sourcing Intelligence
               </div>
@@ -2219,7 +2224,7 @@ export default function MSMEFlow({
               </p>
             </div>
 
-            <div className="pt-3 border-t border-[#123B7A] flex justify-between items-center">
+            <div className="pt-3 border-t border-[#0A3525] flex justify-between items-center">
               <span className="text-xs text-slate-400">
                 MPI Supplier Telemetry
               </span>
@@ -2273,12 +2278,12 @@ export default function MSMEFlow({
                 <span className="text-sm font-bold text-slate-900">
                   {opp.title}
                 </span>
-                <span className="text-xs font-bold text-[#0B1F4B] bg-blue-50 px-2 py-0.5 rounded">
+                <span className="text-xs font-bold text-[#051F16] bg-emerald-50 px-2 py-0.5 rounded">
                   {opp.matchScore}% Match
                 </span>
               </div>
               <div className="text-xs text-slate-500">
-                Buyer: <strong className="text-[#0B1F4B]">{opp.buyer}</strong> ·
+                Buyer: <strong className="text-[#051F16]">{opp.buyer}</strong> ·
                 Budget: <strong>{opp.budget}</strong> · Lead:{" "}
                 <strong>{opp.leadTime}</strong>
               </div>

@@ -97,10 +97,10 @@ export const StatusBadge = ({ status }: { status: string }) => {
       dot: "bg-emerald-500",
     },
     Verified: {
-      bg: "bg-blue-50",
-      text: "text-blue-700",
-      border: "border-blue-200",
-      dot: "bg-blue-500",
+      bg: "bg-emerald-50",
+      text: "text-emerald-800",
+      border: "border-emerald-200",
+      dot: "bg-emerald-600",
     },
     Matched: {
       bg: "bg-indigo-50",
@@ -196,8 +196,8 @@ export const PageHeader = ({
 }) => (
   <div className="mb-6">
     {badge && (
-      <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[11px] font-semibold mb-2 bg-blue-50 text-blue-700 border border-blue-200">
-        <span className="w-1.5 h-1.5 rounded-full bg-blue-600" />
+      <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[11px] font-semibold mb-2 bg-emerald-50 text-emerald-800 border border-emerald-200">
+        <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
         {badge}
       </div>
     )}

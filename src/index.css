@@ -28,41 +28,41 @@
   --border-light: #EAECEF;
   --border-subtle: #DCE2E6;
   
-  /* MPI Official Brand Color Tokens */
+  /* MPI Official Brand Color Tokens (Aligned with Reference Homepage) */
   --mpi-white: #FFFFFF;
-  --mpi-blue: #0B1F4B;
-  --mpi-blue-2: #123B7A;
-  --mpi-orange: #F97316;
-  --mpi-orange-light: #FFF1E8;
+  --mpi-blue: #051F16;
+  --mpi-blue-2: #083A28;
+  --mpi-orange: #A3F65C;
+  --mpi-orange-light: #F0FDF4;
   --mpi-yellow: #D9A400;
   --mpi-yellow-light: #FFF7D6;
-  --mpi-text: #0B1220;
+  --mpi-text: #051F16;
   --mpi-muted: #667085;
   --mpi-border: #E6EAF0;
-  --mpi-background: #F7F9FC;
+  --mpi-background: #FAFAFC;
   --mpi-surface: #FFFFFF;
   --mpi-success: #168A5B;
   --mpi-danger: #D92D20;
   
   --mpi-radius: 12px;
   --mpi-radius-lg: 16px;
-  --mpi-canvas: #F7F9FC;
+  --mpi-canvas: #FAFAFC;
 
   /* Material Design 3 (M3) Official System Tokens (m3.material.io) */
-  --md-sys-color-primary: #0B1F4B;
+  --md-sys-color-primary: #051F16;
   --md-sys-color-on-primary: #FFFFFF;
-  --md-sys-color-primary-container: #D8E2FF;
-  --md-sys-color-on-primary-container: #001A41;
+  --md-sys-color-primary-container: #D1FAE5;
+  --md-sys-color-on-primary-container: #051F16;
 
-  --md-sys-color-secondary: #00639B;
+  --md-sys-color-secondary: #083A28;
   --md-sys-color-on-secondary: #FFFFFF;
-  --md-sys-color-secondary-container: #CDE5FF;
-  --md-sys-color-on-secondary-container: #001D32;
+  --md-sys-color-secondary-container: #E6F4EA;
+  --md-sys-color-on-secondary-container: #051F16;
 
-  --md-sys-color-tertiary: #EA580C;
-  --md-sys-color-on-tertiary: #FFFFFF;
-  --md-sys-color-tertiary-container: #FFDBCF;
-  --md-sys-color-on-tertiary-container: #380D00;
+  --md-sys-color-tertiary: #A3F65C;
+  --md-sys-color-on-tertiary: #051F16;
+  --md-sys-color-tertiary-container: #ECFDF5;
+  --md-sys-color-on-tertiary-container: #051F16;
 
   --md-sys-color-surface: #FDFBFF;
   --md-sys-color-on-surface: #1A1C1E;
@@ -376,18 +376,18 @@ h1, h2, h3, h4, h5, h6 {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: #EA580C;
+  background: #051F16;
   color: #FFFFFF;
-  border: 1px solid #EA580C;
+  border: 1px solid #0A3525;
   font-weight: 600;
   border-radius: 10px;
   padding: 8px 16px;
   font-size: 13px;
   transition: all 0.15s ease;
-  box-shadow: 0 1px 2px rgba(234, 88, 12, 0.12);
+  box-shadow: 0 1px 2px rgba(5, 31, 22, 0.12);
 }
 .btn-orange:hover {
-  background: #C2410C;
+  background: #083A28;
   border-color: #C2410C;
   box-shadow: 0 4px 12px rgba(234, 88, 12, 0.22);
   transform: translateY(-1px);
@@ -512,9 +512,9 @@ h1, h2, h3, h4, h5, h6 {
   cursor: pointer;
 }
 .mpi-btn-ai:hover {
-  background-color: #EA580C;
+  background-color: #083A28;
   transform: translateY(-0.5px);
-  box-shadow: 0 4px 14px rgba(249, 115, 22, 0.28);
+  box-shadow: 0 4px 14px rgba(163, 246, 92, 0.28);
 }
 
 .mpi-btn-outline {
@@ -1426,9 +1426,9 @@ h1, h2, h3, h4, h5, h6 {
   color: #FFFFFF;
   margin-right: 8px;
 }
-.mpi-card-icon.blue { background: #2563EB; }
-.mpi-card-icon.orange { background: #EA580C; }
-.mpi-card-icon.yellow { background: #D97706; }
+.mpi-card-icon.blue { background: #051F16; }
+.mpi-card-icon.orange { background: #083A28; color: #A3F65C; }
+.mpi-card-icon.yellow { background: #0A3525; }
 
 .mpi-icon-button {
   width: 28px;

@@ -453,7 +453,7 @@ export const Icons = {
 // BUTTONS
 // ============================================================================
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "ai" | "outline" | "ghost" | "danger" | "savings"
+  variant?: "primary" | "secondary" | "ai" | "outline" | "ghost" | "danger" | "savings"
   size?: "sm" | "md" | "lg"
   icon?: ReactNode
   iconRight?: ReactNode
@@ -483,6 +483,8 @@ export function MPIButton({
   const variantClasses = {
     primary:
       "bg-[#051F16] text-white hover:bg-[#083A28] active:bg-[#051F16] border border-[#0A3525] shadow-xs active:scale-[0.98]",
+    secondary:
+      "bg-white/10 text-white border border-white/20 hover:bg-white/15 hover:border-white/30 active:scale-[0.98] backdrop-blur-xs",
     ai: "bg-[#051F16] text-[#A3F65C] hover:bg-[#083A28] active:bg-[#051F16] border border-emerald-900/60 shadow-xs active:scale-[0.98]",
     outline:
       "bg-white text-[#051F16] border border-slate-200 hover:bg-slate-50 hover:border-slate-300 active:scale-[0.98]",
@@ -566,16 +568,16 @@ export function MPIStatusBadge({ status }: { status: string }) {
       dot: "bg-emerald-500",
     },
     Verified: {
-      bg: "bg-blue-50",
-      text: "text-[#123B7A]",
-      border: "border-blue-200",
-      dot: "bg-[#0B1F4B]",
+      bg: "bg-emerald-50",
+      text: "text-emerald-800",
+      border: "border-emerald-200",
+      dot: "bg-emerald-600",
     },
     Matched: {
-      bg: "bg-orange-50",
-      text: "text-orange-700",
-      border: "border-orange-200",
-      dot: "bg-orange-500",
+      bg: "bg-emerald-100/60",
+      text: "text-[#051F16]",
+      border: "border-emerald-300",
+      dot: "bg-[#051F16]",
     },
     Quoted: {
       bg: "bg-amber-50",

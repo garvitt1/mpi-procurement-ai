@@ -30,7 +30,6 @@ export const ProductRail: React.FC<ProductRailProps> = ({
   // Drag interaction states
   const [isDragging, setIsDragging] = useState(false)
   const [dragStartX, setDragStartX] = useState(0)
-  const [dragCurrentX, setDragCurrentX] = useState(0)
   const [dragOffset, setDragOffset] = useState(0)
 
   // Wheel interaction throttling
@@ -145,7 +144,6 @@ export const ProductRail: React.FC<ProductRailProps> = ({
     if (e.button !== 0) return
     setIsDragging(true)
     setDragStartX(e.clientX)
-    setDragCurrentX(e.clientX)
     setDragOffset(0)
     // Capture pointer
     e.currentTarget.setPointerCapture(e.pointerId)
@@ -153,7 +151,6 @@ export const ProductRail: React.FC<ProductRailProps> = ({
 
   const handlePointerMove = (e: React.PointerEvent) => {
     if (!isDragging) return
-    setDragCurrentX(e.clientX)
     const offset = e.clientX - dragStartX
     setDragOffset(offset)
   }

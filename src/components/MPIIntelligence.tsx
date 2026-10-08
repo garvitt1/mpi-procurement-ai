@@ -53,7 +53,7 @@ function SectionTitle({
   return (
     <div className="flex items-start justify-between gap-4 mb-4">
       <div>
-        <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-blue-600 mb-1">
+        <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-emerald-700 mb-1">
           {eyebrow}
         </div>
         <div
@@ -148,7 +148,7 @@ export function StartupMPIIntelligence({
                 className="rounded-xl border border-slate-200 p-4 hover:border-slate-300 hover:bg-slate-50/50 transition-all"
               >
                 <div className="flex items-start gap-3.5">
-                  <div className="w-9 h-9 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold shrink-0">
+                  <div className="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-800 flex items-center justify-center font-bold shrink-0">
                     {icon("spark")}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -317,7 +317,7 @@ export function MSMEAIWorkspace({
                 label={label}
                 value={value}
                 note="Verified performance indicator"
-                accent="#EA580C"
+                accent="#051F16"
               />
             ))}
           </div>
@@ -435,7 +435,7 @@ export function MSMEAIWorkspace({
               key={n}
               className="rounded-xl bg-slate-50 border border-slate-200 p-4"
             >
-              <div className="text-xs font-bold text-blue-600">{n}</div>
+              <div className="text-xs font-bold text-emerald-700">{n}</div>
               <div className="text-sm font-semibold text-slate-900 mt-2">
                 {title}
               </div>
@@ -456,13 +456,13 @@ export function AdminMPIControlCenter() {
       "09:42",
       "Startup requirement parsed",
       "3 matching suppliers suggested",
-      "#2563EB",
+      "#051F16",
     ],
     [
       "09:37",
       "MSME opportunity prioritized",
       "High priority alert · RFQ-2048",
-      "#EA580C",
+      "#059669",
     ],
     [
       "09:21",
@@ -474,7 +474,7 @@ export function AdminMPIControlCenter() {
       "09:04",
       "Procurement milestone tracked",
       "Batch delivery confirmed for order #108",
-      "#2563EB",
+      "#051F16",
     ],
   ]
 
@@ -504,13 +504,13 @@ export function AdminMPIControlCenter() {
               label="Open RFQs"
               value="347"
               note="Across 7 sectors"
-              accent="#2563EB"
+              accent="#051F16"
             />
             <Metric
               label="Action items"
               value="16"
               note="Awaiting review"
-              accent="#EA580C"
+              accent="#059669"
             />
           </div>
         </div>
@@ -576,7 +576,7 @@ export function AdminMPIControlCenter() {
                       : tone === "emerald"
                         ? "bg-emerald-500"
                         : tone === "blue"
-                          ? "bg-blue-500"
+                          ? "bg-emerald-600"
                           : "bg-slate-400"
                   }`}
                 />

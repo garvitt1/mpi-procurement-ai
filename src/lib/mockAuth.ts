@@ -255,4 +255,28 @@ export function mockGoogleAuth(role?: RoleKey): Promise<{ success: boolean; user
   })
 }
 
+/**
+ * Retrieve the active stored user session if available.
+ */
+export function getActiveUser(): GoogleAuthUser | null {
+  try {
+    const raw = localStorage.getItem("mpi_active_user")
+    return raw ? JSON.parse(raw) : null
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Log out active session across all roles.
+ */
+export function logoutUser(): void {
+  try {
+    localStorage.removeItem("mpi_active_user")
+    localStorage.removeItem("mpi_user_role")
+    sessionStorage.removeItem("mpi_admin_authenticated")
+    localStorage.removeItem("mpi_admin_authenticated")
+  } catch {}
+}
+
 

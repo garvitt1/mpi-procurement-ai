@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect } from "react"
 import { usePageLanguage } from "../../lib/languageTranslator"
 
 interface LanguageTranslatorButtonProps {
@@ -36,15 +36,15 @@ export default function LanguageTranslatorButton({
         onClick={() => setIsOpen((prev) => !prev)}
         className={`group flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer select-none backdrop-blur-md ${
           variant === "navy"
-            ? "bg-[#0B1F4B]/85 hover:bg-[#123B7A]/92 text-slate-200 border border-white/20 hover:text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.18)]"
-            : "bg-white/85 hover:bg-white text-slate-700 hover:text-[#0B1F4B] border border-slate-200/90 hover:border-slate-300 shadow-2xs"
+            ? "bg-[#051F16]/85 hover:bg-[#083A28]/92 text-slate-200 border border-white/20 hover:text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.18)]"
+            : "bg-white/85 hover:bg-white text-slate-700 hover:text-[#051F16] border border-slate-200/90 hover:border-slate-300 shadow-2xs"
         }`}
         title="Translate webpage language / भाषा बदलें"
         aria-label="Language translator"
       >
         {/* Clean Line Globe Icon matching reference image */}
         <svg
-          className="w-4 h-4 text-slate-600 group-hover:text-[#0B1F4B] transition-colors shrink-0"
+          className="w-4 h-4 text-slate-600 group-hover:text-[#051F16] transition-colors shrink-0"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -89,7 +89,7 @@ export default function LanguageTranslatorButton({
                   }}
                   className={`w-full text-left px-3.5 py-2 flex items-center justify-between transition-colors cursor-pointer ${
                     isSelected
-                      ? "bg-blue-50/80 text-[#0B1F4B] font-bold"
+                      ? "bg-emerald-50 text-[#051F16] font-bold"
                       : "text-slate-700 hover:bg-slate-50 hover:text-slate-900"
                   }`}
                 >
@@ -100,7 +100,7 @@ export default function LanguageTranslatorButton({
                     <span>{lang.nativeName}</span>
                   </div>
                   {isSelected && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#0B1F4B]" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#051F16]" />
                   )}
                 </button>
               )
