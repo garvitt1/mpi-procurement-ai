@@ -18,6 +18,7 @@ import GlobalNavBar from "../components/navigation/GlobalNavBar"
 import ProductCatalogue from "../components/catalogue/ProductCatalogue"
 import useScrollReveal from "../hooks/useScrollReveal"
 import MaterialIcon from "../components/ui/MaterialIcon"
+import CountUpNumber from "../components/ui/CountUpNumber"
 
 export function formatScopeDisplay(category: CatalogCategory, qty: number): string {
   if (category === "Packaging & Printing") {
@@ -43,6 +44,28 @@ export function formatScopeDisplay(category: CatalogCategory, qty: number): stri
   }
   return qty > 0 ? `${qty.toLocaleString("en-IN")} units` : "1 Mandate"
 }
+
+export const INDUSTRIAL_CLUSTERS = [
+  { name: "Peenya Industrial Area, Bengaluru", specialty: "CNC Machining & Precision Tooling", state: "KA" },
+  { name: "Okhla Industrial Area, New Delhi", specialty: "Light Engineering & Electronics", state: "DL" },
+  { name: "Bhosari & Chakan, Pune", specialty: "Automotive Sheet Metal & Stamping", state: "MH" },
+  { name: "Coimbatore Precision Cluster, TN", specialty: "Pumps, Castings & Motors", state: "TN" },
+  { name: "Sivakasi Packaging Corridor, TN", specialty: "Rigid Boxes & Offset Printing", state: "TN" },
+  { name: "Ambattur Industrial Estate, Chennai", specialty: "Electronics & PCB Fabrication", state: "TN" },
+  { name: "Sanand Industrial Park, Gujarat", specialty: "Injection Molding & Tooling", state: "GJ" },
+  { name: "Manesar IMT, Haryana", specialty: "Precision Die Casting & Prototyping", state: "HR" },
+]
+
+export const STATUTORY_STANDARDS = [
+  { label: "DPIIT Recognized Startup Infrastructure", badge: "Govt of India", icon: "verified" },
+  { label: "ZED Gold Certified MSME Manufacturers", badge: "Zero Defect", icon: "military_tech" },
+  { label: "ISO 9001:2015 Quality Management Standard", badge: "Audited", icon: "fact_check" },
+  { label: "Udyam Ministry Verified Active GSTINs", badge: "MSME Ministry", icon: "policy" },
+  { label: "Milestone Tripartite Escrow Banking", badge: "Protected", icon: "lock" },
+  { label: "NABL Accredited Third-Party Testing Labs", badge: "QA Tested", icon: "science" },
+  { label: "Government e-Marketplace (GeM) Compliant", badge: "Institutional", icon: "account_balance" },
+  { label: "Startup India SISFS Seed Grant Assistance", badge: "Up to 80%", icon: "savings" },
+]
 
 export default function Home({
   navigate,
@@ -275,10 +298,14 @@ export default function Home({
 
       {/* ─── 2. HERO SECTION (REFERENCE REIMAGINATION) ─────────────────────── */}
       <section className="relative pt-16 pb-20 lg:pt-24 lg:pb-32 overflow-hidden bg-gradient-to-b from-white via-[#F8FAFC] to-[#F1F5F9]">
-        {/* Ambient Spatial Lighting - Restrained, Clean, Delicate */}
+        {/* Multi-Tiered Luminous Spatial Hero Glows */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 w-[1000px] h-[550px] bg-gradient-to-b from-emerald-100/40 via-amber-50/20 to-transparent rounded-full blur-3xl opacity-70"
+          className="pointer-events-none absolute -top-48 left-1/2 -translate-x-1/2 w-[1100px] h-[650px] bg-gradient-to-b from-[#A3F65C]/20 via-emerald-700/10 to-transparent rounded-full blur-[130px] opacity-80"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -top-24 left-1/3 w-[500px] h-[400px] bg-emerald-400/10 rounded-full blur-[100px] opacity-60"
         />
 
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -312,7 +339,7 @@ export default function Home({
               <button
                 type="button"
                 onClick={() => navigate("startup.procurement")}
-                className="group inline-flex items-center gap-2.5 px-6 py-3.5 text-sm font-bold rounded-xl bg-[#051F16] hover:bg-[#083A28] active:bg-[#051F16] text-white shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer"
+                className="group inline-flex items-center gap-2.5 px-6 py-3.5 text-sm font-bold rounded-xl bg-[#051F16] hover:bg-[#083A28] active:scale-[0.98] text-white shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer border border-[#0A3525]"
               >
                 <span>Start with MPI</span>
                 <Icons.ArrowRight className="w-4 h-4 text-[#A3F65C] group-hover:translate-x-1 transition-transform" />
@@ -320,7 +347,7 @@ export default function Home({
 
               <a
                 href="#marketplace"
-                className="inline-flex items-center gap-2 px-6 py-3.5 text-sm font-semibold rounded-xl bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 shadow-2xs hover:border-slate-300 transition-all cursor-pointer"
+                className="inline-flex items-center gap-2 px-6 py-3.5 text-sm font-semibold rounded-xl bg-white hover:bg-slate-50 active:scale-[0.98] text-slate-800 border border-slate-200 shadow-2xs hover:border-slate-300 transition-all cursor-pointer"
               >
                 <span>Explore Catalogue</span>
                 <MaterialIcon name="arrow_downward" size={15} className="text-slate-400" />
@@ -331,7 +358,7 @@ export default function Home({
             <div className="pt-2 flex items-center justify-center gap-6 text-xs text-slate-500 font-medium">
               <span className="flex items-center gap-1.5">
                 <MaterialIcon name="verified" size={14} className="text-emerald-700" />
-                <span>1,240+ Verified MSME Factories</span>
+                <span><CountUpNumber end={1240} suffix="+" /> Verified MSME Factories</span>
               </span>
               <span className="hidden sm:inline text-slate-300">•</span>
               <span className="hidden sm:flex items-center gap-1.5">
@@ -348,6 +375,12 @@ export default function Home({
 
           {/* ─── 3. REAL MPI PRODUCT PREVIEW (HERO ARTWORK CENTERPIECE) ──────── */}
           <div className="mt-14 lg:mt-18 relative">
+            {/* Luminous Centerpiece Halo Aura */}
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 w-[92%] max-w-4xl h-[420px] bg-gradient-to-r from-emerald-600/15 via-[#A3F65C]/25 to-teal-500/15 blur-[80px] rounded-3xl"
+            />
+
             {/* Outer Product Frame */}
             <div className="relative mx-auto rounded-2xl sm:rounded-3xl border border-slate-200/80 bg-white shadow-[0_20px_60px_-15px_rgba(11,31,75,0.12)] overflow-hidden">
               {/* Product Window Header Bar */}
@@ -367,7 +400,7 @@ export default function Home({
                 <div className="flex items-center gap-3">
                   <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200 font-medium text-[11px]">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    <span>Engine Active • 1,240 Factories Connected</span>
+                    <span>Engine Active • <CountUpNumber end={1240} /> Factories Connected</span>
                   </div>
                 </div>
               </div>
@@ -422,6 +455,34 @@ export default function Home({
                         <span>Run Full RFQ</span>
                       </button>
                     </div>
+                  </div>
+                </div>
+
+                {/* Synthesis Pipeline Bridge Visualizer */}
+                <div className="hidden md:flex items-center justify-between px-3.5 py-2 bg-slate-100/80 rounded-xl border border-slate-200/70 text-[11px] font-mono text-slate-600">
+                  <div className="flex items-center gap-2 font-semibold text-slate-800">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <span>SYNTHESIS PIPELINE</span>
+                  </div>
+                  <div className="flex items-center gap-2.5 text-slate-500">
+                    <span className="text-emerald-800 font-semibold flex items-center gap-1">
+                      <span>BOM Extraction</span>
+                    </span>
+                    <span className="text-slate-300">→</span>
+                    <span className="text-emerald-800 font-semibold flex items-center gap-1">
+                      <span>Machine Slot Match</span>
+                    </span>
+                    <span className="text-slate-300">→</span>
+                    <span className="text-emerald-800 font-semibold flex items-center gap-1">
+                      <span>Reverse Margin Audit</span>
+                    </span>
+                    <span className="text-slate-300">→</span>
+                    <span className="text-emerald-800 font-semibold flex items-center gap-1">
+                      <span>Escrow Gate</span>
+                    </span>
+                  </div>
+                  <div className="text-[10px] text-emerald-800 font-bold bg-white px-2 py-0.5 rounded border border-slate-200 shadow-2xs">
+                    LATENCY &lt; 240ms
                   </div>
                 </div>
 
@@ -574,7 +635,7 @@ export default function Home({
                 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#051F16] tracking-tight"
                 style={{ fontFamily: "Plus Jakarta Sans" }}
               >
-                1,240+
+                <CountUpNumber end={1240} suffix="+" />
               </div>
               <div className="text-xs sm:text-sm text-slate-600 font-medium mt-1">
                 Verified MSME Suppliers
@@ -589,7 +650,7 @@ export default function Home({
                 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#051F16] tracking-tight"
                 style={{ fontFamily: "Plus Jakarta Sans" }}
               >
-                75+
+                <CountUpNumber end={75} suffix="+" />
               </div>
               <div className="text-xs sm:text-sm text-slate-600 font-medium mt-1">
                 Procure-Ready Offerings
@@ -604,7 +665,7 @@ export default function Home({
                 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#051F16] tracking-tight"
                 style={{ fontFamily: "Plus Jakarta Sans" }}
               >
-                7
+                <CountUpNumber end={7} />
               </div>
               <div className="text-xs sm:text-sm text-slate-600 font-medium mt-1">
                 Core Procurement Verticals
@@ -619,7 +680,7 @@ export default function Home({
                 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-emerald-700 tracking-tight"
                 style={{ fontFamily: "Plus Jakarta Sans" }}
               >
-                18–32%
+                <CountUpNumber start={18} end={32} prefix="18–" suffix="%" />
               </div>
               <div className="text-xs sm:text-sm text-slate-600 font-medium mt-1">
                 Direct Cost Reduction
@@ -627,6 +688,59 @@ export default function Home({
               <div className="text-[11px] text-slate-400 mt-0.5">
                 Via Factory Reverse Margins
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── 4B. CONTINUOUS DUAL INDUSTRIAL CLUSTER & STATUTORY MARQUEES ───── */}
+      <section className="py-8 bg-[#FAFAFC] border-b border-slate-200/80 overflow-hidden relative select-none">
+        {/* Left & Right Gradient Fade Masks */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute left-0 top-0 bottom-0 w-24 sm:w-48 bg-gradient-to-r from-[#FAFAFC] via-[#FAFAFC]/90 to-transparent z-10"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute right-0 top-0 bottom-0 w-24 sm:w-48 bg-gradient-to-l from-[#FAFAFC] via-[#FAFAFC]/90 to-transparent z-10"
+        />
+
+        <div className="space-y-3.5">
+          {/* Rail 1: Industrial Manufacturing Hubs (Left-moving) */}
+          <div className="flex overflow-hidden">
+            <div className="animate-marquee-left flex items-center gap-3">
+              {[...INDUSTRIAL_CLUSTERS, ...INDUSTRIAL_CLUSTERS].map((cluster, idx) => (
+                <div
+                  key={`cluster-${idx}`}
+                  className="inline-flex items-center gap-2.5 px-3.5 py-2 rounded-xl bg-white border border-slate-200/80 shadow-2xs hover:border-slate-300 hover:shadow-xs transition-all whitespace-nowrap"
+                >
+                  <span className="w-2 h-2 rounded-full bg-[#A3F65C] ring-2 ring-emerald-600/30" />
+                  <span className="text-xs font-bold text-[#051F16]">{cluster.name}</span>
+                  <span className="text-slate-300">•</span>
+                  <span className="text-[11px] text-slate-500 font-medium">{cluster.specialty}</span>
+                  <span className="text-[10px] font-mono bg-emerald-50 text-emerald-800 font-bold px-1.5 py-0.5 rounded border border-emerald-200/50">
+                    {cluster.state}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Rail 2: Statutory Standards & Certifications (Right-moving) */}
+          <div className="flex overflow-hidden">
+            <div className="animate-marquee-right flex items-center gap-3">
+              {[...STATUTORY_STANDARDS, ...STATUTORY_STANDARDS].map((std, idx) => (
+                <div
+                  key={`std-${idx}`}
+                  className="inline-flex items-center gap-2.5 px-3.5 py-2 rounded-xl bg-[#051F16] border border-[#0A3525] text-white shadow-2xs hover:border-emerald-600/50 transition-all whitespace-nowrap"
+                >
+                  <MaterialIcon name={std.icon} size={15} className="text-[#A3F65C]" />
+                  <span className="text-xs font-semibold text-slate-200">{std.label}</span>
+                  <span className="text-[10px] font-mono font-bold bg-[#0A3525] text-[#A3F65C] px-2 py-0.5 rounded border border-emerald-900/60">
+                    {std.badge}
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -915,7 +1029,7 @@ export default function Home({
             <div className="order-2 lg:order-1 bg-slate-50 rounded-2xl p-6 border border-slate-200 shadow-2xs space-y-4">
               <div className="flex items-center justify-between text-xs font-mono text-slate-500 border-b border-slate-200 pb-3">
                 <span>REVERSE MARGIN LEDGER</span>
-                <span className="text-emerald-700 font-bold">-₹36,000 DIRECT GAIN</span>
+                <span className="text-emerald-700 font-bold">-₹<CountUpNumber end={36000} /> DIRECT GAIN</span>
               </div>
               <div className="bg-white rounded-xl p-4 border border-slate-200 space-y-2 text-xs">
                 <div className="flex justify-between py-1 border-b border-slate-100">
@@ -936,7 +1050,7 @@ export default function Home({
                 </div>
                 <div className="flex justify-between pt-1 text-sm">
                   <span className="font-bold text-[#051F16]">Net Landed Factory Invoice:</span>
-                  <span className="font-extrabold text-emerald-700">₹66,670</span>
+                  <span className="font-extrabold text-emerald-700">₹<CountUpNumber end={66670} /></span>
                 </div>
               </div>
             </div>
@@ -1015,9 +1129,26 @@ export default function Home({
 
           {/* Ecosystem Visual Network */}
           <div className="mt-12 p-8 sm:p-12 bg-slate-50/70 rounded-3xl border border-slate-200 relative overflow-hidden">
+            {/* Dynamic Animated Vector Bridge Connecting Hub to Network */}
+            <svg
+              className="absolute inset-0 w-full h-full pointer-events-none hidden md:block opacity-35"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <defs>
+                <linearGradient id="bridgeGradient" x1="50%" y1="20%" x2="50%" y2="100%">
+                  <stop offset="0%" stopColor="#A3F65C" stopOpacity="0.9" />
+                  <stop offset="50%" stopColor="#10B981" stopOpacity="0.6" />
+                  <stop offset="100%" stopColor="#051F16" stopOpacity="0.2" />
+                </linearGradient>
+              </defs>
+              <line x1="50%" y1="120" x2="20%" y2="240" stroke="url(#bridgeGradient)" strokeWidth="2" strokeDasharray="6 6" className="animate-draw-line" />
+              <line x1="50%" y1="120" x2="50%" y2="240" stroke="url(#bridgeGradient)" strokeWidth="2" strokeDasharray="6 6" className="animate-draw-line" />
+              <line x1="50%" y1="120" x2="80%" y2="240" stroke="url(#bridgeGradient)" strokeWidth="2" strokeDasharray="6 6" className="animate-draw-line" />
+            </svg>
+
             {/* Center Node */}
-            <div className="flex flex-col items-center justify-center">
-              <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl bg-[#051F16] text-white flex flex-col items-center justify-center shadow-xl border-4 border-white z-10">
+            <div className="flex flex-col items-center justify-center relative z-10">
+              <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl bg-[#051F16] text-white flex flex-col items-center justify-center border-4 border-white z-10 animate-pulse-hub">
                 <span className="text-xl sm:text-2xl font-black tracking-tight" style={{ fontFamily: "Plus Jakarta Sans" }}>
                   MPI
                 </span>
@@ -1028,7 +1159,7 @@ export default function Home({
             </div>
 
             {/* Orbiting Satellite Nodes */}
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mt-8 max-w-4xl mx-auto">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mt-8 max-w-4xl mx-auto relative z-10">
               <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs text-left space-y-1">
                 <div className="flex items-center gap-2 font-bold text-slate-900 text-xs">
                   <MaterialIcon name="rocket_launch" size={16} className="text-emerald-700" />
@@ -1423,7 +1554,7 @@ export default function Home({
             <button
               type="button"
               onClick={() => navigate("startup.procurement")}
-              className="group inline-flex items-center gap-2.5 px-7 py-4 text-sm font-bold rounded-xl bg-[#A3F65C] hover:bg-[#92E64B] active:bg-[#A3F65C] text-[#051F16] shadow-lg hover:shadow-xl transition-all cursor-pointer"
+              className="group inline-flex items-center gap-2.5 px-8 py-4 text-sm font-extrabold rounded-xl bg-[#A3F65C] hover:bg-[#92E64B] active:scale-[0.98] text-[#051F16] shadow-[0_4px_24px_rgba(163,246,92,0.35)] hover:shadow-[0_8px_32px_rgba(163,246,92,0.5)] transition-all cursor-pointer"
             >
               <span>Start with MPI</span>
               <Icons.ArrowRight className="w-4 h-4 text-[#051F16] group-hover:translate-x-1 transition-transform" />
@@ -1432,7 +1563,7 @@ export default function Home({
             <button
               type="button"
               onClick={() => navigate("register.msme")}
-              className="px-7 py-4 text-sm font-semibold rounded-xl bg-transparent hover:bg-white/10 text-white border border-white/20 transition-all cursor-pointer"
+              className="px-8 py-4 text-sm font-bold rounded-xl bg-white/10 hover:bg-white/15 active:scale-[0.98] text-white border border-white/25 hover:border-white/40 transition-all cursor-pointer backdrop-blur-xs"
             >
               Register as MSME Supplier
             </button>

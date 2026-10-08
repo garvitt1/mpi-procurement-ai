@@ -382,10 +382,10 @@ export default function GlobalNavBar({
                       className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 cursor-pointer ${
                         active
                           ? variant === "navy"
-                            ? "bg-[#F97316] text-white shadow-xs"
-                            : "bg-[#0B1F4B] text-white shadow-xs"
+                            ? "bg-[#0A3525] text-[#A3F65C] border border-emerald-800/60 shadow-xs"
+                            : "bg-[#051F16] text-white shadow-xs"
                           : variant === "navy"
-                          ? "text-slate-300 hover:bg-[#123B7A] hover:text-white"
+                          ? "text-slate-300 hover:bg-[#0A3525] hover:text-white"
                           : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
                       }`}
                     >
@@ -395,7 +395,7 @@ export default function GlobalNavBar({
                         <span
                           className={`text-[9px] px-1 py-0.2 rounded font-bold uppercase ${
                             variant === "navy"
-                              ? "bg-[#123B7A] text-slate-300"
+                              ? "bg-[#0A3525] text-[#A3F65C]"
                               : "bg-slate-100 text-slate-500"
                           }`}
                         >
@@ -417,17 +417,17 @@ export default function GlobalNavBar({
                 <button
                   type="button"
                   onClick={() => navigate("login.startup")}
-                  className="px-3.5 py-1.5 text-xs font-semibold text-slate-700 hover:text-[#0B1F4B] hover:bg-slate-100/80 rounded-lg transition-colors cursor-pointer"
+                  className="px-3.5 py-1.5 text-xs font-bold text-slate-800 hover:text-[#051F16] hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
                 >
                   Sign In
                 </button>
                 <button
                   type="button"
                   onClick={() => navigate("startup.procurement")}
-                  className="group inline-flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-xl bg-[#0B1F4B] hover:bg-[#123B7A] active:bg-[#0B1F4B] text-white shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer"
+                  className="group inline-flex items-center gap-2 px-4.5 py-2 text-xs font-bold rounded-xl bg-[#051F16] hover:bg-[#083A28] active:bg-[#051F16] text-white shadow-[0_2px_10px_rgba(5,31,22,0.2)] hover:shadow-[0_4px_14px_rgba(5,31,22,0.3)] border border-[#0A3525] active:scale-[0.98] transition-all duration-200 cursor-pointer"
                 >
                   <span>Start with MPI</span>
-                  <Icons.ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                  <Icons.ArrowRight className="w-3.5 h-3.5 text-[#A3F65C] group-hover:translate-x-0.5 transition-transform" />
                 </button>
               </div>
             ) : (

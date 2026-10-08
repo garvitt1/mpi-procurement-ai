@@ -99,6 +99,10 @@
   --md-sys-shape-corner-full: 9999px;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 html, body, #root {
   height: 100%;
 }
@@ -136,6 +140,52 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Animations */
+@keyframes marquee-left {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-50%, 0, 0); }
+}
+
+@keyframes marquee-right {
+  0% { transform: translate3d(-50%, 0, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+
+@keyframes draw-line {
+  0% { stroke-dashoffset: 600; opacity: 0; }
+  100% { stroke-dashoffset: 0; opacity: 1; }
+}
+
+@keyframes pulse-hub {
+  0%, 100% { box-shadow: 0 0 0 12px rgba(163, 246, 92, 0.18), 0 0 30px rgba(163, 246, 92, 0.35); }
+  50% { box-shadow: 0 0 0 20px rgba(163, 246, 92, 0.08), 0 0 45px rgba(163, 246, 92, 0.5); }
+}
+
+.animate-marquee-left {
+  display: flex;
+  width: max-content;
+  animation: marquee-left 24s linear infinite;
+}
+
+.animate-marquee-right {
+  display: flex;
+  width: max-content;
+  animation: marquee-right 24s linear infinite;
+}
+
+.animate-marquee-left:hover,
+.animate-marquee-right:hover {
+  animation-play-state: paused;
+}
+
+.animate-draw-line {
+  stroke-dasharray: 600;
+  animation: draw-line 2.5s ease-out forwards;
+}
+
+.animate-pulse-hub {
+  animation: pulse-hub 3s ease-in-out infinite;
+}
+
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
