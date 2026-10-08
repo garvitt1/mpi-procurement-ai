@@ -32,6 +32,7 @@ import {
   hasLiveAIConfigured,
 } from "../../services/aiService"
 import MaterialIcon from "../../components/ui/MaterialIcon"
+import { MPI_AI_CAPABILITIES } from "../../services/ai/capabilityRegistry"
 
 // Markdown parser for Admin Copilot rich generative text
 function parseInlineFormatting(text: string): React.ReactNode[] {
@@ -109,6 +110,10 @@ export default function AdminFlow({
     pricing: 25,
     compliance: 15,
   })
+
+  // 62-Capability Architecture Registry Filter State
+  const [capCategoryFilter, setCapCategoryFilter] = useState<string>("all")
+  const [capSearchQuery, setCapSearchQuery] = useState<string>("")
 
   // ─── BLUEPRINT AI CAPABILITIES ─────────────────────────────────────────────
   // Items 54 & 55: Risk & Suspicious Pattern Flags & Duplicate Invoice Detection
@@ -2360,6 +2365,151 @@ Select a quick analysis pill below or ask me any question!`,
               <p className="text-slate-700 leading-relaxed">{fairnessReport.governanceRecommendation}</p>
             </div>
           )}
+        </div>
+
+        {/* ─── MODULAR 62-CAPABILITY ARCHITECTURE REGISTRY (Sections 2, 28, 29) ─── */}
+        <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-5 animate-fade-in">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#051F16] bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                  Architectural Blueprint · 62 Capabilities
+                </span>
+                <span className="text-xs text-slate-400 font-mono">Pillars 1 to 6</span>
+              </div>
+              <h3 className="text-base font-extrabold text-slate-900 mt-1" style={{ fontFamily: "Plus Jakarta Sans" }}>
+                AI Capability Lifecycle & Production Registry
+              </h3>
+              <p className="text-xs text-slate-500">
+                Separates operational AI endpoints from upcoming roadmap capabilities without fake UI buttons.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-mono bg-emerald-100/80 text-emerald-800 font-bold px-2.5 py-1 rounded-lg">
+                38 Available
+              </span>
+              <span className="text-xs font-mono bg-blue-100/80 text-blue-800 font-bold px-2.5 py-1 rounded-lg">
+                12 Beta
+              </span>
+              <span className="text-xs font-mono bg-slate-100 text-slate-700 font-bold px-2.5 py-1 rounded-lg">
+                12 Planned
+              </span>
+            </div>
+          </div>
+
+          {/* Category Filter Pills & Search */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex flex-wrap gap-1.5 text-xs">
+              {[
+                { id: "all", label: "All 62" },
+                { id: "demand_capture", label: "Demand Intake (10)" },
+                { id: "supplier_discovery", label: "Supplier Discovery (10)" },
+                { id: "rfq_quotation", label: "RFQ & Quotes (11)" },
+                { id: "schemes_compliance", label: "Schemes & Compliance (7)" },
+                { id: "analytics_forecasting", label: "Analytics & Risk (12)" },
+                { id: "copilots_trust", label: "Copilots & Trust (12)" },
+              ].map((cat) => (
+                <button
+                  key={cat.id}
+                  type="button"
+                  onClick={() => setCapCategoryFilter(cat.id)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer transition-colors ${
+                    capCategoryFilter === cat.id
+                      ? "bg-[#051F16] text-white shadow-2xs"
+                      : "bg-slate-100 hover:bg-slate-200 text-slate-700"
+                  }`}
+                >
+                  {cat.label}
+                </button>
+              ))}
+            </div>
+
+            <div className="w-full sm:w-60 relative">
+              <MaterialIcon name="search" size={16} className="text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                value={capSearchQuery}
+                onChange={(e) => setCapSearchQuery(e.target.value)}
+                placeholder="Search capability or tool..."
+                className="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg outline-none focus:border-[#051F16] focus:bg-white"
+              />
+            </div>
+          </div>
+
+          {/* Capabilities Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[500px] overflow-y-auto pr-1">
+            {Object.values(MPI_AI_CAPABILITIES)
+              .filter((cap) => {
+                if (capCategoryFilter !== "all" && cap.category !== capCategoryFilter) return false
+                if (capSearchQuery.trim()) {
+                  const q = capSearchQuery.toLowerCase().trim()
+                  return (
+                    cap.name.toLowerCase().includes(q) ||
+                    cap.id.toLowerCase().includes(q) ||
+                    cap.description.toLowerCase().includes(q)
+                  )
+                }
+                return true
+              })
+              .map((cap) => {
+                const isAvailable = cap.status === "available"
+                const isBeta = cap.status === "beta"
+
+                return (
+                  <div
+                    key={cap.id}
+                    className="p-3.5 rounded-xl border border-slate-200/80 bg-slate-50/50 hover:bg-white hover:shadow-2xs transition-all space-y-2"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <div className="font-bold text-slate-900 text-xs flex items-center gap-1.5">
+                          <span>{cap.name}</span>
+                        </div>
+                        <div className="font-mono text-[10px] text-slate-400 mt-0.5">
+                          id: {cap.id}
+                        </div>
+                      </div>
+
+                      <span
+                        className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded uppercase tracking-wider shrink-0 ${
+                          isAvailable
+                            ? "bg-emerald-100 text-emerald-800"
+                            : isBeta
+                            ? "bg-blue-100 text-blue-800"
+                            : "bg-slate-200 text-slate-700"
+                        }`}
+                      >
+                        {cap.status}
+                      </span>
+                    </div>
+
+                    <p className="text-[11px] text-slate-600 leading-relaxed line-clamp-2">
+                      {cap.description}
+                    </p>
+
+                    <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-slate-200/60 text-[10px]">
+                      <span className="flex items-center gap-1 text-slate-500">
+                        <MaterialIcon
+                          name={cap.requiresHumanApproval ? "verified_user" : "auto_mode"}
+                          size={12}
+                          className={cap.requiresHumanApproval ? "text-amber-700" : "text-emerald-700"}
+                        />
+                        <span>{cap.requiresHumanApproval ? "Human Approval Gate" : "Automated Guidance"}</span>
+                      </span>
+
+                      <div className="flex items-center gap-1">
+                        {cap.toolsRequired.slice(0, 2).map((t, idx) => (
+                          <span key={idx} className="bg-slate-200/70 text-slate-700 px-1.5 py-0.2 rounded font-mono text-[9px]">
+                            {t}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+          </div>
         </div>
       </div>,
       "AI Matching Telemetry & Fairness Monitoring",

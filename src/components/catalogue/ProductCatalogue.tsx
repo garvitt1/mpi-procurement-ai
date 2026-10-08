@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react"
+import React, { useMemo, useState, useEffect } from "react"
 import { CatalogCategory } from "../../lib/mpiCatalog"
 import {
   CATEGORIES_METADATA,
@@ -11,6 +11,7 @@ import CatalogueNavigation from "./CatalogueNavigation"
 import ProductDetailsModal from "./ProductDetailsModal"
 import MaterialIcon from "../ui/MaterialIcon"
 import { MPIButton } from "../design-system/MPIDesignSystem"
+import ProductionStateCard from "../ui/ProductionStateCard"
 
 interface ProductCatalogueProps {
   onQuoteProduct: (product: EnrichedCatalogProduct) => void
@@ -23,17 +24,48 @@ export const ProductCatalogue: React.FC<ProductCatalogueProps> = ({
   onAskAI,
   onExploreWorkspace,
 }) => {
-  // Category state (Level 1)
-  const [selectedCategory, setSelectedCategory] = useState<CatalogCategory>(
-    "Packaging & Printing",
-  )
+  // Category state (Level 1) initialized from shareable URL query if present (Section 12)
+  const [selectedCategory, setSelectedCategory] = useState<CatalogCategory>(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search)
+      const catParam = params.get("category")
+      const matched = CATEGORIES_METADATA.find(
+        (c) => c.id.toLowerCase() === (catParam || "").toLowerCase() || c.slug === catParam,
+      )
+      if (matched) return matched.id as CatalogCategory
+    }
+    return "Packaging & Printing"
+  })
   const [isTransitioningCategory, setIsTransitioningCategory] = useState(false)
 
   // Rail scroll index (Level 2)
   const [currentRailIndex, setCurrentRailIndex] = useState(0)
 
-  // Search filter query
-  const [searchQuery, setSearchQuery] = useState("")
+  // Search filter query initialized from URL if present (Section 12)
+  const [searchQuery, setSearchQuery] = useState(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search)
+      return params.get("search") || ""
+    }
+    return ""
+  })
+
+  // Synchronize state back to browser URL for shareability (Section 12)
+  useEffect(() => {
+    if (typeof window === "undefined") return
+    const params = new URLSearchParams(window.location.search)
+    if (selectedCategory) {
+      params.set("category", selectedCategory)
+    }
+    if (searchQuery.trim()) {
+      params.set("search", searchQuery.trim())
+    } else {
+      params.delete("search")
+    }
+    const newSearch = params.toString()
+    const newUrl = `${window.location.pathname}${newSearch ? `?${newSearch}` : ""}${window.location.hash || ""}`
+    window.history.replaceState(null, "", newUrl)
+  }, [selectedCategory, searchQuery])
 
   // Product detail modal state
   const [modalProduct, setModalProduct] = useState<EnrichedCatalogProduct | null>(
@@ -240,18 +272,16 @@ export const ProductCatalogue: React.FC<ProductCatalogueProps> = ({
             />
           </div>
         ) : (
-          <div className="text-center py-16 bg-white rounded-3xl border border-slate-200">
-            <MaterialIcon name="search_off" size={36} className="text-slate-400 mx-auto mb-2" />
-            <h4 className="text-sm font-bold text-slate-800">
-              No matching offerings found in {currentCategoryMeta.displayName}
-            </h4>
-            <p className="text-xs text-slate-500 mt-1 mb-4">
-              Try adjusting your search query or ask MPI AI to source it directly.
-            </p>
-            <MPIButton variant="outline" size="sm" onClick={() => setSearchQuery("")}>
-              Clear Search Query
-            </MPIButton>
-          </div>
+          <ProductionStateCard
+            mode="empty"
+            title={`No offerings found matching "${searchQuery}"`}
+            description={`We could not locate items in ${currentCategoryMeta.displayName} matching your specific filter.`}
+            emptyReason={`No pre-catalogued specifications match the keyword "${searchQuery}".`}
+            actionLabel="Clear Search Filter"
+            onAction={() => setSearchQuery("")}
+            secondaryActionLabel="Ask AI to Source"
+            onSecondaryAction={() => onAskAI(searchQuery, selectedCategory)}
+          />
         )}
 
         {/* ─── 13. CAN'T FIND WHAT YOU NEED? ASK MPI AI WORKFLOW CTA ─────────── */}

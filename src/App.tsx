@@ -29,6 +29,7 @@ import StartupOnboarding from "./screens/onboarding/StartupOnboarding"
 import MSMEOnboarding from "./screens/onboarding/MSMEOnboarding"
 
 import GlobalNavBar from "./components/navigation/GlobalNavBar"
+import ErrorBoundary from "./components/ui/ErrorBoundary"
 
 export type Screen = "home" | "landing" | "login.startup" | "login.msme" | "login.admin" | "register.startup" | "register.msme" | "government-schemes.match" | "government-schemes.browse" | "government-schemes.detail" | "analytics.detail.ai-insights" | "analytics.detail.total-sales" | "analytics.detail.revenue-comparison" | "analytics.detail.sales-trend" | "analytics.detail.age-range" | "analytics.add-widget" | "analytics.create-report" | "analytics.pulse" | "analytics.data" | "analytics.shared" | "analytics.notifications" | "analytics.messages" | "analytics.documents" | "analytics.support" | "analytics.profile" | "startup.home" | "startup.onboarding" | "startup.procurement" | "startup.ai-assistant" | "startup.ai-analysis" | "startup.match-results" | "startup.supplier-detail" | "startup.comparison" | "startup.shortlist" | "startup.rfq" | "startup.samples" | "startup.sample-new" | "startup.schemes" | "startup.status" | "startup.history" | "startup.profile" | "startup.settings" | "startup.analytics" | "msme.home" | "msme.onboarding" | "msme.profile" | "msme.capabilities" | "msme.products" | "msme.certifications" | "msme.verification" | "msme.verification-status" | "msme.match-readiness" | "msme.opportunities" | "msme.opportunity-detail" | "msme.proposal" | "msme.procurement-status" | "msme.schemes" | "msme.analytics" | "msme.settings" | "admin.home" | "admin.user-management" | "admin.startup-management" | "admin.msme-management" | "admin.verification" | "admin.procurement" | "admin.ai-matching" | "admin.analytics" | "admin.reports" | "admin.settings"
 
@@ -236,5 +237,9 @@ export default function App() {
     return <Landing {...navProps} />
   }
 
-  return <ProcurementProvider>{renderActiveScreen()}</ProcurementProvider>
+  return (
+    <ErrorBoundary>
+      <ProcurementProvider>{renderActiveScreen()}</ProcurementProvider>
+    </ErrorBoundary>
+  )
 }

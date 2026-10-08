@@ -6,6 +6,12 @@
 
 import { CatalogCategory } from "../lib/mpiCatalog"
 
+// Re-export modular production AI architecture
+export * from "./ai/capabilityRegistry"
+export * from "./ai/aiRateLimiter"
+export * from "./ai/requirementPipeline"
+export * from "./telemetryService"
+
 const STORAGE_KEY_GEMINI_KEY = "mpi_gemini_api_key"
 const STORAGE_KEY_MODEL = "mpi_gemini_model"
 
