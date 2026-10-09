@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useMemo } from "react"
+import React, { createContext, useContext, useState, useMemo, useEffect } from "react"
 import { CatalogCategory, CATALOG_CATEGORIES } from "../lib/mpiCatalog"
 import { extractProcurementSpecsWithAI, type ExtractedProcurementSpecs } from "../services/aiService"
 import {
@@ -8,6 +8,14 @@ import {
   SchemeMatchResult,
   matchSchemesForProfile,
 } from "../data/mpiSchemesData"
+import {
+  checkDatabaseHealth,
+  persistRFQToSupabase,
+  persistQuoteToSupabase,
+  fetchQuotesForRFQFromSupabase,
+  type BackendSyncState,
+} from "../services/procurementDatabaseService"
+import { getActiveUser } from "../lib/mockAuth"
 
 // ----------------------------------------------------------------------------
 // Business Onboarding Profile Models
@@ -368,6 +376,10 @@ export interface ProcurementContextType {
   selectQuote: (quoteId: string) => void
   submitMSMEQuote: (quote: SupplierQuote) => void
   loadDemoQuotes: () => void
+
+  // Backend Database Synchronization Status
+  backendSyncState: BackendSyncState
+  refreshBackendSync: () => Promise<void>
 
   // Order Lifecycle
   currentMilestone: number
@@ -1584,6 +1596,49 @@ export const ProcurementProvider: React.FC<{ children: React.ReactNode }> = ({
   const [repeatCustomerData, setRepeatCustomerData] =
     useState<RepeatCustomerProfile>(INITIAL_REPEAT_CUSTOMER)
 
+  // Backend Database Synchronization Status
+  const [backendSyncState, setBackendSyncState] = useState<BackendSyncState>({
+    isConnected: false,
+    isTableExposed: false,
+    backendUrl: "https://utjysxkaidvbrmatngyb.supabase.co",
+    lastChecked: 0,
+    statusMessage: "Checking Supabase connection...",
+    pendingMigration: false,
+  })
+
+  const refreshBackendSync = async () => {
+    try {
+      const health = await checkDatabaseHealth()
+      setBackendSyncState(health)
+    } catch (err) {
+      console.error("Supabase health check error:", err)
+    }
+  }
+
+  useEffect(() => {
+    refreshBackendSync()
+  }, [])
+
+  // Sync quotes from Supabase when database tables are exposed
+  useEffect(() => {
+    if (backendSyncState.isTableExposed && activeRFQ?.id) {
+      fetchQuotesForRFQFromSupabase(activeRFQ.id).then((res) => {
+        if (res.fromDatabase && res.quotes.length > 0) {
+          setReceivedQuotes((prev) => {
+            const map = new Map<string, SupplierQuote>()
+            prev.forEach((q) => map.set(q.supplierId, q))
+            res.quotes.forEach((q) => map.set(q.supplierId, q))
+            const merged = Array.from(map.values())
+            try {
+              localStorage.setItem("mpi_submitted_quotes", JSON.stringify(merged))
+            } catch {}
+            return merged
+          })
+        }
+      })
+    }
+  }, [backendSyncState.isTableExposed, activeRFQ?.id])
+
   // --------------------------------------------------------------------------
   // Public Projection for Startups (Strict Supplier Privacy Enforcement)
   // Strictly enforce: 1 requirement = Maximum 5 Top MPI Verified Supplier Matches
@@ -1797,6 +1852,16 @@ export const ProcurementProvider: React.FC<{ children: React.ReactNode }> = ({
     // Quotations must be transmitted by real MSMEs via the MSME portal.
     setReceivedQuotes([])
     setSelectedQuoteId(null)
+
+    // Asynchronously synchronize with Supabase PostgreSQL (if tables exist)
+    const currentUser = getActiveUser()
+    persistRFQToSupabase(newRFQ, currentUser)
+      .then((res) => {
+        if (res.fromDatabase) {
+          console.info("[Supabase] RFQ persisted authoritatively to public.rfqs:", newRFQ.id)
+        }
+      })
+      .catch((err) => console.warn("[Supabase] Async RFQ persist error:", err))
   }
 
   const submitMSMEQuote = (quote: SupplierQuote) => {
@@ -1829,6 +1894,17 @@ export const ProcurementProvider: React.FC<{ children: React.ReactNode }> = ({
       } catch {}
       return updated
     })
+
+    // Asynchronously synchronize with Supabase PostgreSQL (if tables exist)
+    const currentRfqId = activeRFQ?.id || "RFQ-2026-0891"
+    const currentUser = getActiveUser()
+    persistQuoteToSupabase(quote, currentRfqId, currentUser)
+      .then((res) => {
+        if (res.fromDatabase) {
+          console.info("[Supabase] Quote persisted authoritatively to public.quotes:", quote.id)
+        }
+      })
+      .catch((err) => console.warn("[Supabase] Async quote persist error:", err))
   }
 
   const loadDemoQuotes = () => {
@@ -2017,6 +2093,8 @@ export const ProcurementProvider: React.FC<{ children: React.ReactNode }> = ({
         selectQuote,
         submitMSMEQuote,
         loadDemoQuotes,
+        backendSyncState,
+        refreshBackendSync,
         currentMilestone,
         advanceMilestone,
         setMilestone,

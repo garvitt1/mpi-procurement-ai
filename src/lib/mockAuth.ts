@@ -218,11 +218,13 @@ export function mockRegister(
 }
 
 export interface GoogleAuthUser {
+  id?: string
   name: string
   email: string
   avatar: string
   role?: RoleKey
   orgName?: string
+  city?: string
 }
 
 /**

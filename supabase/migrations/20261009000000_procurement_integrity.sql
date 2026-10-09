@@ -261,6 +261,47 @@ create policy "Admins can view telemetry"
 alter publication supabase_realtime add table public.rfqs;
 alter publication supabase_realtime add table public.quotes;
 
+-- ----------------------------------------------------------------------------
+-- 6. AUTOMATED USER PROFILE SYNCHRONIZATION TRIGGER
+-- ----------------------------------------------------------------------------
+create or replace function public.handle_new_user()
+returns trigger as $$
+begin
+  insert into public.profiles (id, full_name, company_name, role)
+  values (
+    new.id,
+    coalesce(new.raw_user_meta_data->>'full_name', 'Enterprise Founder'),
+    coalesce(new.raw_user_meta_data->>'company_name', 'Industrial Enterprise'),
+    coalesce(new.raw_user_meta_data->>'role', 'startup')
+  )
+  on conflict (id) do nothing;
+  return new;
+end;
+$$ language plpgsql security definer;
+
+-- Trigger to execute automatically upon user signup
+drop trigger if exists on_auth_user_created on auth.users;
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute procedure public.handle_new_user();
+
+-- ----------------------------------------------------------------------------
+-- 7. EXPLICIT DATA API GRANTS (PostgREST Exposing Protocol)
+-- ----------------------------------------------------------------------------
+grant usage on schema public to anon, authenticated;
+
+grant all on table public.profiles to authenticated;
+grant select on table public.profiles to anon;
+
+grant all on table public.rfqs to authenticated;
+grant select on table public.rfqs to anon;
+
+grant all on table public.quotes to authenticated;
+grant select on table public.quotes to anon;
+
+grant all on table public.telemetry_events to anon, authenticated;
+grant usage, select on all sequences in schema public to anon, authenticated;
+
 -- ============================================================================
 -- ROLLBACK SCRIPT (Reference)
 -- ============================================================================

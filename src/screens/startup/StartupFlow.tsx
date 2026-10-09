@@ -345,6 +345,8 @@ export default function StartupFlow({
     approveSampleAndProceedToRFQ,
     startupProfile,
     updateStartupProfile,
+    backendSyncState,
+    refreshBackendSync,
   } = useProcurement()
 
   // Sample Request Modal & Help Modal State
@@ -1036,6 +1038,35 @@ export default function StartupFlow({
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            {/* Supabase Persistence Sync Pill */}
+            <div
+              className={`hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold border ${
+                backendSyncState.isTableExposed
+                  ? "bg-emerald-50 text-emerald-800 border-emerald-200"
+                  : backendSyncState.pendingMigration
+                  ? "bg-amber-50 text-amber-800 border-amber-200"
+                  : "bg-slate-100 text-slate-700 border-slate-200"
+              }`}
+              title={backendSyncState.statusMessage}
+            >
+              <span
+                className={`w-2 h-2 rounded-full ${
+                  backendSyncState.isTableExposed
+                    ? "bg-emerald-500 animate-pulse"
+                    : backendSyncState.pendingMigration
+                    ? "bg-amber-500"
+                    : "bg-slate-400"
+                }`}
+              />
+              <span>
+                {backendSyncState.isTableExposed
+                  ? "Supabase Live"
+                  : backendSyncState.pendingMigration
+                  ? "DB Migration Pending"
+                  : "Local Fallback"}
+              </span>
+            </div>
+
             {/* Quick Hub Navigation Links */}
             <button
               onClick={() => navigate("home")}
@@ -1066,6 +1097,26 @@ export default function StartupFlow({
             </MPIButton>
           </div>
         </header>
+
+        {/* Database Migration Status Notice */}
+        {backendSyncState.pendingMigration && (
+          <div className="bg-amber-500/10 border-b border-amber-200 px-4 py-2 text-xs text-amber-900 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="font-bold bg-amber-200 text-amber-900 px-1.5 py-0.5 rounded text-[10px] uppercase tracking-wide">
+                Database Notice
+              </span>
+              <span>
+                Supabase backend connected (<code>utjysxkaidvbrmatngyb</code>), but database tables are awaiting migration. RFQ data is safely preserved locally.
+              </span>
+            </div>
+            <button
+              onClick={() => refreshBackendSync()}
+              className="text-amber-800 hover:text-amber-950 font-semibold underline text-xs cursor-pointer ml-2 shrink-0"
+            >
+              Recheck Connection
+            </button>
+          </div>
+        )}
 
         {/* Viewport Content */}
         <main className="p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto space-y-6">
