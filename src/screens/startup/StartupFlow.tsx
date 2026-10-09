@@ -7,6 +7,11 @@ import {
   SourcingHistoryEvent,
 } from "../../context/ProcurementContext"
 import { CATALOG_CATEGORIES } from "../../lib/mpiCatalog"
+import StartupSidebar from "./StartupSidebar"
+import StartupHelpModal from "./StartupHelpModal"
+import StartupCommandCenter from "./StartupCommandCenter"
+import StartupGuidedBuilder from "./StartupGuidedBuilder"
+import StartupSettings from "./StartupSettings"
 import {
   Icons,
   MPIButton,
@@ -338,9 +343,11 @@ export default function StartupFlow({
     updateSampleStatus,
     approveSampleAndProceedToRFQ,
     startupProfile,
+    updateStartupProfile,
   } = useProcurement()
 
-  // Sample Request Modal & Evaluation State
+  // Sample Request Modal & Help Modal State
+  const [helpModalOpen, setHelpModalOpen] = useState(false)
   const [sampleModalOpen, setSampleModalOpen] = useState(false)
   const [selectedSampleSupplier, setSelectedSampleSupplier] =
     useState<PublicStartupSupplier | null>(null)
@@ -948,131 +955,15 @@ export default function StartupFlow({
   ) => (
     <div className="min-h-screen bg-[#F7F9FC] text-[#0B1220] flex font-sans selection:bg-[#051F16] selection:text-white">
       {/* ─── SIDEBAR (Deep Forest #051F16) ───────────────────────────────────────── */}
-      <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-[#051F16] text-white flex flex-col justify-between transition-transform duration-300 border-r border-[#0A3525] lg:static lg:translate-x-0 ${
-          sidebarOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full"
-        }`}
-      >
-        <div>
-          {/* Logo & Workspace header */}
-          <div className="p-5 border-b border-[#0A3525] flex items-center justify-between">
-            <button
-              onClick={() => navigate("home")}
-              className="flex items-center gap-2.5 text-left cursor-pointer group"
-            >
-              <div className="w-8 h-8 rounded-lg bg-[#0A3525] border border-emerald-800/60 text-[#A3F65C] flex items-center justify-center font-bold">
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                >
-                  <path d="M4 14L8 8L12 12L16 6L20 14" />
-                </svg>
-              </div>
-              <div>
-                <div
-                  className="font-extrabold text-base tracking-tight text-white"
-                  style={{ fontFamily: "Plus Jakarta Sans" }}
-                >
-                  MPI Workspace
-                </div>
-                <div className="text-[10px] text-slate-400 font-medium">
-                  Startup Procurement
-                </div>
-              </div>
-            </button>
-            <button
-              onClick={() => setSidebarOpen(false)}
-              className="lg:hidden p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-[#0A3525]"
-            >
-              <Icons.Close className="w-5 h-5" />
-            </button>
-          </div>
-
-          {/* Startup Organization Card */}
-          <div className="p-4 mx-3 my-3 bg-[#0A3525]/70 rounded-xl border border-emerald-900/50">
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-xs font-bold text-white truncate">
-                TechNova Innovations
-              </span>
-              <span className="text-[10px] bg-emerald-950 text-[#A3F65C] font-semibold px-1.5 py-0.2 rounded border border-emerald-800/60">
-                DPIIT Vetted
-              </span>
-            </div>
-            <div className="text-[11px] text-slate-300">
-              Procurement Budget: ₹2,00,000
-            </div>
-            <div className="w-full bg-[#051F16] h-1.5 rounded-full mt-2 overflow-hidden border border-emerald-900/30">
-              <div
-                className="bg-[#A3F65C] h-full rounded-full"
-                style={{ width: "38%" }}
-              />
-            </div>
-            <div className="flex justify-between text-[10px] text-slate-400 mt-1">
-              <span>38% Committed</span>
-              <span>₹1,25,000 Available</span>
-            </div>
-          </div>
-
-          {/* Navigation Links */}
-          <nav className="px-3 py-2 space-y-1">
-            {navItems.map((item) => {
-              const isActive = currentScreen === item.screen
-              return (
-                <button
-                  key={item.screen}
-                  onClick={() => {
-                    navigate(item.screen)
-                    setSidebarOpen(false)
-                  }}
-                  className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                    isActive
-                      ? "bg-[#083A28] text-[#A3F65C] border border-emerald-700/50 shadow-xs"
-                      : "text-slate-300 hover:bg-[#0A3525] hover:text-white"
-                  }`}
-                >
-                  <span className="shrink-0">{item.icon}</span>
-                  <span className="truncate">{item.label}</span>
-                </button>
-              )
-            })}
-          </nav>
-        </div>
-
-        {/* Bottom Help & Cross-Hub Links */}
-        <div className="p-3.5 border-t border-[#0A3525] space-y-1.5">
-          <button
-            onClick={() => navigate("home")}
-            className="w-full flex items-center justify-between text-xs text-slate-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-[#0A3525] cursor-pointer transition-colors"
-          >
-            <span className="flex items-center gap-2">
-              <span className="text-xs">🏠</span>
-              <span>Home Marketplace</span>
-            </span>
-            <span className="text-[10px] bg-[#0A3525] px-1.5 py-0.5 rounded text-slate-300 border border-emerald-900/50">
-              Public
-            </span>
-          </button>
-          <button
-            onClick={() => navigate("government-schemes.match")}
-            className="w-full flex items-center justify-between text-xs text-slate-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-[#0A3525] cursor-pointer transition-colors"
-          >
-            <span className="flex items-center gap-2">
-              <span className="text-xs">📜</span>
-              <span>Government Schemes</span>
-            </span>
-            <span className="text-[10px] bg-emerald-950 text-[#A3F65C] border border-emerald-800/50 px-1.5 py-0.5 rounded">
-              Grants
-            </span>
-          </button>
-          <div className="text-[10px] text-slate-400 text-center pt-1">
-            MPI Sourcing Protocol · Verified
-          </div>
-        </div>
-      </aside>
+      <StartupSidebar
+        currentScreen={currentScreen}
+        navigate={navigate}
+        sidebarOpen={sidebarOpen}
+        setSidebarOpen={setSidebarOpen}
+        startupProfile={startupProfile}
+        ordersList={ordersList}
+        onOpenHelp={() => setHelpModalOpen(true)}
+      />
 
       {/* ─── MAIN CONTENT AREA ─────────────────────────────────────────────────── */}
       <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
@@ -2419,313 +2310,43 @@ export default function StartupFlow({
           </div>
         </div>
       )}
+
+      {/* Help & Support Modal */}
+      <StartupHelpModal
+        isOpen={helpModalOpen}
+        onClose={() => setHelpModalOpen(false)}
+        startupProfile={startupProfile}
+      />
     </div>
   )
 
   // ════════════════════════════════════════════════════════════════════════════
-  // 1. OVERVIEW DASHBOARD (startup.home)
+  // 1. OVERVIEW DASHBOARD (startup.home) — PROCUREMENT COMMAND CENTER
   // ════════════════════════════════════════════════════════════════════════════
   if (currentScreen === "startup.home") {
     return renderShell(
-      <div className="space-y-6">
-        {/* KPI strip - Concise 4 Cards consolidating all key sourcing metrics */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* Card 1: RFQ & Verified Suppliers */}
-          <div className="bg-white border border-[#E6EAF0] rounded-2xl p-5 shadow-xs hover:border-slate-300 hover:shadow-sm transition-all flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between text-xs text-slate-500 mb-2">
-                <span className="font-semibold text-slate-600 uppercase tracking-wider text-[11px]">
-                  Active RFQs & Suppliers
-                </span>
-                <Icons.FileText className="w-4 h-4 text-[#051F16]" />
-              </div>
-              <div className="flex items-baseline gap-2">
-                <div className="text-2xl sm:text-3xl font-extrabold text-[#0B1220] tracking-tight">
-                  3
-                </div>
-                <span className="text-xs text-slate-500 font-medium">
-                  Active RFQs
-                </span>
-              </div>
-            </div>
-            <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
-              <span className="text-[#168A5B] font-semibold flex items-center gap-0.5 text-[11px]">
-                ↑ +1 this cycle
-              </span>
-              <span className="text-slate-600 font-medium text-[11px] bg-slate-100 px-2 py-0.5 rounded-full flex items-center gap-1">
-                <Icons.ShieldCheck className="w-3 h-3 text-emerald-700" />
-                {shortlistedSupplierIds.length} Shortlisted (100% Vetted)
-              </span>
-            </div>
-          </div>
-
-          {/* Card 2: Landed Cost Savings */}
-          <div className="bg-white border border-[#E6EAF0] rounded-2xl p-5 shadow-xs hover:border-slate-300 hover:shadow-sm transition-all flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between text-xs text-slate-500 mb-2">
-                <span className="font-semibold text-slate-600 uppercase tracking-wider text-[11px]">
-                  Landed Savings
-                </span>
-                <Icons.TrendingUp className="w-4 h-4 text-[#D9A400]" />
-              </div>
-              <div className="text-2xl sm:text-3xl font-extrabold text-[#0B1220] tracking-tight">
-                ₹42,850
-              </div>
-            </div>
-            <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
-              <span className="text-[#168A5B] font-semibold flex items-center gap-0.5 text-[11px]">
-                ↑ 24% reverse-margin
-              </span>
-              <span className="text-slate-500 font-medium text-[11px]">
-                Verified benchmark
-              </span>
-            </div>
-          </div>
-
-          {/* Card 3: Turnaround Days */}
-          <div className="bg-white border border-[#E6EAF0] rounded-2xl p-5 shadow-xs hover:border-slate-300 hover:shadow-sm transition-all flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between text-xs text-slate-500 mb-2">
-                <span className="font-semibold text-slate-600 uppercase tracking-wider text-[11px]">
-                  Turnaround SLA
-                </span>
-                <Icons.Clock className="w-4 h-4 text-emerald-700" />
-              </div>
-              <div className="text-2xl sm:text-3xl font-extrabold text-[#0B1220] tracking-tight">
-                8-12 Days
-              </div>
-            </div>
-            <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
-              <span className="text-[#168A5B] font-semibold flex items-center gap-0.5 text-[11px]">
-                ↑ 6 days faster
-              </span>
-              <span className="text-slate-500 font-medium text-[11px]">
-                Direct MSME dispatch
-              </span>
-            </div>
-          </div>
-
-          {/* Card 4: Orders in Flight & Escrow Balance */}
-          <div className="bg-white border border-[#E6EAF0] rounded-2xl p-5 shadow-xs hover:border-slate-300 hover:shadow-sm transition-all flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between text-xs text-slate-500 mb-2">
-                <span className="font-semibold text-slate-600 uppercase tracking-wider text-[11px]">
-                  Orders & Escrow Locked
-                </span>
-                <Icons.Coins className="w-4 h-4 text-[#051F16]" />
-              </div>
-              <div className="flex items-baseline justify-between gap-2">
-                <div className="text-2xl sm:text-3xl font-extrabold text-[#0B1220] tracking-tight">
-                  ₹1,40,250
-                </div>
-                <span className="text-xs font-bold text-blue-900 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                  2 Orders in Flight
-                </span>
-              </div>
-            </div>
-            <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
-              <span className="text-emerald-700 font-semibold text-[11px] flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                Escrow active
-              </span>
-              <span className="text-slate-500 font-medium text-[11px] flex items-center gap-1">
-                <Icons.Award className="w-3 h-3 text-amber-500" />
-                QC inspection locked
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Guided Builder Launcher & Live Order status */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Active Order Card */}
-          <div className="lg:col-span-8 bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-              <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                  Active Procurement Sourcing
-                </span>
-                <h3 className="text-base font-bold text-slate-900 mt-0.5">
-                  {activeRFQ
-                    ? `${activeRFQ.title} (${activeRFQ.id})`
-                    : `${selectedCategory} (${formatScopeDisplay(selectedCategory, quantity)}) Sourcing Request (RFQ-2026-0891)`}
-                </h3>
-              </div>
-              <MPIStatusBadge status="Active" />
-            </div>
-
-            {/* 10-Milestone Progress Summary */}
-            <div>
-              <div className="flex items-center justify-between text-xs font-semibold text-slate-700 mb-2">
-                <span>Current Phase: Milestone {currentMilestone} of 10</span>
-                <span className="text-[#051F16] font-bold">
-                  {currentMilestone >= 8
-                    ? "QC & Drop Inspection"
-                    : currentMilestone >= 4
-                      ? "Commercial PO Agreed"
-                      : "Quotation Analysis"}
-                </span>
-              </div>
-              <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden flex">
-                <div
-                  className="bg-[#051F16] h-full transition-all duration-500"
-                  style={{ width: `${(currentMilestone / 10) * 100}%` }}
-                />
-              </div>
-              <div className="flex justify-between text-[10px] text-slate-400 mt-1.5 font-medium">
-                <span>PO Issued</span>
-                <span>Batch Production</span>
-                <span>QC Pass</span>
-                <span>Landed Delivery</span>
-              </div>
-            </div>
-
-            <div className="pt-2 flex flex-wrap items-center justify-between gap-3">
-              <div className="flex items-center gap-3 text-xs text-slate-600">
-                <span>
-                  Selected: <strong>MPI Verified Supplier #001</strong>
-                </span>
-                <span className="text-slate-300">|</span>
-                <span>
-                  Landed Cost:{" "}
-                  <strong className="text-[#051F16]">₹65,250</strong>
-                </span>
-                <span className="text-slate-300">|</span>
-                <span className="text-[#D9A400] font-bold">
-                  Saved ₹19,750 vs baseline
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <MPIButton
-                  variant="outline"
-                  size="sm"
-                  onClick={() => navigate("startup.comparison")}
-                >
-                  View Quote Matrix
-                </MPIButton>
-                <MPIButton
-                  variant="primary"
-                  size="sm"
-                  onClick={() => navigate("startup.status")}
-                >
-                  Track 10 Milestones →
-                </MPIButton>
-              </div>
-            </div>
-          </div>
-
-          {/* Sourcing & Analytics Action Card */}
-          <div className="lg:col-span-4 bg-[#051F16] text-white rounded-2xl p-6 shadow-sm flex flex-col justify-between">
-            <div>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#0A3525] text-orange-400 text-[10px] font-bold uppercase tracking-wider mb-3">
-                <Icons.Sparkles className="w-3.5 h-3.5" />
-                AI Procurement Engine
-              </div>
-              <h3
-                className="text-lg font-bold text-white mb-2"
-                style={{ fontFamily: "Plus Jakarta Sans" }}
-              >
-                Launch Guided Sourcing
-              </h3>
-              <p className="text-xs text-slate-300 leading-relaxed">
-                Convert your startup procurement requirement into institutional
-                specifications, find verified suppliers, and compare itemized
-                reverse-margin quotes.
-              </p>
-            </div>
-
-            <div className="mt-6 pt-4 border-t border-[#0A3525] space-y-2">
-              <MPIButton
-                variant="ai"
-                fullWidth
-                size="md"
-                onClick={() => navigate("startup.procurement")}
-                icon={<Icons.ArrowRight className="w-4 h-4" />}
-              >
-                Launch 7-Step Builder →
-              </MPIButton>
-              <button
-                onClick={() => navigate("startup.analytics")}
-                className="w-full text-center text-xs text-orange-300 hover:text-white py-1 transition-colors font-semibold cursor-pointer"
-              >
-                Open Analytics Studio Dashboard →
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Sourcing History Table Preview */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h3 className="text-sm font-bold text-slate-900">
-                Recent Procurement Inquiries
-              </h3>
-              <p className="text-xs text-slate-400">
-                All procurement cycles managed through MPI
-              </p>
-            </div>
-            <button
-              onClick={() => navigate("startup.history")}
-              className="text-xs font-bold text-[#051F16] hover:text-[#A3F65C] transition-colors cursor-pointer"
-            >
-              View Full History & Insights →
-            </button>
-          </div>
-
-          <div className="divide-y divide-slate-100">
-            {sourcingHistory.map((item) => (
-              <div
-                key={item.id}
-                className="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-50/50 rounded-xl px-2 transition-colors"
-              >
-                <div className="space-y-0.5">
-                  <div className="text-xs font-bold text-slate-900">
-                    {item.request}
-                  </div>
-                  <div className="text-[11px] text-slate-500 flex items-center gap-2">
-                    <span className="font-mono text-slate-400">{item.id}</span>
-                    <span>•</span>
-                    <span className="font-semibold text-[#051F16]">
-                      {item.category}
-                    </span>
-                    <span>•</span>
-                    <span>{item.date}</span>
-                    <span>•</span>
-                    <span className="font-bold text-[#D9A400]">
-                      Saved ₹{item.savingsAmount.toLocaleString("en-IN")}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <span className="text-xs text-slate-600 font-medium">
-                    <strong className="text-slate-900">
-                      {item.quotesCount}
-                    </strong>{" "}
-                    verified quotes
-                  </span>
-                  <MPIStatusBadge status={item.rfqStatus} />
-                  <MPIButton
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setSelectedHistoryInsight(item)}
-                  >
-                    View Insights
-                  </MPIButton>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>,
+      <StartupCommandCenter
+        navigate={navigate}
+        startupProfile={startupProfile}
+        activeRFQ={activeRFQ}
+        selectedCategory={selectedCategory}
+        quantity={quantity}
+        targetBudget={targetBudget}
+        currentMilestone={currentMilestone}
+        ordersList={ordersList}
+        sourcingHistory={sourcingHistory}
+        publicStartupQuotes={publicStartupQuotes}
+        shortlistedSupplierIds={shortlistedSupplierIds}
+        publicStartupSuppliers={publicStartupSuppliers}
+        onSelectHistoryInsight={(item) => setSelectedHistoryInsight(item)}
+      />,
       "Procurement Command Center",
-      "Manage RFQs, verified supplier shortlists, and landed cost intelligence.",
+      "A real-time overview of your sourcing, procurement activity and supplier performance.",
     )
   }
 
   // ════════════════════════════════════════════════════════════════════════════
-  // 2. 7-STEP GUIDED SOURCING BUILDER (startup.procurement)
+  // 2. 7-STEP GUIDED SOURCING BUILDER (startup.procurement, startup.rfq)
   // ════════════════════════════════════════════════════════════════════════════
   if (
     currentScreen === "startup.procurement" ||
@@ -2734,846 +2355,42 @@ export default function StartupFlow({
     currentScreen === "startup.match-results" ||
     currentScreen === "startup.shortlist"
   ) {
-    const steps = [
-      { num: 1, display: "1", name: "Requirement" },
-      { num: 2, display: "2a", name: "Category & Specs" },
-      { num: 3, display: "2b", name: "Quantity & Budget" },
-      { num: 4, display: "3", name: "Compliance" },
-      { num: 5, display: "4", name: "Supplier Discovery" },
-      { num: 6, display: "5", name: "AI RFQ Document" },
-      { num: 7, display: "6", name: "Dispatch & Verify" },
-    ]
-
     return renderShell(
-      <div className="max-w-5xl mx-auto space-y-6">
-        {/* 7-Step Stepper Bar (Mission Control Dock) */}
-        <div className="sticky top-16 z-20 bg-white/95 backdrop-blur-xl rounded-2xl border border-slate-200/90 p-4 sm:p-5 shadow-[0_12px_32px_-8px_rgba(5,31,22,0.08)] overflow-x-auto transition-all">
-          <div className="flex items-center justify-between min-w-137.5 relative">
-            <div className="absolute top-4.5 left-6 right-6 h-1 bg-slate-100 rounded-full z-0" />
-            <div
-              className="absolute top-4.5 left-6 h-1 bg-gradient-to-r from-emerald-500 via-[#051F16] to-[#A3F65C] rounded-full z-0 transition-all duration-500 ease-out shadow-xs"
-              style={{ width: `${((builderStep - 1) / 6) * 100}%` }}
-            />
-            {steps.map((s) => {
-              const isPast = s.num < builderStep
-              const isCurrent = s.num === builderStep
-              return (
-                <button
-                  key={s.num}
-                  onClick={() => setBuilderStep(s.num)}
-                  className="relative z-10 flex flex-col items-center group cursor-pointer transition-transform hover:-translate-y-0.5 active:translate-y-0"
-                >
-                  <div
-                    className={`w-9 h-9 rounded-full flex items-center justify-center text-[11px] font-bold transition-all duration-300 ${
-                      isCurrent
-                        ? "bg-[#051F16] text-white ring-4 ring-[#A3F65C]/40 shadow-md shadow-[#051F16]/20 scale-110"
-                        : isPast
-                          ? "bg-emerald-600 text-white ring-2 ring-emerald-200 shadow-2xs"
-                          : "bg-white text-slate-500 border-2 border-slate-200 group-hover:border-slate-400 group-hover:text-slate-700 shadow-2xs"
-                    }`}
-                  >
-                    {isPast ? <Icons.Check className="w-4 h-4 text-white" /> : s.display}
-                  </div>
-                  <span
-                    className={`text-[11px] font-semibold mt-2 whitespace-nowrap transition-colors ${
-                      isCurrent
-                        ? "text-[#051F16] font-extrabold"
-                        : isPast
-                          ? "text-slate-700 font-medium"
-                          : "text-slate-400 group-hover:text-slate-600"
-                    }`}
-                  >
-                    {s.name}
-                  </span>
-                </button>
-              )
-            })}
-          </div>
-        </div>
-
-        {/* STEP 1: REQUIREMENT INTAKE */}
-        {builderStep === 1 && (
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-5 animate-fade-in">
-            <div className="flex items-start justify-between">
-              <div>
-                <h3 className="text-lg font-bold text-[#051F16]">
-                  Step 1: Plain-Language Requirement Intake
-                </h3>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  Describe what you need manufactured or sourced in plain
-                  English. MPI AI will structure the technical specs.
-                </p>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setRequirementText(
-                      "Need 500 custom rigid printed boxes for our D2C organic skincare launch by next month, budget under ₹80k with EVA foam inserts",
-                    )
-                    setSelectedCategory("Packaging & Printing")
-                    setQuantity(500)
-                    setTargetBudget(75000)
-                    setStep1Guidance(null)
-                  }}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 bg-white/80 hover:bg-slate-50 hover:border-slate-300 text-slate-700 shadow-2xs transition-all cursor-pointer"
-                >
-                  <MaterialIcon icon="inventory_2" size={14} className="text-amber-600" />
-                  <span>Packaging Sample</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setRequirementText(
-                      "Looking for 5-axis CNC machining for 20 sets of 6061-T6 aluminum drone arm chassis with ±0.05mm tolerance and black anodizing, budget ₹1.2 Lakh",
-                    )
-                    setSelectedCategory("Prototyping & Product Development")
-                    setQuantity(20)
-                    setTargetBudget(120000)
-                    setStep1Guidance(null)
-                  }}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 bg-white/80 hover:bg-slate-50 hover:border-slate-300 text-slate-700 shadow-2xs transition-all cursor-pointer"
-                >
-                  <MaterialIcon icon="precision_manufacturing" size={14} className="text-emerald-700" />
-                  <span>Drone CNC Sample</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setRequirementText(
-                      "Need full-stack development team for custom ERP inventory workflow with Supabase PostgreSQL and Next.js 15, budget ₹1.8 Lakh",
-                    )
-                    setSelectedCategory("IT & Digital Services")
-                    setQuantity(1)
-                    setTargetBudget(180000)
-                    setStep1Guidance(null)
-                  }}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 bg-white/80 hover:bg-slate-50 hover:border-slate-300 text-slate-700 shadow-2xs transition-all cursor-pointer"
-                >
-                  <MaterialIcon icon="dns" size={14} className="text-emerald-600" />
-                  <span>Cloud IT Sample</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setRequirementText(
-                      "Need specialized startup support for DPIIT seed fund compliance, MSME incubation readiness, and go-to-market mentorship, budget ₹50k",
-                    )
-                    setSelectedCategory("Specialized Startup Support")
-                    setQuantity(1)
-                    setTargetBudget(50000)
-                    setStep1Guidance(null)
-                  }}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 bg-white/80 hover:bg-slate-50 hover:border-slate-300 text-slate-700 shadow-2xs transition-all cursor-pointer"
-                >
-                  <MaterialIcon icon="verified_user" size={14} className="text-indigo-600" />
-                  <span>Startup Support Sample</span>
-                </button>
-              </div>
-            </div>
-
-            <textarea
-              rows={5}
-              value={requirementText}
-              onChange={(e) => {
-                setRequirementText(e.target.value)
-                if (step1Guidance) setStep1Guidance(null)
-              }}
-              placeholder="e.g. Need 500 custom rigid printed boxes for our D2C skincare launch by next month, budget under ₹80k with custom foam inserts..."
-              className="w-full p-4 text-sm bg-slate-50 border border-slate-300 rounded-xl text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-[#051F16] outline-none"
-            />
-
-            {step1Guidance && (
-              <div className="p-4 bg-emerald-50/80 border border-emerald-200 rounded-xl text-xs text-slate-700 flex items-start gap-3 animate-fade-in shadow-2xs">
-                <Icons.Sparkles className="w-4 h-4 text-emerald-700 shrink-0 mt-0.5" />
-                <div className="space-y-1">
-                  <span className="font-bold text-[#051F16] block">Requirement Guidance</span>
-                  <p className="leading-relaxed whitespace-pre-line">{step1Guidance}</p>
-                </div>
-              </div>
-            )}
-
-            <div className="flex items-center justify-between pt-2">
-              <span className="text-xs text-slate-400 font-mono">
-                {requirementText.length} characters entered
-              </span>
-              <MPIButton
-                variant="primary"
-                onClick={async () => {
-                  const check = isGreetingOrInsufficientRequirement(requirementText)
-                  if (check.isGreeting) {
-                    setStep1Guidance(check.message)
-                    return
-                  }
-                  setStep1Guidance(null)
-                  const extracted = await runAIExtraction(requirementText)
-                  if (extracted && !extracted.isGreetingOrInsufficient) {
-                    setBuilderStep(2)
-                    handleAuditRFQReadiness(extracted)
-                  } else if (extracted?.isGreetingOrInsufficient) {
-                    setStep1Guidance(extracted.politeGuidanceMessage || check.message)
-                  }
-                }}
-                isLoading={isExtractingSpecs}
-                icon={<Icons.ArrowRight className="w-4 h-4" />}
-              >
-                Analyze & Proceed to 2a. Specs →
-              </MPIButton>
-            </div>
-          </div>
-        )}
-
-        {/* STEP 2a: CATEGORY & SPECS */}
-        {builderStep === 2 && (
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-5 animate-fade-in">
-            <div>
-              <h3 className="text-lg font-bold text-[#051F16]">
-                Step 2a: Category & Technical Specifications
-              </h3>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Confirm your procurement category (strictly 7 approved
-                categories) and fine-tune engineering specs.
-              </p>
-            </div>
-
-            {/* AI RFQ Readiness Gate & Specification Completeness Auditor (Blueprint Items 5, 7, 11, 13, 14) */}
-            <div className="bg-linear-to-br from-slate-900 to-blue-950 text-white rounded-2xl p-5 shadow-xs space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-3">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-800 flex items-center justify-center">
-                    <Icons.Sparkles className="w-4 h-4 text-emerald-700" />
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-bold text-white flex items-center gap-2">
-                      <span>AI RFQ Readiness Gate & Completeness Auditor</span>
-                      <span className="text-[10px] font-mono uppercase bg-white/10 text-blue-200 px-2 py-0.5 rounded">
-                        Blueprint Items 5, 7, 11, 13
-                      </span>
-                    </h4>
-                    <p className="text-xs text-blue-200">
-                      Pre-dispatch specification completeness audit against verified MSME production capacity.
-                    </p>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => handleAuditRFQReadiness()}
-                  disabled={isAuditingReadiness}
-                  className="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer self-start sm:self-auto shrink-0 border border-white/10"
-                >
-                  <Icons.Sparkles className="w-3.5 h-3.5 text-emerald-700" />
-                  <span>{isAuditingReadiness ? "Auditing with MPI AI..." : readinessResult ? "Re-Audit Specs" : "Run AI Readiness Audit"}</span>
-                </button>
-              </div>
-
-              {isAuditingReadiness ? (
-                <div className="py-6 flex flex-col items-center justify-center space-y-2">
-                  <div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-                  <span className="text-xs text-blue-200">Testing specification tolerances and clarity with MPI AI...</span>
-                </div>
-              ) : readinessResult ? (
-                <div className="space-y-4 text-xs animate-fade-in">
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <div className="bg-white/10 p-3 rounded-xl border border-white/10">
-                      <span className="text-blue-200 text-[10px] block">Readiness Score</span>
-                      <div className="text-xl font-extrabold text-white mt-0.5 flex items-center gap-2">
-                        <span>{readinessResult.readinessScore}%</span>
-                        <span className={`text-[10px] px-2 py-0.5 rounded font-bold ${readinessResult.readinessScore >= 85 ? "bg-emerald-500/20 text-emerald-300" : "bg-amber-500/20 text-amber-300"}`}>
-                          {readinessResult.status}
-                        </span>
-                      </div>
-                      <div className="w-full bg-white/10 rounded-full h-1.5 mt-2">
-                        <div
-                          className={`h-1.5 rounded-full ${readinessResult.readinessScore >= 85 ? "bg-emerald-400" : "bg-amber-400"}`}
-                          style={{ width: `${readinessResult.readinessScore}%` }}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="bg-white/10 p-3 rounded-xl border border-white/10 sm:col-span-2">
-                      <span className="text-blue-200 text-[10px] block">Recommended Sourcing Channel (Item 13)</span>
-                      <div className="text-sm font-bold text-white mt-1 flex items-center gap-2">
-                        <Icons.Check className="w-4 h-4 text-emerald-400" />
-                        <span>{readinessResult.recommendedChannel}</span>
-                      </div>
-                      <p className="text-[11px] text-blue-200 mt-1">
-                        {readinessResult.isLive ? "Calibrated via live MPI AI inference based on volume and complexity" : "Algorithmic standard routing"}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Missing details action chips */}
-                  {readinessResult.missingDetails.length > 0 && (
-                    <div className="bg-black/20 p-3.5 rounded-xl border border-white/10 space-y-2">
-                      <span className="text-[11px] font-bold text-amber-300 block">
-                        Missing Technical Details (Click to Add to Specs):
-                      </span>
-                      <div className="flex flex-wrap gap-2">
-                        {readinessResult.missingDetails.map((detail, idx) => (
-                          <button
-                            key={idx}
-                            type="button"
-                            onClick={() => {
-                              addSpecification(detail)
-                              setSpecAddedToast(detail)
-                              setTimeout(() => setSpecAddedToast(null), 3000)
-                            }}
-                            className="text-left text-xs bg-white/10 hover:bg-amber-500/20 text-white hover:text-amber-200 border border-white/20 hover:border-amber-400/40 px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors cursor-pointer"
-                          >
-                            <span className="text-emerald-400 font-bold">+</span>
-                            <span>{detail}</span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* AI Suggestions */}
-                  {readinessResult.aiSuggestions.length > 0 && (
-                    <div className="text-[11px] text-blue-200 flex items-start gap-1.5 pt-1">
-                      <Icons.Sparkles className="w-3.5 h-3.5 text-emerald-700 shrink-0 mt-0.5" />
-                      <span><strong>AI Tip:</strong> {readinessResult.aiSuggestions.join(" · ")}</span>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="bg-white/5 border border-white/10 p-3.5 rounded-xl flex items-center justify-between text-xs text-blue-200">
-                  <span>Audit your specifications against supplier machinery tooling to prevent quote delays.</span>
-                  <button
-                    type="button"
-                    onClick={() => handleAuditRFQReadiness()}
-                    className="font-bold text-white underline hover:text-[#A3F65C] cursor-pointer"
-                  >
-                    Run Audit Now →
-                  </button>
-                </div>
-              )}
-            </div>
-
-            <div>
-              <label className="text-xs font-bold text-slate-700 block mb-2">
-                Approved Procurement Category:
-              </label>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                {CATALOG_CATEGORIES.map((cat) => (
-                  <button
-                    key={cat}
-                    type="button"
-                    onClick={() => setSelectedCategory(cat)}
-                    className={`text-left p-2.5 rounded-xl border text-xs font-semibold transition-all cursor-pointer ${
-                      selectedCategory === cat
-                        ? "bg-emerald-50 border-[#051F16] text-[#051F16] ring-1 ring-[#051F16]"
-                        : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
-                    }`}
-                  >
-                    <div className="truncate">{cat}</div>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <label className="text-xs font-bold text-slate-700">
-                  Extracted Technical Specifications ({specifications.length}):
-                </label>
-                <span className="text-[11px] text-[#051F16] font-bold">
-                  96% AI Parsed
-                </span>
-              </div>
-
-              <div className="space-y-2">
-                {specifications.map((spec, i) => (
-                  <div
-                    key={i}
-                    className="flex items-center justify-between p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs"
-                  >
-                    <span className="text-slate-800 font-medium">{spec}</span>
-                    <button
-                      onClick={() => removeSpecification(i)}
-                      className="text-slate-400 hover:text-red-600 p-1 cursor-pointer"
-                    >
-                      <Icons.Close className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-3 flex gap-2">
-                <input
-                  type="text"
-                  value={newSpecInput}
-                  onChange={(e) => setNewSpecInput(e.target.value)}
-                  placeholder="Add custom specification (e.g., Gold hot-foil stamping on logo)..."
-                  className="flex-1 text-xs px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:border-[#051F16]"
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      addSpecification(newSpecInput)
-                      setNewSpecInput("")
-                    }
-                  }}
-                />
-                <MPIButton
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    addSpecification(newSpecInput)
-                    setNewSpecInput("")
-                  }}
-                >
-                  + Add Spec
-                </MPIButton>
-              </div>
-            </div>
-
-            <div className="flex justify-between pt-4 border-t border-slate-100">
-              <MPIButton variant="ghost" onClick={() => setBuilderStep(1)}>
-                ← Back
-              </MPIButton>
-              <MPIButton variant="primary" onClick={() => setBuilderStep(3)}>
-                Next: 2b. Quantity & Budget →
-              </MPIButton>
-            </div>
-          </div>
-        )}
-
-        {/* STEP 2b: QUANTITY, TIMELINES & BUDGET */}
-        {builderStep === 3 && (
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-5 animate-fade-in">
-            <div>
-              <h3 className="text-lg font-bold text-[#051F16]">
-                Step 2b: Quantities, Timelines & Target Budget
-              </h3>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Set volume parameters and delivery deadlines for competitive
-                supplier quoting.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1.5">
-                  Required Quantity
-                </label>
-                <input
-                  type="number"
-                  value={quantity}
-                  onChange={(e) => setQuantity(Number(e.target.value))}
-                  className="w-full text-sm p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#051F16]"
-                />
-              </div>
-
-              <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1.5">
-                  Target Budget (₹ INR)
-                </label>
-                <input
-                  type="number"
-                  step={1000}
-                  value={targetBudget}
-                  onChange={(e) => setTargetBudget(Number(e.target.value))}
-                  className="w-full text-sm p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#051F16]"
-                />
-              </div>
-
-              <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1.5">
-                  Target Delivery Date
-                </label>
-                <input
-                  type="date"
-                  value={deadlineDate}
-                  onChange={(e) => setDeadlineDate(e.target.value)}
-                  className="w-full text-sm p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#051F16]"
-                />
-              </div>
-
-              <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1.5">
-                  Delivery Destination
-                </label>
-                <input
-                  type="text"
-                  value={deliveryLocation}
-                  onChange={(e) => setDeliveryLocation(e.target.value)}
-                  placeholder="e.g. Bengaluru, Karnataka"
-                  className="w-full text-sm p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#051F16]"
-                />
-              </div>
-            </div>
-
-            <div className="flex justify-between pt-4 border-t border-slate-100">
-              <MPIButton variant="ghost" onClick={() => setBuilderStep(2)}>
-                ← Back
-              </MPIButton>
-              <MPIButton variant="primary" onClick={() => setBuilderStep(4)}>
-                Next: 3. Compliance Criteria →
-              </MPIButton>
-            </div>
-          </div>
-        )}
-
-        {/* STEP 3: COMPLIANCE & CERTIFICATIONS */}
-        {builderStep === 4 && (
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-5 animate-fade-in">
-            <div>
-              <h3 className="text-lg font-bold text-[#051F16]">
-                Step 3: Statutory Compliance & Quality Gates
-              </h3>
-              <p className="text-xs text-slate-500 mt-0.5">
-                MPI filters only suppliers meeting your strict statutory and
-                certification thresholds.
-              </p>
-            </div>
-
-            <div className="space-y-3">
-              {[
-                {
-                  name: "ISO 9001:2015 Quality Management",
-                  desc: "Guarantees calibrated production tolerances and documented quality SOPs.",
-                },
-                {
-                  name: "ZED (Zero Defect Zero Effect) Certified",
-                  desc: "DPIIT/MSME certification for defect-free environmentally sound manufacturing.",
-                },
-                {
-                  name: "Udyam Statutory MSME Registration",
-                  desc: "100% verified Indian enterprise registration with valid GST return history.",
-                },
-                {
-                  name: "FSC Certified Sustainable Paper / Timber",
-                  desc: "Ensures paper and board packaging sourced from responsibly managed forests.",
-                },
-                {
-                  name: "BIS (Bureau of Indian Standards) Pass",
-                  desc: "Compliance with mandatory Indian national product standards.",
-                },
-              ].map((item) => {
-                const isChecked = complianceChecks.includes(item.name)
-                return (
-                  <div
-                    key={item.name}
-                    onClick={() => {
-                      setComplianceChecks((prev) =>
-                        prev.includes(item.name)
-                          ? prev.filter((x) => x !== item.name)
-                          : [...prev, item.name],
-                      )
-                    }}
-                    className={`p-3.5 rounded-xl border flex items-start gap-3 cursor-pointer transition-all ${
-                      isChecked
-                        ? "bg-emerald-50/60 border-[#051F16]"
-                        : "bg-white border-slate-200 hover:bg-slate-50"
-                    }`}
-                  >
-                    <div
-                      className={`w-5 h-5 rounded-md flex items-center justify-center text-xs mt-0.5 shrink-0 ${
-                        isChecked
-                          ? "bg-[#051F16] text-white"
-                          : "border border-slate-300"
-                      }`}
-                    >
-                      {isChecked && <Icons.Check className="w-3.5 h-3.5" />}
-                    </div>
-                    <div>
-                      <div className="text-xs font-bold text-slate-900">
-                        {item.name}
-                      </div>
-                      <div className="text-[11px] text-slate-500 leading-relaxed">
-                        {item.desc}
-                      </div>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-
-            <div className="flex justify-between pt-4 border-t border-slate-100">
-              <MPIButton variant="ghost" onClick={() => setBuilderStep(3)}>
-                ← Back
-              </MPIButton>
-              <MPIButton variant="primary" onClick={() => setBuilderStep(5)}>
-                Next: 4. Discover Suppliers →
-              </MPIButton>
-            </div>
-          </div>
-        )}
-
-        {/* STEP 4: SUPPLIER DISCOVERY & SHORTLISTING */}
-        {builderStep === 5 && (
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-5 animate-fade-in">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-lg font-bold text-[#051F16]">
-                  Step 4: Verified Supplier Discovery
-                </h3>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  Verified suppliers matching your specifications. Real
-                  identities remain anonymized for quote integrity.
-                </p>
-              </div>
-              <span className="text-xs font-bold text-[#051F16] bg-emerald-50 px-2.5 py-1 rounded-lg">
-                {shortlistedSupplierIds.length} Shortlisted
-              </span>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-stretch">
-              {publicStartupSuppliers.slice(0, 3).map((sup, index) => {
-                const isShortlisted = shortlistedSupplierIds.includes(sup.id)
-                const isRecommended = index === 1
-                return (
-                  <div
-                    key={sup.id}
-                    className={`p-4 rounded-xl border flex flex-col justify-between transition-all relative ${
-                      isRecommended
-                        ? "border-2 border-emerald-500 bg-linear-to-b from-emerald-50/40 via-white to-slate-50 shadow-md ring-2 ring-orange-300/40 md:-translate-y-1"
-                        : isShortlisted
-                          ? "border-[#051F16] bg-emerald-50/30 shadow-xs"
-                          : "border-slate-200 bg-white hover:border-slate-300 shadow-xs"
-                    }`}
-                  >
-                    <div className="flex flex-col flex-1">
-                      {isRecommended ? (
-                        <div className="mb-2">
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#051F16] text-white shadow-xs">
-                            <Icons.Sparkles className="w-3 h-3 text-white" />
-                            MPI Recommendation
-                          </span>
-                        </div>
-                      ) : (
-                        <div className="mb-2 hidden md:block h-[19px]" />
-                      )}
-
-                      <div className="flex items-start justify-between gap-1.5 mb-2">
-                        <div className="min-w-0">
-                          <div className="text-xs font-bold text-slate-900 truncate flex items-center gap-1.5">
-                            <span className="truncate">{sup.displayName}</span>
-                            {isRecommended && (
-                              <span className="text-[9px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1 py-0.2 rounded shrink-0">
-                                Preferred
-                              </span>
-                            )}
-                          </div>
-                          <div className="text-[10px] text-slate-500 truncate">
-                            {sup.category} · {sup.city}, {sup.state}
-                          </div>
-                        </div>
-                        <span
-                          className={`text-[11px] font-bold px-2 py-0.5 rounded-md border shrink-0 ${
-                            isRecommended
-                              ? "text-emerald-700 bg-emerald-50 border-emerald-200"
-                              : "text-[#051F16] bg-emerald-50 border-emerald-200"
-                          }`}
-                        >
-                          {sup.matchScore}% Match
-                        </span>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-1.5 text-[11px] text-slate-600 mb-2.5 bg-slate-50 p-2 rounded-lg border border-slate-100">
-                        <div>
-                          <span className="text-slate-400 text-[9px] uppercase font-semibold block">MOQ</span>
-                          <strong className="text-slate-800 text-[11px]">{sup.moq}</strong>
-                        </div>
-                        <div>
-                          <span className="text-slate-400 text-[9px] uppercase font-semibold block">Lead Time</span>
-                          <strong className="text-slate-800 text-[11px]">{sup.leadTime}</strong>
-                        </div>
-                      </div>
-
-                      <div className="flex flex-wrap gap-1 mb-2.5 min-h-[40px]">
-                        {sup.certifications.slice(0, 3).map((c) => (
-                          <span
-                            key={c}
-                            className="text-[9px] bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded font-medium border border-slate-200/60"
-                          >
-                            {c}
-                          </span>
-                        ))}
-                      </div>
-
-                      {/* Grounded Match Evidence */}
-                      <div
-                        className={`p-2.5 rounded-lg border text-[10px] text-slate-700 mb-3 ${
-                          isRecommended
-                            ? "bg-emerald-50/60 border-emerald-200/80"
-                            : "bg-emerald-50/60 border-emerald-200"
-                        }`}
-                      >
-                        <div className="flex items-center gap-1 font-bold text-[#051F16] mb-0.5 text-[10px]">
-                          <Icons.Sparkles className="w-3 h-3 text-emerald-700" />
-                          <span>Grounded Match:</span>
-                        </div>
-                        <p className="text-slate-600 text-[10px] leading-snug line-clamp-3">
-                          Audited facility in {sup.city} · In-house {sup.machinery.slice(0, 2).join(" & ")} · Past batch yield 99.4% with verified ZED.
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between gap-1.5 mt-auto">
-                      <button
-                        onClick={() => setSelectedSupplierDetail(sup)}
-                        className="text-xs text-[#051F16] hover:underline font-semibold cursor-pointer"
-                      >
-                        View Details
-                      </button>
-                      <button
-                        onClick={() => toggleShortlistSupplier(sup.id)}
-                        className={`text-xs px-2.5 py-1.5 rounded-lg font-semibold transition-colors cursor-pointer ${
-                          isShortlisted
-                            ? "bg-[#051F16] text-white"
-                            : isRecommended
-                              ? "bg-[#051F16] text-white hover:bg-[#083A28]"
-                              : "border border-slate-200 text-slate-700 hover:bg-slate-100"
-                        }`}
-                      >
-                        {isShortlisted ? "✓ Shortlisted" : "+ Shortlist"}
-                      </button>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-
-            <div className="flex justify-between pt-4 border-t border-slate-100">
-              <MPIButton variant="ghost" onClick={() => setBuilderStep(4)}>
-                ← Back
-              </MPIButton>
-              <MPIButton variant="primary" onClick={() => setBuilderStep(6)}>
-                Next: 5. Generate AI RFQ →
-              </MPIButton>
-            </div>
-          </div>
-        )}
-
-        {/* STEP 5: AI RFQ GENERATOR */}
-        {builderStep === 6 && (
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-5 animate-fade-in">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-lg font-bold text-[#051F16]">
-                  Step 5: Institutional AI RFQ Document
-                </h3>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  Generated procurement specification ready for dispatch to
-                  verified suppliers.
-                </p>
-              </div>
-              <MPIVerifiedBadge label="MPI Standard RFQ v2.4" />
-            </div>
-
-            {/* Generated RFQ Document Preview */}
-            <div className="p-6 bg-slate-50 rounded-xl border border-slate-300 font-mono text-xs text-slate-800 space-y-4">
-              <div className="flex justify-between pb-3 border-b border-slate-200 font-bold">
-                <span>DOCUMENT: MPI-RFQ-2026-0891</span>
-                <span>STATUS: READY FOR TRANSMISSION</span>
-              </div>
-
-              <div>
-                <div className="font-bold text-[#051F16]">
-                  PROJECT OVERVIEW:
-                </div>
-                <div>
-                  Requirement: {selectedCategory} ({formatScopeDisplay(selectedCategory, quantity)}) {requirementText ? `("${requirementText.slice(0, 80)}${requirementText.length > 80 ? "..." : ""}")` : ""}
-                </div>
-                <div>
-                  Target Budget: ₹{targetBudget.toLocaleString("en-IN")}
-                </div>
-                <div>
-                  Delivery Deadline: {deadlineDate} ({deliveryLocation})
-                </div>
-              </div>
-
-              <div>
-                <div className="font-bold text-[#051F16]">
-                  TECHNICAL SPECIFICATIONS:
-                </div>
-                <ul className="list-disc pl-5 space-y-0.5">
-                  {specifications.map((s, i) => (
-                    <li key={i}>{s}</li>
-                  ))}
-                </ul>
-              </div>
-
-              <div>
-                <div className="font-bold text-[#051F16]">
-                  QUALITY & COMPLIANCE CLAUSES:
-                </div>
-                <div>Mandatory: {complianceChecks.join(" • ")}</div>
-                <div>
-                  Payment Terms: 30% Advance Escrow, 70% against certified QC
-                  pass
-                </div>
-              </div>
-            </div>
-
-            <div className="flex justify-between pt-4 border-t border-slate-100">
-              <MPIButton variant="ghost" onClick={() => setBuilderStep(5)}>
-                ← Back
-              </MPIButton>
-              <MPIButton
-                variant="ai"
-                onClick={() => {
-                  createAndDispatchRFQ()
-                  setBuilderStep(7)
-                }}
-                icon={<Icons.Sparkles className="w-4 h-4" />}
-              >
-                Dispatch to {shortlistedSupplierIds.length} Verified Suppliers →
-              </MPIButton>
-            </div>
-          </div>
-        )}
-
-        {/* STEP 6: DISPATCH & VERIFY CONFIRMATION */}
-        {builderStep === 7 && (
-          <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-xs text-center space-y-5 animate-fade-in">
-            <div className="w-16 h-16 rounded-full bg-emerald-100/60 text-[#051F16] flex items-center justify-center mx-auto">
-              <Icons.Check className="w-8 h-8" />
-            </div>
-
-            <h3
-              className="text-xl font-extrabold text-[#051F16]"
-              style={{ fontFamily: "Plus Jakarta Sans" }}
-            >
-              Step 6: RFQ Transmitted Successfully!
-            </h3>
-            <p className="text-xs sm:text-sm text-slate-600 max-w-lg mx-auto leading-relaxed">
-              Your institutional RFQ has been dispatched to{" "}
-              {shortlistedSupplierIds.length} verified suppliers. You will
-              receive itemized reverse-margin quotes within 24–48 hours.
-            </p>
-
-            <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl max-w-md mx-auto text-xs text-slate-700 flex justify-between">
-              <span>Dispatched Suppliers:</span>
-              <span className="font-bold text-[#051F16]">
-                {shortlistedSupplierIds
-                  .map(
-                    (id) =>
-                      publicStartupSuppliers.find((s) => s.id === id)
-                        ?.displayName || id,
-                  )
-                  .join(", ")}
-              </span>
-            </div>
-
-            <div className="pt-4 flex justify-center gap-3">
-              <MPIButton
-                variant="outline"
-                onClick={() => navigate("startup.ai-assistant")}
-              >
-                Open AI Copilot
-              </MPIButton>
-              <MPIButton
-                variant="primary"
-                onClick={() => navigate("startup.comparison")}
-                icon={<Icons.ArrowRight className="w-4 h-4" />}
-              >
-                Go to Quote Comparison Matrix →
-              </MPIButton>
-            </div>
-          </div>
-        )}
-      </div>,
+      <StartupGuidedBuilder
+        navigate={navigate}
+        goBack={goBack}
+        builderStep={builderStep}
+        setBuilderStep={setBuilderStep}
+        requirementText={requirementText}
+        setRequirementText={setRequirementText}
+        selectedCategory={selectedCategory}
+        setSelectedCategory={setSelectedCategory}
+        quantity={quantity}
+        setQuantity={setQuantity}
+        targetBudget={targetBudget}
+        setTargetBudget={setTargetBudget}
+        deliveryLocation={deliveryLocation}
+        setDeliveryLocation={setDeliveryLocation}
+        deadlineDate={deadlineDate}
+        setDeadlineDate={setDeadlineDate}
+        specifications={specifications}
+        addSpecification={addSpecification}
+        removeSpecification={removeSpecification}
+        complianceChecks={complianceChecks}
+        setComplianceChecks={setComplianceChecks}
+        isExtractingSpecs={isExtractingSpecs}
+        runAIExtraction={runAIExtraction}
+        publicStartupSuppliers={publicStartupSuppliers}
+        shortlistedSupplierIds={shortlistedSupplierIds}
+        toggleShortlistSupplier={toggleShortlistSupplier}
+        activeRFQ={activeRFQ}
+        createAndDispatchRFQ={createAndDispatchRFQ}
+        publicStartupQuotes={publicStartupQuotes}
+        onOpenSampleModal={(sup) => {
+          setSelectedSampleSupplier(sup)
+          setSampleModalOpen(true)
+        }}
+      />,
       "Guided Sourcing Builder",
       "7-step automated procurement flow from requirement to RFQ dispatch.",
     )
@@ -5202,7 +4019,22 @@ export default function StartupFlow({
   }
 
   // ════════════════════════════════════════════════════════════════════════════
-  // 10. DEFAULT FALLBACK / SHORTLIST / MATCHES SCREENS
+  // 10. STARTUP SETTINGS & ACCOUNT GOVERNANCE (startup.settings)
+  // ════════════════════════════════════════════════════════════════════════════
+  if (currentScreen === "startup.settings") {
+    return renderShell(
+      <StartupSettings
+        startupProfile={startupProfile}
+        updateStartupProfile={updateStartupProfile}
+        navigate={navigate}
+      />,
+      "Startup Profile & Procurement Settings",
+      "Manage your statutory DPIIT credentials, annual sourcing threshold, and escrow parameters.",
+    )
+  }
+
+  // ════════════════════════════════════════════════════════════════════════════
+  // 11. DEFAULT FALLBACK / SHORTLIST / MATCHES SCREENS
   // ════════════════════════════════════════════════════════════════════════════
   return renderShell(
     <div className="space-y-6">
