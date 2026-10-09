@@ -367,6 +367,7 @@ export interface ProcurementContextType {
   selectedQuoteId: string | null
   selectQuote: (quoteId: string) => void
   submitMSMEQuote: (quote: SupplierQuote) => void
+  loadDemoQuotes: () => void
 
   // Order Lifecycle
   currentMilestone: number
@@ -887,8 +888,8 @@ const INITIAL_QUOTES: SupplierQuote[] = [
     deliveryDays: 12,
     terms:
       "30% Advance, 70% against delivery dispatch inspection. 100% Quality Replacement guarantee.",
-    schemeSubsidyApplied: 7250, // 10% ZED Gold MSME packaging subsidy
-    finalLandedCost: 65250,
+    schemeSubsidyApplied: 7250, // Distinct ZED Gold MSME packaging subsidy eligibility assessment
+    finalLandedCost: 72500, // Payable commercial invoice (not reduced by grant)
     scoreBreakdown: {
       priceCompetitiveness: 94,
       qualityAssurance: 98,
@@ -914,7 +915,7 @@ const INITIAL_QUOTES: SupplierQuote[] = [
     terms:
       "40% Advance, 60% on Bill of Lading. Includes free sample batch run.",
     schemeSubsidyApplied: 3250,
-    finalLandedCost: 61750,
+    finalLandedCost: 65000,
     scoreBreakdown: {
       priceCompetitiveness: 99,
       qualityAssurance: 92,
@@ -922,7 +923,7 @@ const INITIAL_QUOTES: SupplierQuote[] = [
       complianceScore: 92,
     },
     recommendationReason:
-      "Better Tier (Recommended): Optimal price-to-performance sweet spot with lowest net landed cost (₹59,280), high value yield and full statutory compliance.",
+      "Better Tier (Recommended): Optimal price-to-performance sweet spot with direct factory pricing, high value yield and full statutory compliance.",
   },
   {
     id: "QTE-003",
@@ -939,7 +940,7 @@ const INITIAL_QUOTES: SupplierQuote[] = [
     deliveryDays: 6,
     terms: "50% Advance, 50% post-delivery 15 days credit period.",
     schemeSubsidyApplied: 4125,
-    finalLandedCost: 78375,
+    finalLandedCost: 82500,
     scoreBreakdown: {
       priceCompetitiveness: 82,
       qualityAssurance: 99,
@@ -1504,22 +1505,37 @@ export const ProcurementProvider: React.FC<{ children: React.ReactNode }> = ({
     useState<MatchedSupplier[]>(INITIAL_SUPPLIERS)
   const [shortlistedSupplierIds, setShortlistedSupplierIds] =
     useState<string[]>(["SUP-001", "SUP-002", "SUP-003"])
-  const [activeRFQ, setActiveRFQ] = useState<RFQDetails | null>({
-    id: "RFQ-2026-0891",
-    title: "500x Custom Rigid Skincare Packaging Boxes",
-    category: "Packaging & Printing",
-    quantity: 500,
-    targetBudget: 75000,
-    deliveryDate: "2026-10-25",
-    specifications: DEFAULT_SPECS,
-    dispatchedToSupplierIds: ["SUP-001", "SUP-002", "SUP-003", "SUP-004"],
-    createdDate: "2026-09-22",
-    status: "Quotes Received",
+  const [activeRFQ, setActiveRFQ] = useState<RFQDetails | null>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const stored = localStorage.getItem("mpi_active_rfq")
+        if (stored) return JSON.parse(stored)
+      } catch {}
+    }
+    return {
+      id: "RFQ-2026-0891",
+      title: "500x Custom Rigid Skincare Packaging Boxes",
+      category: "Packaging & Printing",
+      quantity: 500,
+      targetBudget: 75000,
+      deliveryDate: "2026-10-25",
+      specifications: DEFAULT_SPECS,
+      dispatchedToSupplierIds: ["SUP-001", "SUP-002", "SUP-003", "SUP-004"],
+      createdDate: "2026-09-22",
+      status: "Quotes Received",
+    }
   })
 
   // Quotes & Comparison
-  const [receivedQuotes, setReceivedQuotes] =
-    useState<SupplierQuote[]>(INITIAL_QUOTES)
+  const [receivedQuotes, setReceivedQuotes] = useState<SupplierQuote[]>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const stored = localStorage.getItem("mpi_submitted_quotes")
+        if (stored) return JSON.parse(stored)
+      } catch {}
+    }
+    return INITIAL_QUOTES
+  })
   const [selectedQuoteId, setSelectedQuoteId] = useState<string | null>(
     "QTE-002",
   )
@@ -1768,96 +1784,59 @@ export const ProcurementProvider: React.FC<{ children: React.ReactNode }> = ({
       specifications,
       dispatchedToSupplierIds: targetIds,
       createdDate: new Date().toISOString().split("T")[0],
-      status: "Quotes Received",
+      status: "Dispatched",
     }
     setActiveRFQ(newRFQ)
     try {
+      localStorage.setItem("mpi_active_rfq", JSON.stringify(newRFQ))
       localStorage.setItem("mpi_rfq_dispatched", "true")
+      localStorage.removeItem("mpi_submitted_quotes")
     } catch {}
 
-    // Dynamically generate tailored reverse-margin quotes for dispatched suppliers
-    const chosenSuppliers = matchedSuppliers.filter((s) => targetIds.includes(s.id))
-    const suppliersToQuote =
-      chosenSuppliers.length > 0
-        ? chosenSuppliers
-        : matchedSuppliers.filter((s) => s.category === selectedCategory).length > 0
-          ? matchedSuppliers.filter((s) => s.category === selectedCategory).slice(0, 3)
-          : matchedSuppliers.slice(0, 3)
-
-    const freshQuotes: SupplierQuote[] = suppliersToQuote.slice(0, 3).map((sup, idx) => {
-      let discountFactor = 0.85
-      let leadDays = 12
-      let recReason = `Best Value & Highest Savings. High quality score (${sup.matchScore}%), verified MSME credentials, and eligible for government subsidy pass-through.`
-      let subsidyRate = 0.10
-
-      if (idx === 0) {
-        discountFactor = 0.85
-        leadDays = 10
-        recReason = `Best Value & Highest Savings. High quality score (${sup.matchScore}%), verified MSME credentials, and eligible for government subsidy pass-through.`
-        subsidyRate = 0.10
-      } else if (idx === 1) {
-        discountFactor = 0.78
-        leadDays = 14
-        recReason = `Lowest Price option with direct factory economics and competitive unit fabrication.`
-        subsidyRate = 0.05
-      } else {
-        discountFactor = 0.92
-        leadDays = 6
-        recReason = `Fastest Delivery (${leadDays} business days) with expedited turnaround and dedicated project engineering.`
-        subsidyRate = 0.05
-      }
-
-      const totalAmount = Math.max(5000, Math.round(targetBudget * discountFactor))
-      const subsidy = Math.round(totalAmount * subsidyRate)
-      const finalLanded = totalAmount - subsidy
-      const baseTooling = Math.round(totalAmount * 0.08)
-      const unitMfg = Math.round(totalAmount * 0.72)
-      const testing = Math.round(totalAmount * 0.05)
-      const logistics = Math.round(totalAmount * 0.05)
-      const gst = Math.max(0, totalAmount - (baseTooling + unitMfg + testing + logistics))
-
-      return {
-        id: `QTE-00${idx + 1}`,
-        supplierId: sup.id,
-        supplierName: sup.name,
-        totalAmount,
-        breakdown: {
-          baseToolingOrSetup: baseTooling,
-          unitManufacturing: unitMfg,
-          qualityTesting: testing,
-          logisticsAndPackaging: logistics,
-          gstAmount: gst,
-        },
-        deliveryDays: leadDays,
-        terms: "30% Advance Escrow, 70% against certified QC pass & delivery inspection.",
-        schemeSubsidyApplied: subsidy,
-        finalLandedCost: finalLanded,
-        scoreBreakdown: {
-          priceCompetitiveness: idx === 1 ? 99 : idx === 0 ? 94 : 85,
-          qualityAssurance: sup.matchScore,
-          leadTimeFeasibility: idx === 2 ? 99 : 92,
-          complianceScore: sup.verificationStatus === "Verified" ? 98 : 88,
-        },
-        recommendationReason: recReason,
-      }
-    })
-
-    setReceivedQuotes(freshQuotes)
-    if (freshQuotes.length > 0) {
-      setSelectedQuoteId(freshQuotes[0].id)
-    }
+    // In a live RFQ workflow, do not synthesize fake quotes.
+    // Quotations must be transmitted by real MSMEs via the MSME portal.
+    setReceivedQuotes([])
+    setSelectedQuoteId(null)
   }
 
   const submitMSMEQuote = (quote: SupplierQuote) => {
     setReceivedQuotes((prev) => {
       const existing = prev.findIndex((q) => q.supplierId === quote.supplierId)
+      let updated: SupplierQuote[]
       if (existing >= 0) {
-        const copy = [...prev]
-        copy[existing] = quote
-        return copy
+        updated = [...prev]
+        updated[existing] = quote
+      } else {
+        updated = [quote, ...prev]
       }
-      return [quote, ...prev]
+      try {
+        localStorage.setItem("mpi_submitted_quotes", JSON.stringify(updated))
+      } catch {}
+      return updated
     })
+
+    setSelectedQuoteId((current) => current || quote.id)
+
+    // Automatically transition RFQ status to Quotes Received
+    setActiveRFQ((prev) => {
+      if (!prev) return null
+      const updated: RFQDetails = {
+        ...prev,
+        status: "Quotes Received",
+      }
+      try {
+        localStorage.setItem("mpi_active_rfq", JSON.stringify(updated))
+      } catch {}
+      return updated
+    })
+  }
+
+  const loadDemoQuotes = () => {
+    setReceivedQuotes(INITIAL_QUOTES)
+    setSelectedQuoteId("QTE-002")
+    try {
+      localStorage.setItem("mpi_submitted_quotes", JSON.stringify(INITIAL_QUOTES))
+    } catch {}
   }
 
   const selectQuote = (quoteId: string) => {
@@ -2037,6 +2016,7 @@ export const ProcurementProvider: React.FC<{ children: React.ReactNode }> = ({
         selectedQuoteId,
         selectQuote,
         submitMSMEQuote,
+        loadDemoQuotes,
         currentMilestone,
         advanceMilestone,
         setMilestone,

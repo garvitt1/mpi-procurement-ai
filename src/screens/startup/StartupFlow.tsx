@@ -332,6 +332,7 @@ export default function StartupFlow({
     publicStartupQuotes,
     selectedQuoteId,
     selectQuote,
+    loadDemoQuotes,
     currentMilestone,
     advanceMilestone,
     setMilestone,
@@ -2797,8 +2798,39 @@ export default function StartupFlow({
           </MPIButton>
         </div>
 
-        {/* Side-by-side comparative cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 items-stretch">
+        {/* Side-by-side comparative cards or Empty Awaiting Quotes State */}
+        {publicStartupQuotes.length === 0 ? (
+          <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center space-y-4 shadow-xs">
+            <div className="w-14 h-14 rounded-full bg-amber-50 text-amber-700 flex items-center justify-center mx-auto border border-amber-200">
+              <Icons.Clock className="w-7 h-7" />
+            </div>
+            <div className="max-w-md mx-auto space-y-2">
+              <h3 className="text-base font-bold text-slate-900">
+                Awaiting MSME Quotations
+              </h3>
+              <p className="text-xs text-slate-500 leading-relaxed">
+                Your RFQ ({activeRFQ?.title || "Custom Batch Run"}) has been dispatched to verified manufacturing clusters. Suppliers in our audited network evaluate tooling specs and submit binding proposals within 24–48 hours.
+              </p>
+            </div>
+            <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
+              <MPIButton
+                variant="outline"
+                size="sm"
+                onClick={() => navigate("msme.opportunities")}
+              >
+                Switch to MSME Portal to Review &amp; Transmit Quote →
+              </MPIButton>
+              <button
+                type="button"
+                onClick={() => loadDemoQuotes()}
+                className="px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-slate-200 transition-all cursor-pointer"
+              >
+                Inspect Sample Demonstration Quotes
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 items-stretch">
           {publicStartupQuotes.slice(0, 3).map((q, idx) => {
             const isSelected = selectedQuoteId === q.id
             const isTopRecommended = idx === 1
@@ -2888,30 +2920,30 @@ export default function StartupFlow({
                         className="text-2xl font-extrabold text-[#051F16] tracking-tight"
                         style={{ fontFamily: "Plus Jakarta Sans" }}
                       >
-                        ₹{q.finalLandedCost.toLocaleString("en-IN")}
+                        ₹{q.quotedTotal.toLocaleString("en-IN")}
                       </div>
                       <div className="text-[11px] text-slate-500 font-medium">
-                        Net Landed Cost (₹{q.unitPrice}/unit)
+                        Payable Supplier Invoice (₹{q.unitPrice}/unit)
                       </div>
                     </div>
 
                     {/* Savings vs Baseline */}
                     <div className="mt-3 p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-1">
                       <div className="flex justify-between text-slate-500 text-[11px]">
-                        <span>Baseline Benchmark:</span>
+                        <span>Market Baseline Benchmark:</span>
                         <span className="line-through">
                           ₹{q.baselineCost.toLocaleString("en-IN")}
                         </span>
                       </div>
                       <div className="flex justify-between font-bold text-[#051F16]">
-                        <span>Total Savings:</span>
+                        <span>Direct Factory Savings:</span>
                         <span className="text-[#D9A400]">
                           ₹{q.totalSavings.toLocaleString("en-IN")} (
                           {q.savingsPercent}%)
                         </span>
                       </div>
                       <div className="flex justify-between text-[11px] text-slate-600">
-                        <span>Est. Time Saved:</span>
+                        <span>Est. Turnaround SLA:</span>
                         <span className="font-semibold text-emerald-700">
                           {q.estimatedTimeSaved}
                         </span>
@@ -2954,12 +2986,19 @@ export default function StartupFlow({
                           ).toLocaleString("en-IN")}
                         </span>
                       </div>
-                      {q.schemeSubsidyApplied > 0 && (
-                        <div className="flex justify-between text-[#8C6B00] bg-[#FFF7D6] px-2 py-1 rounded font-bold">
-                          <span>Gov Scheme Subsidy:</span>
-                          <span>
-                            - ₹{q.schemeSubsidyApplied.toLocaleString("en-IN")}
-                          </span>
+                      {q.schemeSubsidyApplied > 0 ? (
+                        <div className="mt-2.5 p-2 bg-[#FFF7D6]/60 border border-[#FFE799] rounded-lg text-[11px] space-y-0.5">
+                          <div className="flex justify-between font-bold text-[#8C6B00]">
+                            <span>Gov Scheme Subsidy Eligibility:</span>
+                            <span>Est. ₹{q.schemeSubsidyApplied.toLocaleString("en-IN")}</span>
+                          </div>
+                          <p className="text-[10px] text-[#A37D00] leading-tight">
+                            Separate post-procurement ZED/Design reimbursement track. Claimable via Ministry upon compliance audit; not deducted from payable invoice.
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="mt-2 p-1.5 bg-slate-50 border border-slate-200/80 rounded-md text-[10px] text-slate-500 text-center">
+                          Scheme benefit unverified for this batch category.
                         </div>
                       )}
                     </div>
@@ -3027,6 +3066,7 @@ export default function StartupFlow({
             )
           })}
         </div>
+        )}
       </div>,
       "Multi-Quote Comparison Matrix",
       "Side-by-side transparent landed cost evaluation against defined baseline market benchmarks.",

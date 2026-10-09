@@ -361,14 +361,14 @@ export default function MSMEFlow({
         deliveryDays: quoteForm.leadDays,
         terms: quoteForm.paymentTerms,
         schemeSubsidyApplied: subsidyDiscount,
-        finalLandedCost: netLandedCostToBuyer,
+        finalLandedCost: totalWithGst,
         scoreBreakdown: {
           priceCompetitiveness: 96,
           qualityAssurance: 98,
           leadTimeFeasibility: 96,
           complianceScore: 100,
         },
-        recommendationReason: `Submitted by ${supplierEnterpriseName} (Udyam: ${supplierId}) via MSME Portal with verified ZED Gold subsidy pass-through and ${repeatDiscountPercent}% repeat client concession.`,
+        recommendationReason: `Submitted by ${supplierEnterpriseName} (Udyam: ${supplierId}) via MSME Portal with ${repeatDiscountPercent}% repeat client concession and separate post-procurement ZED Gold scheme assessment.`,
       }
 
       submitMSMEQuote(newQuote)
@@ -1401,19 +1401,24 @@ export default function MSMEFlow({
               </span>
             </div>
 
-            {quoteForm.applyZedSubsidy && (
-              <div className="flex justify-between text-[#8C6B00] bg-[#FFF7D6] px-2 py-1 rounded font-bold">
-                <span>ZED Gold Certification Subsidy Credit:</span>
-                <span>- ₹{subsidyDiscount.toLocaleString("en-IN")}</span>
-              </div>
-            )}
-
             <div className="pt-2 border-t border-slate-200 flex justify-between text-sm font-extrabold text-[#051F16]">
-              <span>Final Landed Cost to Startup Buyer:</span>
+              <span>Contracted Payable Invoice to Factory (Escrow Locked):</span>
               <span className="text-base text-[#051F16]">
-                ₹{netLandedCostToBuyer.toLocaleString("en-IN")}
+                ₹{totalWithGst.toLocaleString("en-IN")}
               </span>
             </div>
+
+            {quoteForm.applyZedSubsidy && (
+              <div className="p-2.5 rounded-xl bg-[#FFF7D6]/60 border border-[#FFE799] text-xs space-y-1">
+                <div className="flex justify-between font-bold text-[#8C6B00]">
+                  <span>Eligible Buyer Scheme Subsidy (Separate Track):</span>
+                  <span>Est. ₹{subsidyDiscount.toLocaleString("en-IN")}</span>
+                </div>
+                <p className="text-[10px] text-[#A37D00] leading-tight">
+                  Estimated ZED Gold quality audit reimbursement claimable post-procurement from Ministry of MSME. Payable invoice to your factory remains ₹{totalWithGst.toLocaleString("en-IN")} in full.
+                </p>
+              </div>
+            )}
           </div>
 
           {/* ─── MSME AI QUOTATION ASSISTANT CARD ──────────────────────────── */}
@@ -1471,8 +1476,9 @@ export default function MSMEFlow({
               </h3>
               <p className="text-xs text-slate-600 leading-relaxed">
                 Your binding itemized quotation of{" "}
-                <strong>₹{netLandedCostToBuyer.toLocaleString("en-IN")}</strong>{" "}
-                (including {repeatDiscountPercent}% repeat client concession)
+                <strong>₹{totalWithGst.toLocaleString("en-IN")}</strong> payable invoice value{" "}
+                (including {repeatDiscountPercent}% repeat client concession
+                {subsidyDiscount > 0 ? ` and ₹${subsidyDiscount.toLocaleString("en-IN")} eligible ZED subsidy assessment` : ""})
                 has been transmitted directly into {selectedOpp.buyer}'s comparison
                 matrix on behalf of <strong>{supplierEnterpriseName}</strong>.
               </p>
