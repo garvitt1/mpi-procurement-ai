@@ -253,7 +253,7 @@ export default function StartupCommandCenter({
               <div>
                 <div className="flex items-center justify-between text-xs mb-2">
                   <span className="font-extrabold text-slate-500 uppercase tracking-wider text-[10px]">
-                    REVERSE-MARGIN TARGET
+                    BENCHMARK: REVERSE-MARGIN*
                   </span>
                   <div className="w-8 h-8 rounded-xl bg-[#A3F65C]/20 border border-[#A3F65C]/40 text-[#051F16] flex items-center justify-center font-bold">
                     <Icons.TrendingUp className="w-4 h-4" />
@@ -271,7 +271,7 @@ export default function StartupCommandCenter({
                   Direct Factory Margin
                 </span>
                 <span className="text-slate-500 font-medium text-[11px]">
-                  Zero intermediary markup
+                  Indicative cluster model*
                 </span>
               </div>
             </div>
@@ -284,7 +284,7 @@ export default function StartupCommandCenter({
               <div>
                 <div className="flex items-center justify-between text-xs mb-2">
                   <span className="font-extrabold text-slate-500 uppercase tracking-wider text-[10px]">
-                    QUOTATION SLA
+                    TARGET RESPONSE SLA*
                   </span>
                   <div className="w-8 h-8 rounded-xl bg-[#A3F65C]/20 border border-[#A3F65C]/40 text-[#051F16] flex items-center justify-center font-bold">
                     <Icons.Clock className="w-4 h-4" />
@@ -302,7 +302,7 @@ export default function StartupCommandCenter({
                   Audited MSME Clusters
                 </span>
                 <span className="text-slate-500 font-medium text-[11px]">
-                  Peenya & Pune
+                  Peenya & Pune network
                 </span>
               </div>
             </div>
@@ -315,7 +315,7 @@ export default function StartupCommandCenter({
               <div>
                 <div className="flex items-center justify-between text-xs mb-2">
                   <span className="font-extrabold text-slate-500 uppercase tracking-wider text-[10px]">
-                    ESCROW PROTECTION
+                    ESCROW PROTECTION PROTOCOL
                   </span>
                   <div className="w-8 h-8 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 flex items-center justify-center font-bold">
                     <Icons.ShieldCheck className="w-4 h-4 text-emerald-700" />
@@ -325,17 +325,28 @@ export default function StartupCommandCenter({
                   className="text-2xl sm:text-3xl font-extrabold text-[#051F16] tracking-tight"
                   style={{ fontFamily: "Plus Jakarta Sans" }}
                 >
-                  100% Protected
+                  Milestone-Gated
                 </div>
               </div>
               <div className="mt-3.5 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
                 <span className="text-emerald-700 font-bold text-[11px]">
-                  Milestone Gated
+                  Disbursement Gate
                 </span>
                 <span className="text-slate-500 font-medium text-[11px]">
                   Released upon QC pass
                 </span>
               </div>
+            </div>
+
+            {/* Transparent Methodology & Baseline Indicator */}
+            <div className="col-span-1 sm:col-span-2 lg:col-span-4 px-3.5 py-2.5 bg-slate-50 border border-slate-200/80 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-[11px] text-slate-500">
+              <span className="flex items-center gap-1.5">
+                <Icons.AlertCircle className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                <span>
+                  * Day-0 benchmark estimates derived from comparative batch tooling and reverse-margin models across verified Indian MSME clusters (Peenya &amp; Pune).
+                </span>
+              </span>
+              <span className="font-semibold text-slate-600 shrink-0">Baseline state (0 live orders)</span>
             </div>
           </div>
 

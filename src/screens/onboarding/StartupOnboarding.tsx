@@ -85,12 +85,18 @@ export default function StartupOnboarding({ navigate, goBack }: NavProps) {
   const activeUser = getActiveUser()
   const pending = getPendingAction()
 
-  // Load any previously saved draft from localStorage
+  // Load any previously saved draft from localStorage (scoped to active user)
   const savedDraft = (() => {
     if (typeof window === "undefined") return null
     try {
       const raw = localStorage.getItem(ONBOARDING_DRAFT_KEY)
-      return raw ? JSON.parse(raw) : null
+      if (!raw) return null
+      const parsed = JSON.parse(raw)
+      // Guard against cross-user draft pollution: if active user exists and draft has a different email, ignore it
+      if (activeUser?.email && parsed?.email && parsed.email.trim().toLowerCase() !== activeUser.email.trim().toLowerCase()) {
+        return null
+      }
+      return parsed
     } catch {
       return null
     }
@@ -240,10 +246,10 @@ export default function StartupOnboarding({ navigate, goBack }: NavProps) {
       return false
     }
 
-    // If unauthenticated and no password was generated/supplied
+    // If unauthenticated, validate password
     const authed = isAuthenticated()
-    if (!authed && !password) {
-      if (password.length < 6) {
+    if (!authed) {
+      if (!password || password.length < 6) {
         setErrorMessage("Please enter an account password (minimum 6 characters).")
         return false
       }

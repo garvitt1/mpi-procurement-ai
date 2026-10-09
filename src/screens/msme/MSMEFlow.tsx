@@ -175,6 +175,7 @@ export default function MSMEFlow({
     useState<string>("2.5")
 
   const [quoteSubmittedModal, setQuoteSubmittedModal] = useState(false)
+  const [isTransmittingQuote, setIsTransmittingQuote] = useState(false)
 
   // Machinery & Capacity Ledger State
   const [machineryList, setMachineryList] = useState([
@@ -337,39 +338,50 @@ export default function MSMEFlow({
   const netLandedCostToBuyer = totalWithGst - subsidyDiscount
 
   const handleTransmitQuotation = () => {
-    const newQuote: SupplierQuote = {
-      id: `QTE-${Date.now().toString().slice(-4)}`,
-      supplierId: supplierId,
-      supplierName: supplierEnterpriseName,
-      totalAmount: totalWithGst,
-      breakdown: {
-        baseToolingOrSetup: quoteForm.baseTooling,
-        unitManufacturing: manufacturingSubtotal,
-        qualityTesting: quoteForm.qaTesting,
-        logisticsAndPackaging: quoteForm.logistics,
-        gstAmount: gstAmount,
-      },
-      deliveryDays: quoteForm.leadDays,
-      terms: quoteForm.paymentTerms,
-      schemeSubsidyApplied: subsidyDiscount,
-      finalLandedCost: netLandedCostToBuyer,
-      scoreBreakdown: {
-        priceCompetitiveness: 96,
-        qualityAssurance: 98,
-        leadTimeFeasibility: 96,
-        complianceScore: 100,
-      },
-      recommendationReason: `Submitted by ${supplierEnterpriseName} (Udyam: ${supplierId}) via MSME Portal with verified ZED Gold subsidy pass-through and ${repeatDiscountPercent}% repeat client concession.`,
+    if (isTransmittingQuote) return
+    if (selectedOpp.status === "Quote Transmitted") {
+      setQuoteSubmittedModal(true)
+      return
     }
 
-    submitMSMEQuote(newQuote)
-    // Update opportunity status to "Quote Transmitted"
-    setOpportunities((prev) =>
-      prev.map((o) =>
-        o.id === selectedOpp.id ? { ...o, status: "Quote Transmitted" } : o
+    setIsTransmittingQuote(true)
+    try {
+      const newQuote: SupplierQuote = {
+        id: `QTE-${Date.now().toString().slice(-4)}`,
+        supplierId: supplierId,
+        supplierName: supplierEnterpriseName,
+        totalAmount: totalWithGst,
+        breakdown: {
+          baseToolingOrSetup: quoteForm.baseTooling,
+          unitManufacturing: manufacturingSubtotal,
+          qualityTesting: quoteForm.qaTesting,
+          logisticsAndPackaging: quoteForm.logistics,
+          gstAmount: gstAmount,
+        },
+        deliveryDays: quoteForm.leadDays,
+        terms: quoteForm.paymentTerms,
+        schemeSubsidyApplied: subsidyDiscount,
+        finalLandedCost: netLandedCostToBuyer,
+        scoreBreakdown: {
+          priceCompetitiveness: 96,
+          qualityAssurance: 98,
+          leadTimeFeasibility: 96,
+          complianceScore: 100,
+        },
+        recommendationReason: `Submitted by ${supplierEnterpriseName} (Udyam: ${supplierId}) via MSME Portal with verified ZED Gold subsidy pass-through and ${repeatDiscountPercent}% repeat client concession.`,
+      }
+
+      submitMSMEQuote(newQuote)
+      // Update opportunity status to "Quote Transmitted"
+      setOpportunities((prev) =>
+        prev.map((o) =>
+          o.id === selectedOpp.id ? { ...o, status: "Quote Transmitted" } : o
+        )
       )
-    )
-    setQuoteSubmittedModal(true)
+      setQuoteSubmittedModal(true)
+    } finally {
+      setIsTransmittingQuote(false)
+    }
   }
 
   const navItems = [
@@ -1437,9 +1449,13 @@ export default function MSMEFlow({
             fullWidth
             size="lg"
             onClick={handleTransmitQuotation}
+            disabled={isTransmittingQuote || selectedOpp.status === "Quote Transmitted"}
+            isLoading={isTransmittingQuote}
             icon={<Icons.ArrowRight className="w-4 h-4" />}
           >
-            Transmit Binding Quotation to {selectedOpp.buyer.split("(")[0]} →
+            {selectedOpp.status === "Quote Transmitted"
+              ? "Quotation Already Transmitted"
+              : `Transmit Binding Quotation to ${selectedOpp.buyer.split("(")[0]} →`}
           </MPIButton>
         </div>
 
