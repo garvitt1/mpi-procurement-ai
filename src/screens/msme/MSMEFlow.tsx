@@ -30,7 +30,15 @@ export default function MSMEFlow({
   goBack,
   currentScreen,
 }: NavProps) {
-  const { submitMSMEQuote, msmeProfile, msmeRFQs, backendSyncState, refreshBackendSync } = useProcurement()
+  const {
+    submitMSMEQuote,
+    msmeProfile,
+    msmeRFQs,
+    backendSyncState,
+    refreshBackendSync,
+    quotePersistenceStatus,
+    quotePersistenceError,
+  } = useProcurement()
   const activeUser = getActiveUser()
 
   const supplierEnterpriseName =
@@ -592,7 +600,7 @@ export default function MSMEFlow({
                 {currentScreen !== "msme.home" && (
                   <>
                     <span>/</span>
-                    <span className="text-[#051F16] font-semibold truncate max-w-30 sm:max-w-[200px]">
+                    <span className="text-[#051F16] font-semibold truncate max-w-30 sm:max-w-50">
                       {title}
                     </span>
                   </>
@@ -636,7 +644,7 @@ export default function MSMEFlow({
               />
               <span>
                 {backendSyncState.isTableExposed
-                  ? "Supabase Live"
+                  ? "Supabase Connected"
                   : backendSyncState.pendingMigration
                   ? "DB Migration Pending"
                   : "Local Fallback"}
@@ -1144,7 +1152,7 @@ export default function MSMEFlow({
         </div>
 
         {/* ─── AI MSME RFQ RESPONSE COPILOT (Blueprint Item 24) ──────────── */}
-        <div className="bg-gradient-to-r from-[#051F16] to-[#0A3525] text-white rounded-2xl p-5 shadow-xs space-y-4">
+        <div className="bg-linear-to-r from-[#051F16] to-[#0A3525] text-white rounded-2xl p-5 shadow-xs space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center font-bold shrink-0">
@@ -1531,12 +1539,33 @@ export default function MSMEFlow({
                 has been transmitted directly into {selectedOpp.buyer}'s comparison
                 matrix on behalf of <strong>{supplierEnterpriseName}</strong>.
               </p>
-              <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-xs text-emerald-900 text-left space-y-1">
-                <div className="font-bold flex items-center gap-1">
-                  <Icons.ShieldCheck className="w-3.5 h-3.5 text-emerald-700" />
+              <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs text-left space-y-1.5">
+                <div className="font-bold flex items-center gap-1.5">
+                  <Icons.ShieldCheck className="w-3.5 h-3.5 text-[#051F16]" />
                   <span>Quotation Lifecycle Status: Quote Transmitted</span>
                 </div>
-                <div className="text-[11px] text-emerald-700 leading-snug">
+                <div className="flex items-center gap-1.5 pt-0.5">
+                  {quotePersistenceStatus === "saved_to_supabase" ? (
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                      <span>Persisted in PostgreSQL public.quotes</span>
+                    </span>
+                  ) : quotePersistenceStatus === "saving" ? (
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-blue-50 text-blue-800 border border-blue-200">
+                      <span className="w-2 h-2 rounded-full bg-blue-500 animate-spin" />
+                      <span>Syncing with Supabase...</span>
+                    </span>
+                  ) : (
+                    <span
+                      className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-800 border border-amber-200"
+                      title={quotePersistenceError || "Stored locally in browser session"}
+                    >
+                      <span className="w-2 h-2 rounded-full bg-amber-500" />
+                      <span>Saved Locally {quotePersistenceError ? `(${quotePersistenceError})` : "(Offline Fallback)"}</span>
+                    </span>
+                  )}
+                </div>
+                <div className="text-[11px] text-slate-500 leading-snug pt-1">
                   The buyer has been notified. You can track evaluation progress, sample requests, and PO escrow release directly from your supplier dashboard.
                 </div>
               </div>
@@ -1699,7 +1728,7 @@ export default function MSMEFlow({
           /* AI Smart Inventory, Reorder & Lead-Time Assistant (Blueprint Items 51, 52, 53) */
           <div className="space-y-6">
             {/* Header Banner */}
-            <div className="bg-gradient-to-r from-[#051F16] to-slate-900 text-white rounded-2xl p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-5">
+            <div className="bg-linear-to-r from-[#051F16] to-slate-900 text-white rounded-2xl p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-5">
               <div className="space-y-1.5">
                 <div className="flex items-center gap-2">
                   <span className="text-[10px] font-bold uppercase tracking-wider bg-[#051F16] text-white px-2.5 py-0.5 rounded-full">

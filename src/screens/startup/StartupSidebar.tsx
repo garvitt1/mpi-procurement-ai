@@ -210,7 +210,7 @@ export default function StartupSidebar({
           <div className="p-3.5 mx-3 my-3 bg-[#0A3525]/70 rounded-xl border border-emerald-900/50 shadow-xs">
             <div className="flex items-center justify-between mb-1.5">
               <span
-                className="text-xs font-bold text-white truncate max-w-[130px]"
+                className="text-xs font-bold text-white truncate max-w-32.5"
                 title={displayCompanyName}
               >
                 {displayCompanyName}

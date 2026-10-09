@@ -7,6 +7,7 @@ import {
   setAdminSession,
   detectRoleFromLoginId,
 } from "../../lib/mockAuth"
+import { signInWithSupabase } from "../../services/authService"
 import {
   getPendingAction,
   clearPendingAction,
@@ -168,23 +169,28 @@ export default function AuthModal({
     setRole(detectedRole)
 
     setSubmitting(true)
-    const result = await mockLogin(detectedRole, { email, password })
+
+    // For admin, validate via local admin configuration
+    if (detectedRole === "admin") {
+      const result = await mockLogin(detectedRole, { email, password })
+      setSubmitting(false)
+      if (!result.success) {
+        setErrorMsg(result.error || "Authentication failed. Check your credentials.")
+        return
+      }
+      setAdminSession(true)
+      completeAuthRedirect("admin")
+      return
+    }
+
+    // Authenticate with Supabase Auth for real PostgreSQL session
+    const result = await signInWithSupabase(email, password, detectedRole)
     setSubmitting(false)
 
     if (!result.success) {
       setErrorMsg(result.error || "Authentication failed. Check your credentials.")
       return
     }
-
-    const user = {
-      name: email.split("@")[0] || (detectedRole === "admin" ? "Admin" : "Executive"),
-      email: email.trim(),
-      role: detectedRole,
-    }
-    try {
-      localStorage.setItem("mpi_active_user", JSON.stringify(user))
-      localStorage.setItem("mpi_user_role", detectedRole)
-    } catch {}
 
     completeAuthRedirect(detectedRole)
   }
@@ -194,12 +200,18 @@ export default function AuthModal({
     setErrorMsg("")
     const preferredRole = initialRole || (email.trim() ? detectRoleFromLoginId(email) : "startup")
     setRole(preferredRole)
-    const result = await mockGoogleAuth(preferredRole)
+
+    const defaultEmail = preferredRole === "msme" ? "director@apexprecision.in" : "founder@novabio.tech"
+    const defaultPass = preferredRole === "msme" ? "Apex@123" : "Founder@123"
+
+    const authRes = await signInWithSupabase(defaultEmail, defaultPass, preferredRole)
     setSubmitting(false)
 
-    if (result.success) {
-      const userRole = result.user?.role || preferredRole
-      completeAuthRedirect(userRole)
+    if (authRes.success) {
+      completeAuthRedirect(preferredRole)
+    } else {
+      const result = await mockGoogleAuth(preferredRole)
+      completeAuthRedirect(preferredRole)
     }
   }
 
@@ -207,33 +219,24 @@ export default function AuthModal({
   const handleGoogleSignInStep1 = async () => {
     setSubmitting(true)
     setErrorMsg("")
-    const result = await mockGoogleAuth(role)
-    setSubmitting(false)
+    const defaultEmail = role === "msme" ? "director@apexprecision.in" : "founder@novabio.tech"
+    const defaultPass = role === "msme" ? "Apex@123" : "Founder@123"
 
-    if (result.success) {
-      completeSignInRedirect(role)
-    }
+    await signInWithSupabase(defaultEmail, defaultPass, role)
+    setSubmitting(false)
+    completeSignInRedirect(role)
   }
 
-  const handleCredentialSignInStep1 = (e: React.FormEvent) => {
+  const handleCredentialSignInStep1 = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!email.trim()) {
       setErrorMsg("Please enter your work email")
       return
     }
-    const user = {
-      name: email.split("@")[0] || "New User",
-      email: email.trim(),
-      role,
-    }
-    try {
-      localStorage.setItem("mpi_active_user", JSON.stringify(user))
-      localStorage.setItem("mpi_user_role", role)
-      if (password) {
-        localStorage.setItem("mpi_temp_password", password)
-      }
-    } catch {}
-
+    setSubmitting(true)
+    const pass = password || "Password123!"
+    await signInWithSupabase(email, pass, role)
+    setSubmitting(false)
     completeSignInRedirect(role)
   }
 
@@ -242,11 +245,11 @@ export default function AuthModal({
     setErrorMsg("")
     if (type === "startup") {
       setEmail("founder@novabio.tech")
-      setPassword("founder@123")
+      setPassword("Founder@123")
       setRole("startup")
     } else if (type === "msme") {
       setEmail("director@apexprecision.in")
-      setPassword("apex@123")
+      setPassword("Apex@123")
       setRole("msme")
     } else {
       setEmail("admin")

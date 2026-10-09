@@ -902,7 +902,7 @@ export default function StartupCommandCenter({
                   return (
                     <div
                       key={s.num}
-                      className="flex flex-col items-center gap-1 min-w-[32px]"
+                      className="flex flex-col items-center gap-1 min-w-8"
                       title={`Step ${s.num}: ${s.label}`}
                     >
                       <div

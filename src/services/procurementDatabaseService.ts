@@ -56,8 +56,8 @@ export async function checkDatabaseHealth(): Promise<BackendSyncState> {
         backendUrl: url,
         lastChecked: Date.now(),
         statusMessage: isMissingTable
-          ? "Database online. Migration 20261009000000_procurement_integrity.sql pending in Supabase SQL editor."
-          : `Database error (${error.code}): ${error.message}`,
+          ? "Database online. Migration pending in Supabase SQL editor."
+          : `Database notice (${error.code}): ${error.message}`,
         pendingMigration: isMissingTable,
       }
       return cachedSyncState
@@ -103,11 +103,23 @@ export async function persistRFQToSupabase(
       }
     }
 
+    // Resolve authenticated user ID
+    const { data: sessionData } = await supabase.auth.getSession()
+    const authenticatedUid = sessionData.session?.user?.id || activeUser?.id
+
+    if (!authenticatedUid) {
+      return {
+        success: false,
+        fromDatabase: false,
+        error: "Authentication required: Log in with an authenticated account to persist RFQ to Supabase.",
+      }
+    }
+
     const payload = {
       id: rfq.id,
-      buyer_id: activeUser?.id || "00000000-0000-0000-0000-000000000000",
-      buyer_name: activeUser?.name || "Enterprise Founder",
-      buyer_company: activeUser?.orgName || "Industrial Enterprise",
+      buyer_id: authenticatedUid,
+      buyer_name: activeUser?.name || sessionData.session?.user?.user_metadata?.full_name || "Enterprise Founder",
+      buyer_company: activeUser?.orgName || sessionData.session?.user?.user_metadata?.company_name || "Industrial Enterprise",
       buyer_city: activeUser?.city || "Bengaluru",
       title: rfq.title,
       category: rfq.category,
@@ -124,7 +136,8 @@ export async function persistRFQToSupabase(
 
     const { error } = await supabase.from("rfqs").upsert(payload, { onConflict: "id" })
     if (error) {
-      return { success: false, fromDatabase: false, error: error.message }
+      console.error("[Database] persistRFQ error:", error)
+      return { success: false, fromDatabase: false, error: `${error.code}: ${error.message}` }
     }
 
     return { success: true, fromDatabase: true }
@@ -155,10 +168,22 @@ export async function persistQuoteToSupabase(
       }
     }
 
+    // Resolve authenticated user ID
+    const { data: sessionData } = await supabase.auth.getSession()
+    const authenticatedUid = sessionData.session?.user?.id || supplierUser?.id
+
+    if (!authenticatedUid) {
+      return {
+        success: false,
+        fromDatabase: false,
+        error: "Authentication required: Log in as an MSME supplier to persist quote to Supabase.",
+      }
+    }
+
     const payload = {
       id: quote.id,
       rfq_id: rfqId,
-      supplier_id: supplierUser?.id || "00000000-0000-0000-0000-000000000000",
+      supplier_id: authenticatedUid,
       supplier_name: quote.supplierName,
       supplier_udyam: quote.supplierId,
       supplier_city: supplierUser?.city || "Pune",
@@ -184,7 +209,8 @@ export async function persistQuoteToSupabase(
     // On conflict with unique (rfq_id, supplier_id), update the existing quote
     const { error } = await supabase.from("quotes").upsert(payload, { onConflict: "id" })
     if (error) {
-      return { success: false, fromDatabase: false, error: error.message }
+      console.error("[Database] persistQuote error:", error)
+      return { success: false, fromDatabase: false, error: `${error.code}: ${error.message}` }
     }
 
     return { success: true, fromDatabase: true }
@@ -203,6 +229,7 @@ export async function persistQuoteToSupabase(
 export async function fetchDispatchedRFQsFromSupabase(): Promise<{
   rfqs: PublicMSMERFQ[]
   fromDatabase: boolean
+  error?: string
 }> {
   try {
     const health = await checkDatabaseHealth()
@@ -216,8 +243,13 @@ export async function fetchDispatchedRFQsFromSupabase(): Promise<{
       .in("status", ["Dispatched", "Under Review", "Quotes Received"])
       .order("created_at", { ascending: false })
 
-    if (error || !data) {
-      return { rfqs: [], fromDatabase: false }
+    if (error) {
+      console.warn("[Database] fetchDispatchedRFQs error:", error.message)
+      return { rfqs: [], fromDatabase: false, error: error.message }
+    }
+
+    if (!data || data.length === 0) {
+      return { rfqs: [], fromDatabase: true }
     }
 
     const mapped: PublicMSMERFQ[] = data.map((r: any, idx: number) => ({
@@ -235,8 +267,12 @@ export async function fetchDispatchedRFQsFromSupabase(): Promise<{
     }))
 
     return { rfqs: mapped, fromDatabase: true }
-  } catch {
-    return { rfqs: [], fromDatabase: false }
+  } catch (err: unknown) {
+    return {
+      rfqs: [],
+      fromDatabase: false,
+      error: err instanceof Error ? err.message : "Fetch failure",
+    }
   }
 }
 
@@ -245,7 +281,7 @@ export async function fetchDispatchedRFQsFromSupabase(): Promise<{
  */
 export async function fetchQuotesForRFQFromSupabase(
   rfqId: string,
-): Promise<{ quotes: SupplierQuote[]; fromDatabase: boolean }> {
+): Promise<{ quotes: SupplierQuote[]; fromDatabase: boolean; error?: string }> {
   try {
     const health = await checkDatabaseHealth()
     if (!health.isTableExposed) {
@@ -258,8 +294,13 @@ export async function fetchQuotesForRFQFromSupabase(
       .eq("rfq_id", rfqId)
       .order("created_at", { ascending: false })
 
-    if (error || !data || data.length === 0) {
-      return { quotes: [], fromDatabase: false }
+    if (error) {
+      console.warn("[Database] fetchQuotes error:", error.message)
+      return { quotes: [], fromDatabase: false, error: error.message }
+    }
+
+    if (!data || data.length === 0) {
+      return { quotes: [], fromDatabase: true }
     }
 
     const mapped: SupplierQuote[] = data.map((q: any) => ({
@@ -288,8 +329,57 @@ export async function fetchQuotesForRFQFromSupabase(
     }))
 
     return { quotes: mapped, fromDatabase: true }
-  } catch {
-    return { quotes: [], fromDatabase: false }
+  } catch (err: unknown) {
+    return {
+      quotes: [],
+      fromDatabase: false,
+      error: err instanceof Error ? err.message : "Fetch quotes failure",
+    }
   }
 }
 
+/**
+ * Fetches the active buyer's latest RFQ from Supabase
+ */
+export async function fetchBuyerActiveRFQFromSupabase(): Promise<{
+  rfq: RFQDetails | null
+  fromDatabase: boolean
+  error?: string
+}> {
+  try {
+    const { data: sessionData } = await supabase.auth.getSession()
+    const buyerId = sessionData.session?.user?.id
+    if (!buyerId) {
+      return { rfq: null, fromDatabase: false }
+    }
+
+    const { data, error } = await supabase
+      .from("rfqs")
+      .select("*")
+      .eq("buyer_id", buyerId)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle()
+
+    if (error || !data) {
+      return { rfq: null, fromDatabase: false, error: error?.message }
+    }
+
+    const rfq: RFQDetails = {
+      id: data.id,
+      title: data.title,
+      category: data.category,
+      quantity: data.quantity,
+      targetBudget: Number(data.target_budget),
+      deliveryDate: data.created_at?.split("T")[0] || "2026-10-25",
+      specifications: Array.isArray(data.specifications) ? data.specifications : [],
+      dispatchedToSupplierIds: Array.isArray(data.dispatched_supplier_ids) ? data.dispatched_supplier_ids : [],
+      createdDate: data.created_at?.split("T")[0] || new Date().toISOString().split("T")[0],
+      status: data.status,
+    }
+
+    return { rfq, fromDatabase: true }
+  } catch (err: unknown) {
+    return { rfq: null, fromDatabase: false, error: err instanceof Error ? err.message : "Fetch error" }
+  }
+}

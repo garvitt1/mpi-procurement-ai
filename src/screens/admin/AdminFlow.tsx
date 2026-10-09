@@ -778,7 +778,7 @@ Select a quick analysis pill below or ask me any question!`,
                 {currentScreen !== "admin.home" && (
                   <>
                     <span>/</span>
-                    <span className="text-[#0B1220] font-semibold truncate max-w-30 sm:max-w-[200px]">
+                    <span className="text-[#0B1220] font-semibold truncate max-w-30 sm:max-w-50">
                       {title}
                     </span>
                   </>

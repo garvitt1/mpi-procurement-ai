@@ -347,6 +347,8 @@ export default function StartupFlow({
     updateStartupProfile,
     backendSyncState,
     refreshBackendSync,
+    rfqPersistenceStatus,
+    rfqPersistenceError,
   } = useProcurement()
 
   // Sample Request Modal & Help Modal State
@@ -1060,7 +1062,7 @@ export default function StartupFlow({
               />
               <span>
                 {backendSyncState.isTableExposed
-                  ? "Supabase Live"
+                  ? "Supabase Connected"
                   : backendSyncState.pendingMigration
                   ? "DB Migration Pending"
                   : "Local Fallback"}
@@ -2642,7 +2644,7 @@ export default function StartupFlow({
 
           {/* Voice Recording Live Indicator Strip */}
           {isCopilotVoiceActive && (
-            <div className="px-4 py-2 bg-gradient-to-r from-purple-50 via-indigo-50 to-purple-50 border-t border-purple-200 text-purple-900 flex items-center justify-between text-xs animate-fade-in">
+            <div className="px-4 py-2 bg-linear-to-r from-purple-50 via-indigo-50 to-purple-50 border-t border-purple-200 text-purple-900 flex items-center justify-between text-xs animate-fade-in">
               <div className="flex items-center gap-2">
                 <span
                   className="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping"
@@ -2862,6 +2864,27 @@ export default function StartupFlow({
               <p className="text-xs text-slate-500 leading-relaxed">
                 Your RFQ ({activeRFQ?.title || "Custom Batch Run"}) has been dispatched to verified manufacturing clusters. Suppliers in our audited network evaluate tooling specs and submit binding proposals within 24–48 hours.
               </p>
+              <div className="flex items-center justify-center gap-2 pt-1">
+                {rfqPersistenceStatus === "saved_to_supabase" ? (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <span>Persisted in PostgreSQL (ID: {activeRFQ?.id})</span>
+                  </span>
+                ) : rfqPersistenceStatus === "saving" ? (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-800 border border-blue-200">
+                    <span className="w-2 h-2 rounded-full bg-blue-500 animate-spin" />
+                    <span>Syncing with Supabase...</span>
+                  </span>
+                ) : (
+                  <span
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200"
+                    title={rfqPersistenceError || "Stored locally in browser session"}
+                  >
+                    <span className="w-2 h-2 rounded-full bg-amber-500" />
+                    <span>Saved Locally {rfqPersistenceError ? `(${rfqPersistenceError})` : "(Offline Fallback)"}</span>
+                  </span>
+                )}
+              </div>
             </div>
             <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
               <MPIButton
@@ -2924,7 +2947,7 @@ export default function StartupFlow({
                       <span>MPI AI Recommended</span>
                     </div>
                   ) : (
-                    <div className="hidden md:block h-[31px]" />
+                    <div className="hidden md:block h-7.75" />
                   )}
 
                   <div className="p-5">

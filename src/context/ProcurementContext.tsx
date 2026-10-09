@@ -13,6 +13,8 @@ import {
   persistRFQToSupabase,
   persistQuoteToSupabase,
   fetchQuotesForRFQFromSupabase,
+  fetchDispatchedRFQsFromSupabase,
+  fetchBuyerActiveRFQFromSupabase,
   type BackendSyncState,
 } from "../services/procurementDatabaseService"
 import { getActiveUser } from "../lib/mockAuth"
@@ -380,6 +382,10 @@ export interface ProcurementContextType {
   // Backend Database Synchronization Status
   backendSyncState: BackendSyncState
   refreshBackendSync: () => Promise<void>
+  rfqPersistenceStatus: "idle" | "saving" | "saved_to_supabase" | "saved_locally"
+  rfqPersistenceError?: string
+  quotePersistenceStatus: "idle" | "saving" | "saved_to_supabase" | "saved_locally"
+  quotePersistenceError?: string
 
   // Order Lifecycle
   currentMilestone: number
@@ -1619,6 +1625,42 @@ export const ProcurementProvider: React.FC<{ children: React.ReactNode }> = ({
     refreshBackendSync()
   }, [])
 
+  // Explicit Record-Level Persistence Status
+  const [rfqPersistenceStatus, setRfqPersistenceStatus] = useState<
+    "idle" | "saving" | "saved_to_supabase" | "saved_locally"
+  >("idle")
+  const [rfqPersistenceError, setRfqPersistenceError] = useState<string | undefined>()
+
+  const [quotePersistenceStatus, setQuotePersistenceStatus] = useState<
+    "idle" | "saving" | "saved_to_supabase" | "saved_locally"
+  >("idle")
+  const [quotePersistenceError, setQuotePersistenceError] = useState<string | undefined>()
+
+  const [remoteDispatchedRFQs, setRemoteDispatchedRFQs] = useState<PublicMSMERFQ[]>([])
+
+  // Authoritative data loading from Supabase
+  useEffect(() => {
+    if (!backendSyncState.isTableExposed) return
+
+    // 1. Restore authoritative active RFQ for logged-in buyer
+    fetchBuyerActiveRFQFromSupabase().then((res) => {
+      if (res.fromDatabase && res.rfq) {
+        setActiveRFQ(res.rfq)
+        setRfqPersistenceStatus("saved_to_supabase")
+        try {
+          localStorage.setItem("mpi_active_rfq", JSON.stringify(res.rfq))
+        } catch {}
+      }
+    })
+
+    // 2. Fetch dispatched RFQs for MSME suppliers
+    fetchDispatchedRFQsFromSupabase().then((res) => {
+      if (res.fromDatabase && res.rfqs.length > 0) {
+        setRemoteDispatchedRFQs(res.rfqs)
+      }
+    })
+  }, [backendSyncState.isTableExposed])
+
   // Sync quotes from Supabase when database tables are exposed
   useEffect(() => {
     if (backendSyncState.isTableExposed && activeRFQ?.id) {
@@ -1634,6 +1676,7 @@ export const ProcurementProvider: React.FC<{ children: React.ReactNode }> = ({
             } catch {}
             return merged
           })
+          setQuotePersistenceStatus("saved_to_supabase")
         }
       })
     }
@@ -1728,6 +1771,11 @@ export const ProcurementProvider: React.FC<{ children: React.ReactNode }> = ({
   // Public MSME RFQs with Buyer Anonymity
   // --------------------------------------------------------------------------
   const msmeRFQs = useMemo<PublicMSMERFQ[]>(() => {
+    // If Supabase has dispatched RFQs from live database, prioritize them
+    if (remoteDispatchedRFQs.length > 0) {
+      return remoteDispatchedRFQs
+    }
+
     return [
       {
         id: activeRFQ?.id || "RFQ-2026-0891",
@@ -1773,7 +1821,7 @@ export const ProcurementProvider: React.FC<{ children: React.ReactNode }> = ({
         matchScore: 89,
       },
     ]
-  }, [activeRFQ, specifications])
+  }, [remoteDispatchedRFQs, activeRFQ, specifications])
 
   const addSpecification = (spec: string) => {
     if (spec.trim()) {
@@ -1852,16 +1900,34 @@ export const ProcurementProvider: React.FC<{ children: React.ReactNode }> = ({
     // Quotations must be transmitted by real MSMEs via the MSME portal.
     setReceivedQuotes([])
     setSelectedQuoteId(null)
+    setRfqPersistenceStatus("saving")
+    setRfqPersistenceError(undefined)
 
-    // Asynchronously synchronize with Supabase PostgreSQL (if tables exist)
+    // Synchronize with Supabase PostgreSQL (if tables exist)
     const currentUser = getActiveUser()
     persistRFQToSupabase(newRFQ, currentUser)
       .then((res) => {
         if (res.fromDatabase) {
           console.info("[Supabase] RFQ persisted authoritatively to public.rfqs:", newRFQ.id)
+          setRfqPersistenceStatus("saved_to_supabase")
+          setRfqPersistenceError(undefined)
+          // Refresh MSME feed with real dispatched RFQ
+          fetchDispatchedRFQsFromSupabase().then((rfqRes) => {
+            if (rfqRes.fromDatabase && rfqRes.rfqs.length > 0) {
+              setRemoteDispatchedRFQs(rfqRes.rfqs)
+            }
+          })
+        } else {
+          setRfqPersistenceStatus("saved_locally")
+          setRfqPersistenceError(res.error)
+          console.warn("[Supabase] RFQ local fallback:", res.error)
         }
       })
-      .catch((err) => console.warn("[Supabase] Async RFQ persist error:", err))
+      .catch((err) => {
+        setRfqPersistenceStatus("saved_locally")
+        setRfqPersistenceError(err instanceof Error ? err.message : "Sync error")
+        console.warn("[Supabase] Async RFQ persist error:", err)
+      })
   }
 
   const submitMSMEQuote = (quote: SupplierQuote) => {
@@ -1895,16 +1961,29 @@ export const ProcurementProvider: React.FC<{ children: React.ReactNode }> = ({
       return updated
     })
 
-    // Asynchronously synchronize with Supabase PostgreSQL (if tables exist)
+    setQuotePersistenceStatus("saving")
+    setQuotePersistenceError(undefined)
+
+    // Synchronize with Supabase PostgreSQL (if tables exist)
     const currentRfqId = activeRFQ?.id || "RFQ-2026-0891"
     const currentUser = getActiveUser()
     persistQuoteToSupabase(quote, currentRfqId, currentUser)
       .then((res) => {
         if (res.fromDatabase) {
           console.info("[Supabase] Quote persisted authoritatively to public.quotes:", quote.id)
+          setQuotePersistenceStatus("saved_to_supabase")
+          setQuotePersistenceError(undefined)
+        } else {
+          setQuotePersistenceStatus("saved_locally")
+          setQuotePersistenceError(res.error)
+          console.warn("[Supabase] Quote local fallback:", res.error)
         }
       })
-      .catch((err) => console.warn("[Supabase] Async quote persist error:", err))
+      .catch((err) => {
+        setQuotePersistenceStatus("saved_locally")
+        setQuotePersistenceError(err instanceof Error ? err.message : "Sync error")
+        console.warn("[Supabase] Async quote persist error:", err)
+      })
   }
 
   const loadDemoQuotes = () => {
@@ -2095,6 +2174,10 @@ export const ProcurementProvider: React.FC<{ children: React.ReactNode }> = ({
         loadDemoQuotes,
         backendSyncState,
         refreshBackendSync,
+        rfqPersistenceStatus,
+        rfqPersistenceError,
+        quotePersistenceStatus,
+        quotePersistenceError,
         currentMilestone,
         advanceMilestone,
         setMilestone,
