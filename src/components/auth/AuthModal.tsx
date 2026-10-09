@@ -139,23 +139,9 @@ export default function AuthModal({
       targetScreen,
     })
 
-    if (onAuthSuccess) {
-      onAuthSuccess(userRole, pending)
-      clearPendingAction()
-      onClose()
-      return
-    }
-
     onClose()
-    if (pending && pending.targetScreen) {
-      clearPendingAction()
-      navigate(pending.targetScreen)
-      return
-    }
 
-    if (targetScreen && (targetScreen === "government-schemes.match" || targetScreen.startsWith("startup.") || targetScreen.startsWith("msme."))) {
-      navigate(targetScreen)
-    } else if (userRole === "msme") {
+    if (userRole === "msme") {
       navigate("msme.onboarding")
     } else {
       navigate("startup.onboarding")
@@ -225,8 +211,8 @@ export default function AuthModal({
 
   const handleCredentialSignInStep1 = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!email.trim() || !password) {
-      setErrorMsg("Please enter your email and a password")
+    if (!email.trim()) {
+      setErrorMsg("Please enter your work email")
       return
     }
     const user = {
@@ -237,6 +223,9 @@ export default function AuthModal({
     try {
       localStorage.setItem("mpi_active_user", JSON.stringify(user))
       localStorage.setItem("mpi_user_role", role)
+      if (password) {
+        localStorage.setItem("mpi_temp_password", password)
+      }
     } catch {}
 
     completeSignInRedirect(role)

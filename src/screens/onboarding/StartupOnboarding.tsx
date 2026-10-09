@@ -11,6 +11,7 @@ import {
 } from "../../components/design-system/MPIDesignSystem"
 import { MPILogo } from "../../components/shared"
 import { mockRegister } from "../../lib/mockAuth"
+import { getPendingAction, clearPendingAction } from "../../lib/sessionManager"
 
 const STAGES = [
   {
@@ -121,14 +122,14 @@ export default function StartupOnboarding({ navigate, goBack }: NavProps) {
     }
   })()
 
-  // Form State initialized from startupProfile or Google session
+  // Form State initialized from newly authenticated user or startupProfile
   const [founderName, setFounderName] = useState(
-    startupProfile.founderName || googleUser?.name || "",
+    googleUser?.name || startupProfile.founderName || "",
   )
   const [startupName, setStartupName] = useState(
-    startupProfile.startupName || googleUser?.orgName || googleUser?.companyName || "",
+    googleUser?.orgName || googleUser?.companyName || startupProfile.startupName || "",
   )
-  const [email, setEmail] = useState(startupProfile.email || googleUser?.email || "")
+  const [email, setEmail] = useState(googleUser?.email || startupProfile.email || "")
   const [phone, setPhone] = useState(startupProfile.phone || "")
   const [city, setCity] = useState(startupProfile.city || "Bengaluru")
   const [state, setState] = useState(startupProfile.state || "Karnataka")
@@ -193,8 +194,20 @@ export default function StartupOnboarding({ navigate, goBack }: NavProps) {
     ],
   )
 
-  const [password, setPassword] = useState("")
-  const [confirmPassword, setConfirmPassword] = useState("")
+  const [password, setPassword] = useState(() => {
+    try {
+      return localStorage.getItem("mpi_temp_password") || ""
+    } catch {
+      return ""
+    }
+  })
+  const [confirmPassword, setConfirmPassword] = useState(() => {
+    try {
+      return localStorage.getItem("mpi_temp_password") || ""
+    } catch {
+      return ""
+    }
+  })
   const [agreedTerms, setAgreedTerms] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState("")
@@ -323,7 +336,17 @@ export default function StartupOnboarding({ navigate, goBack }: NavProps) {
     })
 
     setIsSubmitting(false)
-    navigate("startup.home")
+    try {
+      localStorage.removeItem("mpi_temp_password")
+    } catch {}
+
+    const pending = getPendingAction()
+    if (pending && pending.targetScreen && pending.targetScreen !== "startup.onboarding") {
+      clearPendingAction()
+      navigate(pending.targetScreen)
+    } else {
+      navigate("startup.home")
+    }
   }
 
   return (
