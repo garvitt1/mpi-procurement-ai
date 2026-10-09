@@ -1,4 +1,4 @@
-import React, { useRef } from "react"
+import React, { useRef, useState } from "react"
 import { Screen } from "../../App"
 import {
   Icons,
@@ -12,10 +12,12 @@ import {
   SourcingHistoryEvent,
   PublicStartupQuote,
   PublicStartupSupplier,
+  useProcurement,
 } from "../../context/ProcurementContext"
 import { CatalogCategory } from "../../lib/mpiCatalog"
 import { formatScopeDisplay } from "../Home"
 import { useStartupGSAP } from "../../hooks/useStartupGSAP"
+import { getActiveUser } from "../../lib/mockAuth"
 
 interface StartupCommandCenterProps {
   navigate: (screen: Screen) => void
@@ -49,12 +51,44 @@ export default function StartupCommandCenter({
   onSelectHistoryInsight,
 }: StartupCommandCenterProps) {
   const containerRef = useRef<HTMLDivElement>(null)
+  const { setSelectedCategory } = useProcurement()
+  const activeUser = getActiveUser()
+
+  // Sourcing & Activation Detection
+  const [viewMode, setViewMode] = useState<"auto" | "activation" | "demo">("auto")
+
+  // Check if current user is an authenticated / custom user profile
+  const isCustomUser = Boolean(
+    (activeUser && activeUser.email && activeUser.email !== "aarav@technovainnovations.com") ||
+    (typeof window !== "undefined" &&
+      localStorage.getItem("mpi_startup_profile") &&
+      startupProfile.email !== "aarav@technovainnovations.com")
+  )
+
+  // Check if an RFQ was explicitly dispatched
+  const hasDispatchedRFQ = Boolean(
+    (typeof window !== "undefined" && localStorage.getItem("mpi_rfq_dispatched") === "true") ||
+    (activeRFQ && activeRFQ.id !== "RFQ-2026-0891" && activeRFQ.id !== "RFQ-2026-0881")
+  )
+
+  // Determine whether to display the dedicated Day-0 Activation State
+  const isFirstRunActive =
+    viewMode === "activation" ||
+    (viewMode === "auto" && isCustomUser && !hasDispatchedRFQ)
+
+  // Display metadata for authenticated / active startup profile
+  const displayFounderName = startupProfile.founderName || activeUser?.name || "Startup Founder"
+  const displayStartupName = startupProfile.startupName || activeUser?.orgName || "Your Enterprise Workspace"
+  const displayLocation = startupProfile.city
+    ? `${startupProfile.city}${startupProfile.state ? `, ${startupProfile.state}` : ""}`
+    : "Bengaluru, Karnataka"
+  const displayStage = startupProfile.stage || "MVP"
 
   // Attach scoped GSAP entrance motion
   useStartupGSAP(
     containerRef,
     { animateHeader: true, animateKPIs: true, animatePanels: true },
-    [activeRFQ, currentMilestone]
+    [activeRFQ, currentMilestone, isFirstRunActive]
   )
 
   // 1. KPI 1: Active RFQs from genuine records
@@ -117,46 +151,515 @@ export default function StartupCommandCenter({
 
   return (
     <div ref={containerRef} className="space-y-6">
-      {/* ─── DASHBOARD HEADER ─────────────────────────────────────────────────── */}
-      <div
-        data-gsap="header"
-        className="bg-white rounded-2xl border border-[#EAECEF] p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4"
-      >
-        <div className="space-y-1">
-          <div className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#A3F65C]" />
-            <span>STARTUP PROCUREMENT WORKSPACE</span>
+      {isFirstRunActive ? (
+        /* ─── DAY-0 FIRST-RUN ACTIVATION WORKSPACE ───────────────────────── */
+        <div className="space-y-6">
+          {/* User Profile Header Banner */}
+          <div
+            data-gsap="header"
+            className="bg-white rounded-2xl border border-[#EAECEF] p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4"
+          >
+            <div className="space-y-1.5">
+              <div className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span>STARTUP PROCUREMENT WORKSPACE • ACTIVATION IN PROGRESS</span>
+              </div>
+              <h1
+                className="text-xl sm:text-2xl font-extrabold text-[#051F16] tracking-tight flex items-center gap-2.5 flex-wrap"
+                style={{ fontFamily: "Plus Jakarta Sans" }}
+              >
+                <span>{displayStartupName}</span>
+                <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
+                  {displayStage} Stage
+                </span>
+                {startupProfile.dpiitNumber && (
+                  <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-800 border border-blue-200">
+                    DPIIT: {startupProfile.dpiitNumber}
+                  </span>
+                )}
+              </h1>
+              <p className="text-xs sm:text-sm text-slate-500 max-w-2xl leading-relaxed">
+                Welcome, <strong>{displayFounderName}</strong> ({displayLocation}). Your verified procurement workspace is active. Launch your first requirement to get reverse-margin quotes from audited Indian MSMEs.
+              </p>
+            </div>
+
+            {/* Header Action Buttons */}
+            <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
+              <button
+                onClick={() => setViewMode("demo")}
+                className="px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-600 bg-slate-50 hover:bg-slate-100 border border-slate-200 transition-all cursor-pointer shadow-2xs flex items-center gap-1.5"
+                title="Preview what an active procurement dashboard looks like with demo orders"
+              >
+                <Icons.FolderCheck className="w-3.5 h-3.5 text-slate-500" />
+                <span>View Sample Live Data</span>
+              </button>
+
+              <button
+                onClick={() => navigate("startup.analytics")}
+                className="px-4 py-2.5 rounded-xl text-xs font-bold text-[#111413] bg-white hover:bg-slate-50 border border-[#EAECEF] transition-all cursor-pointer shadow-2xs flex items-center gap-2"
+              >
+                <Icons.BarChart3 className="w-4 h-4 text-slate-600" />
+                <span>Analytics</span>
+              </button>
+
+              <button
+                onClick={() => navigate("startup.procurement")}
+                className="px-4 py-2.5 rounded-xl text-xs font-bold text-[#051F16] bg-[#A3F65C] hover:bg-[#92E64B] transition-all cursor-pointer shadow-xs flex items-center gap-2 group"
+              >
+                <Icons.Sparkles className="w-4 h-4 text-[#051F16] transition-transform group-hover:rotate-12" />
+                <span>+ Create Your First RFQ</span>
+              </button>
+            </div>
           </div>
-          <h1
-            className="text-xl sm:text-2xl font-extrabold text-[#051F16] tracking-tight"
-            style={{ fontFamily: "Plus Jakarta Sans" }}
-          >
-            Procurement Command Center
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-500 max-w-2xl leading-relaxed">
-            A real-time overview of your sourcing, procurement activity and supplier performance.
-          </p>
-        </div>
 
-        {/* Header Action Buttons */}
-        <div className="flex items-center gap-2.5 shrink-0">
-          <button
-            onClick={() => navigate("startup.analytics")}
-            className="px-4 py-2.5 rounded-xl text-xs font-bold text-[#111413] bg-white hover:bg-slate-50 border border-[#EAECEF] transition-all cursor-pointer shadow-2xs flex items-center gap-2"
-          >
-            <Icons.BarChart3 className="w-4 h-4 text-slate-600" />
-            <span>Analytics</span>
-          </button>
+          {/* 4 Day-0 Activation Metric Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Card 1: Active RFQs */}
+            <div
+              data-gsap="kpi-card"
+              className="bg-white border border-[#EAECEF] rounded-2xl p-5 shadow-xs flex flex-col justify-between"
+            >
+              <div>
+                <div className="flex items-center justify-between text-xs mb-2">
+                  <span className="font-extrabold text-slate-500 uppercase tracking-wider text-[10px]">
+                    ACTIVE RFQS
+                  </span>
+                  <div className="w-8 h-8 rounded-xl bg-slate-100 border border-slate-200 text-slate-600 flex items-center justify-center font-bold">
+                    <Icons.FileText className="w-4 h-4" />
+                  </div>
+                </div>
+                <div
+                  className="text-2xl sm:text-3xl font-extrabold text-[#051F16] tracking-tight"
+                  style={{ fontFamily: "Plus Jakarta Sans" }}
+                >
+                  0
+                </div>
+              </div>
+              <div className="mt-3.5 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                <span className="text-slate-500 font-medium text-[11px]">
+                  Awaiting First Request
+                </span>
+                <span className="text-emerald-700 font-bold text-[11px] bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                  Ready to Draft
+                </span>
+              </div>
+            </div>
 
-          <button
-            onClick={() => navigate("startup.procurement")}
-            className="px-4 py-2.5 rounded-xl text-xs font-bold text-[#051F16] bg-[#A3F65C] hover:bg-[#92E64B] transition-all cursor-pointer shadow-xs flex items-center gap-2 group"
+            {/* Card 2: Reverse-Margin Savings */}
+            <div
+              data-gsap="kpi-card"
+              className="bg-white border border-[#EAECEF] rounded-2xl p-5 shadow-xs flex flex-col justify-between"
+            >
+              <div>
+                <div className="flex items-center justify-between text-xs mb-2">
+                  <span className="font-extrabold text-slate-500 uppercase tracking-wider text-[10px]">
+                    REVERSE-MARGIN TARGET
+                  </span>
+                  <div className="w-8 h-8 rounded-xl bg-[#A3F65C]/20 border border-[#A3F65C]/40 text-[#051F16] flex items-center justify-center font-bold">
+                    <Icons.TrendingUp className="w-4 h-4" />
+                  </div>
+                </div>
+                <div
+                  className="text-2xl sm:text-3xl font-extrabold text-[#051F16] tracking-tight"
+                  style={{ fontFamily: "Plus Jakarta Sans" }}
+                >
+                  18–32%
+                </div>
+              </div>
+              <div className="mt-3.5 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                <span className="text-emerald-700 font-bold text-[11px]">
+                  Direct Factory Margin
+                </span>
+                <span className="text-slate-500 font-medium text-[11px]">
+                  Zero intermediary markup
+                </span>
+              </div>
+            </div>
+
+            {/* Card 3: Quotation SLA */}
+            <div
+              data-gsap="kpi-card"
+              className="bg-white border border-[#EAECEF] rounded-2xl p-5 shadow-xs flex flex-col justify-between"
+            >
+              <div>
+                <div className="flex items-center justify-between text-xs mb-2">
+                  <span className="font-extrabold text-slate-500 uppercase tracking-wider text-[10px]">
+                    QUOTATION SLA
+                  </span>
+                  <div className="w-8 h-8 rounded-xl bg-[#A3F65C]/20 border border-[#A3F65C]/40 text-[#051F16] flex items-center justify-center font-bold">
+                    <Icons.Clock className="w-4 h-4" />
+                  </div>
+                </div>
+                <div
+                  className="text-2xl sm:text-3xl font-extrabold text-[#051F16] tracking-tight"
+                  style={{ fontFamily: "Plus Jakarta Sans" }}
+                >
+                  24–48 Hours
+                </div>
+              </div>
+              <div className="mt-3.5 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                <span className="text-slate-700 font-semibold text-[11px]">
+                  Audited MSME Clusters
+                </span>
+                <span className="text-slate-500 font-medium text-[11px]">
+                  Peenya & Pune
+                </span>
+              </div>
+            </div>
+
+            {/* Card 4: Escrow Protection */}
+            <div
+              data-gsap="kpi-card"
+              className="bg-white border border-[#EAECEF] rounded-2xl p-5 shadow-xs flex flex-col justify-between"
+            >
+              <div>
+                <div className="flex items-center justify-between text-xs mb-2">
+                  <span className="font-extrabold text-slate-500 uppercase tracking-wider text-[10px]">
+                    ESCROW PROTECTION
+                  </span>
+                  <div className="w-8 h-8 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 flex items-center justify-center font-bold">
+                    <Icons.ShieldCheck className="w-4 h-4 text-emerald-700" />
+                  </div>
+                </div>
+                <div
+                  className="text-2xl sm:text-3xl font-extrabold text-[#051F16] tracking-tight"
+                  style={{ fontFamily: "Plus Jakarta Sans" }}
+                >
+                  100% Protected
+                </div>
+              </div>
+              <div className="mt-3.5 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                <span className="text-emerald-700 font-bold text-[11px]">
+                  Milestone Gated
+                </span>
+                <span className="text-slate-500 font-medium text-[11px]">
+                  Released upon QC pass
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* 3-Step Guided Activation Protocol */}
+          <div
+            data-gsap="panel"
+            className="bg-white rounded-2xl border border-[#EAECEF] p-6 shadow-xs space-y-6"
           >
-            <Icons.Sparkles className="w-4 h-4 text-[#051F16] transition-transform group-hover:rotate-12" />
-            <span>+ New Procurement</span>
-          </button>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
+              <div>
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+                  ACTIVATION PROTOCOL
+                </span>
+                <h2
+                  className="text-lg sm:text-xl font-extrabold text-[#051F16] mt-2"
+                  style={{ fontFamily: "Plus Jakarta Sans" }}
+                >
+                  Your 3-Step Path to Verified Batch Procurement
+                </h2>
+                <p className="text-xs text-slate-500 mt-1 max-w-2xl">
+                  Follow this structured protocol to source industrial parts with reverse-margin transparency, statutory subsidies, and zero middleman markups.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  onClick={() => navigate("home")}
+                  className="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-700 bg-slate-50 hover:bg-slate-100 border border-slate-200 transition-all cursor-pointer"
+                >
+                  Explore MSME Catalogue
+                </button>
+                <MPIButton
+                  variant="primary"
+                  size="sm"
+                  onClick={() => navigate("startup.procurement")}
+                  icon={<Icons.Sparkles className="w-3.5 h-3.5" />}
+                >
+                  Create Your First RFQ →
+                </MPIButton>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Step 1 */}
+              <div className="p-5 rounded-xl border border-emerald-200/80 bg-[#F4FBF7] flex flex-col justify-between space-y-4 hover:shadow-xs transition-shadow">
+                <div className="space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <span className="w-7 h-7 rounded-lg bg-[#051F16] text-[#A3F65C] flex items-center justify-center font-mono font-extrabold text-xs shadow-xs">
+                      01
+                    </span>
+                    <span className="text-[10px] font-bold text-emerald-800 bg-white px-2 py-0.5 rounded-full border border-emerald-200">
+                      Step 1 • Intake
+                    </span>
+                  </div>
+                  <h3 className="text-sm font-extrabold text-[#051F16]">
+                    Describe Requirement
+                  </h3>
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    Specify batch volume, material parameters, target delivery timeline, and budget. MPI AI standardizes your prompt into an industrial RFQ engineering specification.
+                  </p>
+                </div>
+                <button
+                  onClick={() => navigate("startup.procurement")}
+                  className="text-xs font-bold text-[#051F16] hover:text-emerald-800 flex items-center gap-1.5 cursor-pointer pt-3 border-t border-emerald-200/60"
+                >
+                  <span>Launch RFQ Builder</span>
+                  <Icons.ArrowRight className="w-3 h-3" />
+                </button>
+              </div>
+
+              {/* Step 2 */}
+              <div className="p-5 rounded-xl border border-slate-200 bg-slate-50/70 flex flex-col justify-between space-y-4">
+                <div className="space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <span className="w-7 h-7 rounded-lg bg-slate-200 text-slate-700 flex items-center justify-center font-mono font-extrabold text-xs">
+                      02
+                    </span>
+                    <span className="text-[10px] font-semibold text-slate-500 bg-white px-2 py-0.5 rounded-full border border-slate-200">
+                      Step 2 • Matching
+                    </span>
+                  </div>
+                  <h3 className="text-sm font-extrabold text-slate-800">
+                    Review Matched Options & Quotes
+                  </h3>
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    MPI matches verified MSME factories in Peenya, Pune, and Okhla. Suppliers submit transparent reverse-margin itemized quotes with material, tooling, and labor breakdowns within 24–48 hours.
+                  </p>
+                </div>
+                <div className="text-xs font-semibold text-slate-400 flex items-center gap-1.5 pt-3 border-t border-slate-200">
+                  <Icons.Clock className="w-3 h-3 text-slate-400" />
+                  <span>Available after RFQ dispatch</span>
+                </div>
+              </div>
+
+              {/* Step 3 */}
+              <div className="p-5 rounded-xl border border-slate-200 bg-slate-50/70 flex flex-col justify-between space-y-4">
+                <div className="space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <span className="w-7 h-7 rounded-lg bg-slate-200 text-slate-700 flex items-center justify-center font-mono font-extrabold text-xs">
+                      03
+                    </span>
+                    <span className="text-[10px] font-semibold text-slate-500 bg-white px-2 py-0.5 rounded-full border border-slate-200">
+                      Step 3 • Escrow Order
+                    </span>
+                  </div>
+                  <h3 className="text-sm font-extrabold text-slate-800">
+                    Evaluate Options & Issue Order
+                  </h3>
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    Compare quotes side-by-side, inspect pre-production samples, lock funds into milestone escrow, and release tranches only upon independent third-party QC inspection sign-off.
+                  </p>
+                </div>
+                <div className="text-xs font-semibold text-slate-400 flex items-center gap-1.5 pt-3 border-t border-slate-200">
+                  <Icons.ShieldCheck className="w-3 h-3 text-slate-400" />
+                  <span>100% Milestone-gated protection</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Quick-Start Industrial Categories & Government Scheme Readiness */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {/* Quick-Start Categories (7 cols) */}
+            <div
+              data-gsap="panel"
+              className="lg:col-span-7 bg-white rounded-2xl border border-[#EAECEF] p-6 shadow-xs space-y-4"
+            >
+              <div>
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
+                  INSTANT DISPATCH TEMPLATES
+                </span>
+                <h3
+                  className="text-sm sm:text-base font-extrabold text-[#051F16] mt-0.5"
+                  style={{ fontFamily: "Plus Jakarta Sans" }}
+                >
+                  Select a Manufacturing Category to Begin
+                </h3>
+                <p className="text-xs text-slate-500">
+                  Pre-calibrated industrial templates with verified supplier clusters ready in industrial hubs.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {[
+                  {
+                    cat: "Packaging & Printing" as CatalogCategory,
+                    desc: "Rigid boxes, corrugated shipping cartons, mono cartons & labels",
+                    cluster: "Peenya & Okhla",
+                  },
+                  {
+                    cat: "Prototyping & Product Development" as CatalogCategory,
+                    desc: "CNC aluminium 6061, 3D printing, sheet metal fabrication",
+                    cluster: "Pune & Chakan",
+                  },
+                  {
+                    cat: "Electrical & Electronics" as CatalogCategory,
+                    desc: "SMT PCB assembly, wire harnesses, potting & casing",
+                    cluster: "Coimbatore & Noida",
+                  },
+                  {
+                    cat: "Raw Materials & Metals" as CatalogCategory,
+                    desc: "Speciality alloys, custom extrusion dies, polymer resins",
+                    cluster: "Ahmedabad & Chennai",
+                  },
+                ].map((item) => (
+                  <button
+                    key={item.cat}
+                    onClick={() => {
+                      setSelectedCategory(item.cat)
+                      navigate("startup.procurement")
+                    }}
+                    className="p-3.5 rounded-xl border border-slate-200 bg-[#F2F6F8]/60 hover:bg-[#F2F6F8] hover:border-slate-300 text-left transition-all cursor-pointer group"
+                  >
+                    <div className="flex items-center justify-between text-xs font-bold text-[#051F16] mb-1">
+                      <span>{item.cat}</span>
+                      <Icons.ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:translate-x-0.5 group-hover:text-[#051F16] transition-all" />
+                    </div>
+                    <p className="text-[11px] text-slate-500 leading-snug mb-2">
+                      {item.desc}
+                    </p>
+                    <span className="text-[10px] font-semibold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                      Cluster: {item.cluster}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Schemes & Subsidies Assistance (5 cols) */}
+            <div
+              data-gsap="panel"
+              className="lg:col-span-5 bg-[#F4FBF7] rounded-2xl border border-[#A3F65C]/40 p-6 shadow-xs flex flex-col justify-between space-y-4"
+            >
+              <div>
+                <div className="flex items-center justify-between mb-3 pb-2 border-b border-emerald-100">
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 rounded-lg bg-[#051F16] text-[#A3F65C] flex items-center justify-center font-bold text-xs">
+                      <Icons.Award className="w-3.5 h-3.5" />
+                    </div>
+                    <h3
+                      className="text-sm font-extrabold text-[#051F16]"
+                      style={{ fontFamily: "Plus Jakarta Sans" }}
+                    >
+                      Government Subsidies Ready
+                    </h3>
+                  </div>
+                  <span className="text-[10px] font-extrabold text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                    Up to 80% Reimbursement
+                  </span>
+                </div>
+
+                <p className="text-xs text-slate-600 mb-4 leading-relaxed">
+                  Your procurement orders are eligible for Indian MSME statutory grants and quality testing reimbursements.
+                </p>
+
+                <div className="space-y-3">
+                  <div className="p-3 bg-white rounded-xl border border-emerald-100 shadow-2xs space-y-1">
+                    <div className="flex items-center justify-between text-xs font-bold text-[#051F16]">
+                      <span>ZED Gold Quality Subsidy</span>
+                      <span className="text-[10px] text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded font-bold">
+                        80% Testing Grant
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-600 leading-snug">
+                      Matched factories hold ZED Gold certification, unlocking up to 80% reimbursement on NABL laboratory testing.
+                    </p>
+                  </div>
+
+                  <div className="p-3 bg-white rounded-xl border border-emerald-100 shadow-2xs space-y-1">
+                    <div className="flex items-center justify-between text-xs font-bold text-[#051F16]">
+                      <span>CGTMSE Credit Guarantee</span>
+                      <span className="text-[10px] text-blue-700 bg-blue-50 px-1.5 py-0.2 rounded font-bold">
+                        Collateral-Free
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-600 leading-snug">
+                      Procurement purchase orders can qualify for working capital backing through partner financial institutions.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-3 border-t border-emerald-200/60">
+                <button
+                  onClick={() => navigate("startup.schemes")}
+                  className="w-full py-2 px-3 rounded-xl bg-white hover:bg-emerald-50 text-xs font-bold text-[#051F16] border border-emerald-200 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <span>Explore All Eligible Subsidies</span>
+                  <Icons.ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      ) : (
+        /* ─── FULL ACTIVE COMMAND CENTER ─────────────────────────────────── */
+        <>
+          {/* Demo Mode Notice Banner if user toggled demo preview */}
+          {viewMode === "demo" && (
+            <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-amber-900 shadow-2xs">
+              <div className="flex items-center gap-2">
+                <Icons.AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+                <span>
+                  <strong>Sample Demonstration View:</strong> You are currently inspecting live demonstration data for TechNova Innovations.
+                </span>
+              </div>
+              <button
+                onClick={() => setViewMode(isCustomUser ? "activation" : "auto")}
+                className="px-3 py-1.5 rounded-lg bg-amber-100 hover:bg-amber-200 font-bold text-amber-900 cursor-pointer shrink-0 transition-colors"
+              >
+                Return to My Activation View →
+              </button>
+            </div>
+          )}
+
+          {/* ─── DASHBOARD HEADER ─────────────────────────────────────────────────── */}
+          <div
+            data-gsap="header"
+            className="bg-white rounded-2xl border border-[#EAECEF] p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4"
+          >
+            <div className="space-y-1">
+              <div className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#A3F65C]" />
+                <span>STARTUP PROCUREMENT WORKSPACE</span>
+              </div>
+              <h1
+                className="text-xl sm:text-2xl font-extrabold text-[#051F16] tracking-tight"
+                style={{ fontFamily: "Plus Jakarta Sans" }}
+              >
+                Procurement Command Center
+              </h1>
+              <p className="text-xs sm:text-sm text-slate-500 max-w-2xl leading-relaxed">
+                A real-time overview of your sourcing, procurement activity and supplier performance.
+              </p>
+            </div>
+
+            {/* Header Action Buttons */}
+            <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
+              <button
+                onClick={() => setViewMode("activation")}
+                className="px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-600 bg-slate-50 hover:bg-slate-100 border border-slate-200 transition-all cursor-pointer shadow-2xs flex items-center gap-1.5"
+                title="Toggle fresh startup activation view"
+              >
+                <Icons.Sparkles className="w-3.5 h-3.5 text-slate-500" />
+                <span>Fresh Startup View</span>
+              </button>
+
+              <button
+                onClick={() => navigate("startup.analytics")}
+                className="px-4 py-2.5 rounded-xl text-xs font-bold text-[#111413] bg-white hover:bg-slate-50 border border-[#EAECEF] transition-all cursor-pointer shadow-2xs flex items-center gap-2"
+              >
+                <Icons.BarChart3 className="w-4 h-4 text-slate-600" />
+                <span>Analytics</span>
+              </button>
+
+              <button
+                onClick={() => navigate("startup.procurement")}
+                className="px-4 py-2.5 rounded-xl text-xs font-bold text-[#051F16] bg-[#A3F65C] hover:bg-[#92E64B] transition-all cursor-pointer shadow-xs flex items-center gap-2 group"
+              >
+                <Icons.Sparkles className="w-4 h-4 text-[#051F16] transition-transform group-hover:rotate-12" />
+                <span>+ New Procurement</span>
+              </button>
+            </div>
+          </div>
 
       {/* ─── KPI STRIP (4 Equal-Width Cards on Desktop) ───────────────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -670,6 +1173,8 @@ export default function StartupCommandCenter({
           ))}
         </div>
       </div>
-    </div>
-  )
+      </>
+    )}
+  </div>
+)
 }

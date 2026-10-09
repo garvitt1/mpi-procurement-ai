@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { NavProps, Screen } from "../../App"
 import { useProcurement, SupplierQuote } from "../../context/ProcurementContext"
 import { CatalogCategory } from "../../lib/mpiCatalog"
@@ -23,63 +23,135 @@ import {
   MSMEInventoryReorderResult,
 } from "../../services/aiService"
 import MaterialIcon from "../../components/ui/MaterialIcon"
+import { getActiveUser } from "../../lib/mockAuth"
 
 export default function MSMEFlow({
   navigate,
   goBack,
   currentScreen,
 }: NavProps) {
-  const { submitMSMEQuote } = useProcurement()
+  const { submitMSMEQuote, msmeProfile, msmeRFQs } = useProcurement()
+  const activeUser = getActiveUser()
+
+  const supplierEnterpriseName =
+    msmeProfile.enterpriseName ||
+    activeUser?.orgName ||
+    "Apex Precision Packaging Ltd."
+
+  const supplierId =
+    msmeProfile.udyamNumber ||
+    (activeUser?.email ? `MSME-${activeUser.email.split("@")[0].toUpperCase()}` : "SUP-001")
 
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
-  // Active RFQ Opportunities for MSME (Strict Buyer Anonymity: Real startup names never exposed)
-  const [opportunities] = useState([
-    {
-      id: "OPP-8910",
-      title: "500x Custom Rigid Skincare Packaging Boxes",
-      buyer: "MPI Verified Buyer #042 (Bengaluru, KA)",
-      cat: "Packaging & Printing" as CatalogCategory,
-      matchScore: 97,
-      qty: "500 units",
-      budget: "₹75,000",
-      leadTime: "12 days",
-      posted: "2 hours ago",
-      status: "Open for Bidding",
-      specs:
-        "1200 GSM kappa board, matte lamination, spot UV logo, EVA foam inserts",
-    },
-    {
-      id: "OPP-8914",
-      title: "2,000x Corrugated Outer Shipping Cartons",
-      buyer: "MPI Verified Buyer #089 (Pune, MH)",
-      cat: "Packaging & Printing" as CatalogCategory,
-      matchScore: 93,
-      qty: "2,000 boxes",
-      budget: "₹55,000",
-      leadTime: "10 days",
-      posted: "1 day ago",
-      status: "Open for Bidding",
-      specs:
-        "5-ply corrugated board, flexo print 2-color, burst test 14 kg/cm²",
-    },
-    {
-      id: "OPP-8922",
-      title: "100x Rapid Prototype Samples with Hot Foil Stamping",
-      buyer: "MPI Verified Buyer #104 (Mumbai, MH)",
-      cat: "Packaging & Printing" as CatalogCategory,
-      matchScore: 89,
-      qty: "100 units",
-      budget: "₹22,000",
-      leadTime: "5 days",
-      posted: "2 days ago",
-      status: "Quoted",
-      specs: "Sample run with micro-embossing and gold foil",
-    },
-  ])
+  // Active RFQ Opportunities for MSME (Connected to msmeRFQs with buyer privacy guaranteed)
+  const [opportunities, setOpportunities] = useState<Array<{
+    id: string
+    title: string
+    buyer: string
+    cat: CatalogCategory
+    matchScore: number
+    qty: string
+    budget: string
+    leadTime: string
+    posted: string
+    status: string
+    specs: string
+    buyerRequirements?: {
+      material: string
+      tolerance: string
+      testingCertificates: string[]
+      packagingRequirement: string
+    }
+  }>>(() => {
+    if (msmeRFQs && msmeRFQs.length > 0) {
+      return msmeRFQs.map((rfq, idx) => ({
+        id: rfq.id,
+        title: rfq.title,
+        buyer: `${rfq.buyerDisplayName} (${idx === 0 ? "Bengaluru, KA" : idx === 1 ? "Pune, MH" : "Mumbai, MH"})`,
+        cat: (rfq.category as CatalogCategory) || "Packaging & Printing",
+        matchScore: rfq.matchScore || (97 - idx * 4),
+        qty: `${rfq.quantity.toLocaleString("en-IN")} units`,
+        budget: `₹${rfq.targetBudget.toLocaleString("en-IN")}`,
+        leadTime: idx === 0 ? "12 days" : idx === 1 ? "10 days" : "5 days",
+        posted: rfq.postedTime || "Recently posted",
+        status: (rfq.status as any) || "Open for Bidding",
+        specs: rfq.specs || "Standard industrial engineering tolerances",
+        buyerRequirements: {
+          material: idx === 0 ? "1200 GSM Kappa Board with Matte Lamination" : "5-ply Corrugated Craft Board (14 kg/cm² burst test)",
+          tolerance: "±0.5mm dimensional precision",
+          testingCertificates: ["ZED Gold Quality Audit", "NABL Lab Drop Test Report"],
+          packagingRequirement: "Shrink-wrapped master carton batch packing with humidity barrier",
+        },
+      }))
+    }
+    return [
+      {
+        id: "OPP-8910",
+        title: "500x Custom Rigid Skincare Packaging Boxes",
+        buyer: "MPI Verified Buyer #042 (Bengaluru, KA)",
+        cat: "Packaging & Printing" as CatalogCategory,
+        matchScore: 97,
+        qty: "500 units",
+        budget: "₹75,000",
+        leadTime: "12 days",
+        posted: "2 hours ago",
+        status: "Open for Bidding",
+        specs:
+          "1200 GSM kappa board, matte lamination, spot UV logo, EVA foam inserts",
+        buyerRequirements: {
+          material: "1200 GSM kappa board with matte lamination",
+          tolerance: "±0.5mm dimensional precision",
+          testingCertificates: ["ZED Gold Quality Audit", "NABL Lab Drop Test Report"],
+          packagingRequirement: "Shrink-wrapped master carton batch packing with humidity barrier",
+        },
+      },
+      {
+        id: "OPP-8914",
+        title: "2,000x Corrugated Outer Shipping Cartons",
+        buyer: "MPI Verified Buyer #089 (Pune, MH)",
+        cat: "Packaging & Printing" as CatalogCategory,
+        matchScore: 93,
+        qty: "2,000 boxes",
+        budget: "₹55,000",
+        leadTime: "10 days",
+        posted: "1 day ago",
+        status: "Open for Bidding",
+        specs:
+          "5-ply corrugated board, flexo print 2-color, burst test 14 kg/cm²",
+        buyerRequirements: {
+          material: "5-ply corrugated craft board",
+          tolerance: "Burst test 14 kg/cm²",
+          testingCertificates: ["Edge Crush Test (ECT)", "Bursting Strength Report"],
+          packagingRequirement: "Bundled in lots of 25 with strapping",
+        },
+      },
+      {
+        id: "OPP-8922",
+        title: "100x Rapid Prototype Samples with Hot Foil Stamping",
+        buyer: "MPI Verified Buyer #104 (Mumbai, MH)",
+        cat: "Packaging & Printing" as CatalogCategory,
+        matchScore: 89,
+        qty: "100 units",
+        budget: "₹22,000",
+        leadTime: "5 days",
+        posted: "2 days ago",
+        status: "Quoted",
+        specs: "Sample run with micro-embossing and gold foil",
+        buyerRequirements: {
+          material: "350 GSM Art Board with metallic foil",
+          tolerance: "Visual inspection standard AQL 1.0",
+          testingCertificates: ["Sample approval sheet"],
+          packagingRequirement: "Individual bubble sleeve wrap",
+        },
+      },
+    ]
+  })
 
   // Selected opportunity for quote building
-  const [selectedOppId, setSelectedOppId] = useState<string>("OPP-8910")
+  const [selectedOppId, setSelectedOppId] = useState<string>(() => {
+    return msmeRFQs && msmeRFQs.length > 0 ? msmeRFQs[0].id : "OPP-8910"
+  })
 
   // Quotation Builder Form State
   const [quoteForm, setQuoteForm] = useState({
@@ -227,14 +299,14 @@ export default function MSMEFlow({
           specs: selectedOpp.specs,
         },
         {
-          businessName: "Apex Precision Packaging Ltd.",
+          businessName: supplierEnterpriseName,
           machinery: machineryList.map((m) => m.name),
           certifications: [
             "ISO 9001:2015",
             "ZED Gold Certified",
             "Udyam Statutory MSME Registration",
           ],
-          city: "Bengaluru",
+          city: msmeProfile.city || "Bengaluru",
         },
       )
       setAiDraftResult(res)
@@ -266,9 +338,9 @@ export default function MSMEFlow({
 
   const handleTransmitQuotation = () => {
     const newQuote: SupplierQuote = {
-      id: `QTE-APEX-${Date.now().toString().slice(-4)}`,
-      supplierId: "SUP-001",
-      supplierName: "Apex Precision Packaging Ltd.",
+      id: `QTE-${Date.now().toString().slice(-4)}`,
+      supplierId: supplierId,
+      supplierName: supplierEnterpriseName,
       totalAmount: totalWithGst,
       breakdown: {
         baseToolingOrSetup: quoteForm.baseTooling,
@@ -287,10 +359,16 @@ export default function MSMEFlow({
         leadTimeFeasibility: 96,
         complianceScore: 100,
       },
-      recommendationReason: `Submitted via MSME Portal with verified ZED Gold subsidy pass-through and ${repeatDiscountPercent}% repeat client concession.`,
+      recommendationReason: `Submitted by ${supplierEnterpriseName} (Udyam: ${supplierId}) via MSME Portal with verified ZED Gold subsidy pass-through and ${repeatDiscountPercent}% repeat client concession.`,
     }
 
     submitMSMEQuote(newQuote)
+    // Update opportunity status to "Quote Transmitted"
+    setOpportunities((prev) =>
+      prev.map((o) =>
+        o.id === selectedOpp.id ? { ...o, status: "Quote Transmitted" } : o
+      )
+    )
     setQuoteSubmittedModal(true)
   }
 
@@ -643,6 +721,17 @@ export default function MSMEFlow({
                     <span className="text-[10px] font-bold text-[#051F16] bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
                       {opp.matchScore}% Match
                     </span>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+                      opp.status === "Quote Transmitted"
+                        ? "bg-emerald-50 text-emerald-800 border-emerald-200"
+                        : opp.status === "Under Evaluation"
+                        ? "bg-blue-50 text-blue-800 border-blue-200"
+                        : opp.status === "Accepted"
+                        ? "bg-purple-50 text-purple-800 border-purple-200"
+                        : "bg-amber-50 text-amber-800 border-amber-200"
+                    }`}>
+                      ● {opp.status}
+                    </span>
                   </div>
                   <div className="text-xs text-slate-500">
                     Buyer:{" "}
@@ -665,7 +754,9 @@ export default function MSMEFlow({
                     }}
                     icon={<Icons.Coins className="w-3.5 h-3.5" />}
                   >
-                    Submit Itemized Quote →
+                    {opp.status === "Quote Transmitted"
+                      ? "View / Revise Quote →"
+                      : "Submit Itemized Quote →"}
                   </MPIButton>
                 </div>
               </div>
@@ -745,24 +836,125 @@ export default function MSMEFlow({
   if (currentScreen === "msme.proposal") {
     return renderShell(
       <div className="max-w-4xl mx-auto space-y-6">
-        {/* RFQ Context Header */}
+        {/* RFQ Context Header with Dynamic Selected Opportunity & Submitting Identity */}
         <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-              SUBMITTING QUOTE FOR RFQ #{selectedOppId}
-            </span>
-            <h3 className="text-lg font-bold text-[#051F16] mt-0.5">
-              500x Custom Rigid Skincare Packaging Boxes
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-wider bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200">
+                RFQ #{selectedOpp.id}
+              </span>
+              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+                selectedOpp.status === "Quote Transmitted"
+                  ? "bg-emerald-50 text-emerald-800 border-emerald-200"
+                  : selectedOpp.status === "Under Evaluation"
+                  ? "bg-blue-50 text-blue-800 border-blue-200"
+                  : selectedOpp.status === "Accepted"
+                  ? "bg-purple-50 text-purple-800 border-purple-200"
+                  : "bg-amber-50 text-amber-800 border-amber-200"
+              }`}>
+                ● Status: {selectedOpp.status}
+              </span>
+              <span className="text-[10px] font-bold bg-emerald-50 text-emerald-800 px-2 py-0.5 rounded-full border border-emerald-200">
+                Submitting as: {supplierEnterpriseName}
+              </span>
+            </div>
+            <h3 className="text-lg font-bold text-[#051F16]">
+              {selectedOpp.title}
             </h3>
-            <div className="text-xs text-slate-500 mt-1">
-              Buyer:{" "}
-              <strong className="text-[#051F16]">
-                MPI Verified Buyer #042 (Bengaluru, KA)
-              </strong>{" "}
-              · Target Budget: <strong>₹75,000</strong>
+            <div className="text-xs text-slate-500 flex items-center gap-2 flex-wrap">
+              <span>Buyer: <strong className="text-[#051F16]">{selectedOpp.buyer}</strong></span>
+              <span>•</span>
+              <span>Target Budget: <strong className="text-slate-800">{selectedOpp.budget}</strong></span>
+              <span>•</span>
+              <span>Target Volume: <strong className="text-slate-800">{selectedOpp.qty}</strong></span>
+              <span>•</span>
+              <span>Turnaround: <strong className="text-slate-800">{selectedOpp.leadTime}</strong></span>
             </div>
           </div>
-          <MPIVerifiedBadge label="Institutional Reverse Margin" />
+          <MPIVerifiedBadge label="Reverse-Margin Protocol" />
+        </div>
+
+        {/* ─── RFQ SPECIFICATIONS & BID SUBMISSION PROTOCOL GUIDANCE ─────────── */}
+        <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-4">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-lg bg-[#051F16] text-[#A3F65C] flex items-center justify-center font-bold text-xs">
+                <Icons.FileText className="w-4 h-4" />
+              </div>
+              <h4 className="text-sm font-extrabold text-[#051F16]">
+                Quotation Submission Protocol & Buyer Specifications
+              </h4>
+            </div>
+            <span className="text-[10px] font-semibold text-slate-500 bg-slate-50 px-2.5 py-1 rounded-full border border-slate-200">
+              Guidance & Compliance
+            </span>
+          </div>
+
+          {/* 4-Stage Post-Submission Lifecycle Roadmap */}
+          <div className="space-y-1.5 pt-1">
+            <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block">
+              Quotation Lifecycle Roadmap
+            </span>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              {[
+                { stage: "1. Draft", desc: "Formulating itemized pricing", active: selectedOpp.status === "Open for Bidding" || selectedOpp.status === "Draft" },
+                { stage: "2. Transmitted", desc: "Live in buyer's matrix", active: selectedOpp.status === "Quote Transmitted" },
+                { stage: "3. Under Evaluation", desc: "Sample & tolerance check", active: selectedOpp.status === "Under Evaluation" },
+                { stage: "4. Accepted", desc: "PO issued & escrow locked", active: selectedOpp.status === "Accepted" },
+              ].map((item, i) => (
+                <div
+                  key={i}
+                  className={`p-2.5 rounded-xl border text-left transition-all ${
+                    item.active
+                      ? "bg-[#F4FBF7] border-emerald-300 ring-1 ring-emerald-300"
+                      : "bg-slate-50/70 border-slate-200 opacity-80"
+                  }`}
+                >
+                  <div className={`text-xs font-bold ${item.active ? "text-emerald-900" : "text-slate-700"}`}>
+                    {item.stage}
+                  </div>
+                  <div className="text-[10px] text-slate-500 mt-0.5 leading-snug">
+                    {item.desc}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Specifications Needing Supplier Response */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
+            <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5 text-xs">
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 block">
+                Buyer Technical Specifications
+              </span>
+              <p className="text-slate-700 font-semibold leading-relaxed">
+                {selectedOpp.specs}
+              </p>
+              <div className="text-[11px] text-slate-500 pt-1 border-t border-slate-200/60">
+                Material: <strong>{selectedOpp.buyerRequirements?.material || "Standard Grade"}</strong> • Tolerance: <strong>{selectedOpp.buyerRequirements?.tolerance || "±0.5mm"}</strong>
+              </div>
+            </div>
+
+            <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5 text-xs">
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 block">
+                Supplier Response Requirements
+              </span>
+              <ul className="space-y-1 text-[11px] text-slate-600">
+                <li className="flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
+                  <span>Itemize setup tooling separately from unit production</span>
+                </li>
+                <li className="flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
+                  <span>Confirm NABL/ZED testing certificates availability</span>
+                </li>
+                <li className="flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
+                  <span>30% advance escrow with 70% released upon QC sign-off</span>
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
 
         {/* ─── REPEAT BUYER PROFILE BANNER ─────────────────────────────────── */}
@@ -1247,7 +1439,7 @@ export default function MSMEFlow({
             onClick={handleTransmitQuotation}
             icon={<Icons.ArrowRight className="w-4 h-4" />}
           >
-            Transmit Binding Quotation to MPI Verified Buyer #042 →
+            Transmit Binding Quotation to {selectedOpp.buyer.split("(")[0]} →
           </MPIButton>
         </div>
 
@@ -1265,9 +1457,18 @@ export default function MSMEFlow({
                 Your binding itemized quotation of{" "}
                 <strong>₹{netLandedCostToBuyer.toLocaleString("en-IN")}</strong>{" "}
                 (including {repeatDiscountPercent}% repeat client concession)
-                has been transmitted directly into Buyer #042's comparison
-                matrix.
+                has been transmitted directly into {selectedOpp.buyer}'s comparison
+                matrix on behalf of <strong>{supplierEnterpriseName}</strong>.
               </p>
+              <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-xs text-emerald-900 text-left space-y-1">
+                <div className="font-bold flex items-center gap-1">
+                  <Icons.ShieldCheck className="w-3.5 h-3.5 text-emerald-700" />
+                  <span>Quotation Lifecycle Status: Quote Transmitted</span>
+                </div>
+                <div className="text-[11px] text-emerald-700 leading-snug">
+                  The buyer has been notified. You can track evaluation progress, sample requests, and PO escrow release directly from your supplier dashboard.
+                </div>
+              </div>
               <MPIButton
                 variant="primary"
                 fullWidth
@@ -2274,20 +2475,35 @@ export default function MSMEFlow({
             className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4"
           >
             <div className="space-y-1">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-sm font-bold text-slate-900">
                   {opp.title}
                 </span>
-                <span className="text-xs font-bold text-[#051F16] bg-emerald-50 px-2 py-0.5 rounded">
+                <span className="text-xs font-bold text-[#051F16] bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
                   {opp.matchScore}% Match
                 </span>
+                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+                  opp.status === "Quote Transmitted"
+                    ? "bg-emerald-50 text-emerald-800 border-emerald-200"
+                    : opp.status === "Under Evaluation"
+                    ? "bg-blue-50 text-blue-800 border-blue-200"
+                    : opp.status === "Accepted"
+                    ? "bg-purple-50 text-purple-800 border-purple-200"
+                    : "bg-amber-50 text-amber-800 border-amber-200"
+                }`}>
+                  ● {opp.status}
+                </span>
               </div>
-              <div className="text-xs text-slate-500">
-                Buyer: <strong className="text-[#051F16]">{opp.buyer}</strong> ·
-                Budget: <strong>{opp.budget}</strong> · Lead:{" "}
-                <strong>{opp.leadTime}</strong>
+              <div className="text-xs text-slate-500 flex items-center gap-2 flex-wrap">
+                <span>Buyer: <strong className="text-[#051F16]">{opp.buyer}</strong></span>
+                <span>•</span>
+                <span>Budget: <strong>{opp.budget}</strong></span>
+                <span>•</span>
+                <span>Volume: <strong>{opp.qty}</strong></span>
+                <span>•</span>
+                <span>Lead: <strong>{opp.leadTime}</strong></span>
               </div>
-              <div className="text-xs text-slate-600 bg-slate-50 p-2 rounded-lg mt-1">
+              <div className="text-xs text-slate-600 bg-slate-50 p-2 rounded-lg mt-1 border border-slate-200">
                 {opp.specs}
               </div>
             </div>
@@ -2301,7 +2517,9 @@ export default function MSMEFlow({
               }}
               icon={<Icons.Coins className="w-3.5 h-3.5" />}
             >
-              Submit Itemized Quote
+              {opp.status === "Quote Transmitted"
+                ? "View / Revise Quote →"
+                : "Submit Itemized Quote →"}
             </MPIButton>
           </div>
         ))}

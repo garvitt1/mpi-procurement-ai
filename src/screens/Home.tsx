@@ -551,14 +551,14 @@ export default function Home({
             </p>
 
             {/* Primary & Secondary Action Buttons */}
-            <div className="flex flex-wrap items-center justify-center gap-3.5 pt-2">
+            <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
               <button
                 type="button"
                 onClick={() =>
                   handleProtectedJourney({
                     targetScreen: "startup.procurement",
                     actionType: "start_mpi",
-                    actionLabel: "Start with MPI",
+                    actionLabel: "Start a Procurement Request",
                     requiredRole: "startup",
                     portalContext: {
                       badge: "Startup Buyer Portal",
@@ -570,13 +570,35 @@ export default function Home({
                 }
                 className="group inline-flex items-center gap-2.5 px-6 py-3.5 text-sm font-bold rounded-xl bg-[#051F16] hover:bg-[#083A28] active:scale-[0.98] text-white shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer border border-[#0A3525]"
               >
-                <span>Start with MPI</span>
+                <span>Start a Procurement Request</span>
                 <Icons.ArrowRight className="w-4 h-4 text-[#A3F65C] group-hover:translate-x-1 transition-transform" />
+              </button>
+
+              <button
+                type="button"
+                onClick={() =>
+                  handleProtectedJourney({
+                    targetScreen: "msme.onboarding",
+                    actionType: "register_msme",
+                    actionLabel: "Register as MSME Supplier",
+                    requiredRole: "msme",
+                    portalContext: {
+                      badge: "MSME Supplier Network",
+                      title: "Join MPI Supplier Network",
+                      description: "Register your manufacturing unit, verify statutory compliance, and receive high-intent RFQs.",
+                      icon: "precision_manufacturing",
+                    },
+                  })
+                }
+                className="inline-flex items-center gap-2 px-5 py-3.5 text-sm font-semibold rounded-xl bg-white hover:bg-slate-50 active:scale-[0.98] text-[#051F16] border border-slate-200 shadow-2xs hover:border-slate-300 transition-all cursor-pointer"
+              >
+                <MaterialIcon name="precision_manufacturing" size={16} className="text-emerald-700" />
+                <span>Register as MSME Supplier</span>
               </button>
 
               <a
                 href="#marketplace"
-                className="inline-flex items-center gap-2 px-6 py-3.5 text-sm font-semibold rounded-xl bg-white hover:bg-slate-50 active:scale-[0.98] text-slate-800 border border-slate-200 shadow-2xs hover:border-slate-300 transition-all cursor-pointer"
+                className="inline-flex items-center gap-2 px-5 py-3.5 text-sm font-semibold rounded-xl bg-slate-50 hover:bg-slate-100 active:scale-[0.98] text-slate-700 border border-slate-200 transition-all cursor-pointer"
               >
                 <span>Explore Catalogue</span>
                 <MaterialIcon name="arrow_downward" size={15} className="text-slate-400" />
@@ -1965,7 +1987,7 @@ export default function Home({
                 handleProtectedJourney({
                   targetScreen: "startup.procurement",
                   actionType: "start_mpi",
-                  actionLabel: "Start with MPI",
+                  actionLabel: "Start a Procurement Request",
                   requiredRole: "startup",
                   portalContext: {
                     badge: "Startup Buyer Portal",
@@ -1977,7 +1999,7 @@ export default function Home({
               }
               className="group inline-flex items-center gap-2.5 px-8 py-4 text-sm font-extrabold rounded-xl bg-[#A3F65C] hover:bg-[#92E64B] active:scale-[0.98] text-[#051F16] shadow-[0_4px_24px_rgba(163,246,92,0.35)] hover:shadow-[0_8px_32px_rgba(163,246,92,0.5)] transition-all cursor-pointer"
             >
-              <span>Start with MPI</span>
+              <span>Start a Procurement Request</span>
               <Icons.ArrowRight className="w-4 h-4 text-[#051F16] group-hover:translate-x-1 transition-transform" />
             </button>
 

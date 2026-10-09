@@ -1544,9 +1544,18 @@ export const ProcurementProvider: React.FC<{ children: React.ReactNode }> = ({
   )
 
   // Business Profiles
-  const [startupProfile, setStartupProfile] = useState<StartupBusinessProfile>(
-    INITIAL_STARTUP_PROFILE,
-  )
+  const [startupProfile, setStartupProfile] = useState<StartupBusinessProfile>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const stored = localStorage.getItem("mpi_startup_profile")
+        if (stored) {
+          const parsed = JSON.parse(stored)
+          if (parsed && parsed.startupName) return parsed
+        }
+      } catch {}
+    }
+    return INITIAL_STARTUP_PROFILE
+  })
   const [msmeProfile, setMSMEProfile] =
     useState<MSMEBusinessProfile>(INITIAL_MSME_PROFILE)
 
@@ -1762,6 +1771,9 @@ export const ProcurementProvider: React.FC<{ children: React.ReactNode }> = ({
       status: "Quotes Received",
     }
     setActiveRFQ(newRFQ)
+    try {
+      localStorage.setItem("mpi_rfq_dispatched", "true")
+    } catch {}
 
     // Dynamically generate tailored reverse-margin quotes for dispatched suppliers
     const chosenSuppliers = matchedSuppliers.filter((s) => targetIds.includes(s.id))
@@ -1903,7 +1915,13 @@ export const ProcurementProvider: React.FC<{ children: React.ReactNode }> = ({
   }
 
   const updateStartupProfile = (profile: Partial<StartupBusinessProfile>) => {
-    setStartupProfile((prev) => ({ ...prev, ...profile }))
+    setStartupProfile((prev) => {
+      const next = { ...prev, ...profile }
+      try {
+        localStorage.setItem("mpi_startup_profile", JSON.stringify(next))
+      } catch {}
+      return next
+    })
   }
 
   const updateMSMEProfile = (profile: Partial<MSMEBusinessProfile>) => {
