@@ -68,12 +68,19 @@ export default function StartupCommandCenter({
     (sum, o) => sum + (o.savings || 0),
     0
   )
-  const activeQuoteSavings = activeRFQ ? 19750 : 0
+  const activeQuoteSavings =
+    activeRFQ && publicStartupQuotes.length > 0
+      ? (publicStartupQuotes[0]?.totalSavings || 0)
+      : 0
   const totalVerifiedSavings = ordersSavings + activeQuoteSavings
 
   // 3. KPI 3: Turnaround SLA (Average days from actual quotes)
-  const baseDeliveryDays = publicStartupQuotes[0]?.deliveryDays || 8
-  const turnaroundMetric = `${baseDeliveryDays}–${baseDeliveryDays + 4} Days`
+  const baseDeliveryDays = publicStartupQuotes[0]?.deliveryDays
+  const turnaroundMetric = baseDeliveryDays
+    ? `${baseDeliveryDays}–${baseDeliveryDays + 4} Days`
+    : activeRFQ
+    ? "8–12 Days"
+    : "8–14 Days Standard"
 
   // 4. KPI 4: Orders & Escrow Locked Value
   const inFlightOrders = ordersList.filter((o) => o.status !== "Delivered")
@@ -214,7 +221,7 @@ export default function StartupCommandCenter({
           </div>
           <div className="mt-3.5 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
             <span className="text-emerald-700 font-bold flex items-center gap-0.5 text-[11px]">
-              ↑ 24% reverse-margin
+              {totalVerifiedSavings > 0 ? "↑ 24% reverse-margin" : "Calculated upon quote"}
             </span>
             <span className="text-slate-500 font-medium text-[11px]">
               vs Market Baseline
@@ -272,10 +279,10 @@ export default function StartupCommandCenter({
                 className="text-2xl sm:text-3xl font-extrabold text-[#051F16] tracking-tight"
                 style={{ fontFamily: "Plus Jakarta Sans" }}
               >
-                ₹{escrowLockedValue > 0 ? escrowLockedValue.toLocaleString("en-IN") : "1,40,250"}
+                ₹{escrowLockedValue.toLocaleString("en-IN")}
               </div>
               <span className="text-[11px] font-bold text-emerald-900 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                {inFlightCount > 0 ? inFlightCount : 2} in Flight
+                {inFlightCount} in Flight
               </span>
             </div>
           </div>
@@ -568,7 +575,9 @@ export default function StartupCommandCenter({
                   </span>
                 </div>
                 <p className="text-[11px] text-slate-600 leading-snug">
-                  {publicStartupSuppliers.length} audited manufacturers ready in Peenya and Pune with direct delivery guarantees.
+                  {publicStartupSuppliers.length > 0
+                    ? `${publicStartupSuppliers.length} audited manufacturers ready in Peenya and Pune with direct delivery guarantees.`
+                    : "Audited manufacturers across Peenya and Pune ready to connect upon RFQ dispatch."}
                 </p>
                 <button
                   onClick={() => navigate("startup.match-results")}

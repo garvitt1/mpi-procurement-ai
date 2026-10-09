@@ -7,9 +7,14 @@
  */
 
 import { hasConsent, hasUserDecided } from "./cookieConsentService"
+import { supabase } from "../lib/supabaseClient"
 
 export type TelemetryEventType =
   | "landing_view"
+  | "cta_rfq_clicked"
+  | "signup_completed"
+  | "onboarding_step_viewed"
+  | "rfq_dispatched"
   | "requirement_started"
   | "requirement_submitted"
   | "ai_parsing_completed"
@@ -41,6 +46,59 @@ function getSessionId(): string {
     sessionStorage.setItem("mpi_session_id", sid)
   }
   return sid
+}
+
+/**
+ * Asynchronously dispatches telemetry to configured production destination:
+ * 1. If VITE_ANALYTICS_ENDPOINT is configured, uses navigator.sendBeacon or fetch.
+ * 2. If Supabase is configured, attempts insert into `telemetry_events` table.
+ * 3. Non-blocking error handling ensures user actions are never interrupted.
+ */
+async function dispatchToProductionDestination(item: TelemetryEvent): Promise<boolean> {
+  let dispatched = false
+
+  // 1. Check for configured HTTP beacon/REST analytics endpoint
+  const analyticsEndpoint =
+    (typeof import.meta !== "undefined" && import.meta.env?.VITE_ANALYTICS_ENDPOINT) || ""
+  if (analyticsEndpoint && typeof window !== "undefined") {
+    try {
+      const payload = JSON.stringify(item)
+      if (navigator.sendBeacon) {
+        dispatched = navigator.sendBeacon(analyticsEndpoint, payload)
+      } else {
+        await fetch(analyticsEndpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: payload,
+          keepalive: true,
+        })
+        dispatched = true
+      }
+    } catch {
+      // Non-blocking fallback
+    }
+  }
+
+  // 2. Dispatch to Supabase if client credentials are configured
+  try {
+    const supabaseUrl = import.meta.env?.VITE_SUPABASE_URL
+    const supabaseKey = import.meta.env?.VITE_SUPABASE_PUBLISHABLE_KEY
+    if (supabaseUrl && supabaseKey) {
+      const { error } = await supabase.from("telemetry_events").insert({
+        event: item.event,
+        session_id: item.sessionId,
+        metadata: item.metadata,
+        created_at: item.timestamp,
+      })
+      if (!error) {
+        dispatched = true
+      }
+    }
+  } catch {
+    // Non-blocking fallback
+  }
+
+  return dispatched
 }
 
 export function trackTelemetryEvent(
@@ -79,6 +137,12 @@ export function trackTelemetryEvent(
   } catch {
     // LocalStorage quota or access exception silently handled
   }
+
+  // Asynchronously dispatch to production analytics destination
+  // Fire-and-forget: does not block execution or raise uncaught errors
+  dispatchToProductionDestination(telemetryItem).catch(() => {
+    // Silently ignore network transport errors
+  })
 }
 
 /**

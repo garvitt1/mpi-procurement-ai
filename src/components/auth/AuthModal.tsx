@@ -13,6 +13,7 @@ import {
   PendingActionContext,
   logUserJourney,
 } from "../../lib/sessionManager"
+import { trackTelemetryEvent } from "../../services/telemetryService"
 import MaterialIcon from "../ui/MaterialIcon"
 
 export interface AuthPortalContext {
@@ -132,6 +133,11 @@ export default function AuthModal({
   // Helper to handle post-registration navigation
   const completeSignInRedirect = (userRole: RoleKey) => {
     const pending = getPendingAction()
+    trackTelemetryEvent("signup_completed", {
+      role: userRole,
+      hasPendingAction: Boolean(pending),
+      targetScreen: pending?.targetScreen || targetScreen || (userRole === "msme" ? "msme.onboarding" : "startup.onboarding"),
+    })
     logUserJourney("AUTH_SIGNIN_SUCCESS", {
       userRole,
       hasPendingAction: Boolean(pending),

@@ -15,6 +15,7 @@ import {
 import { formatScopeDisplay } from "../Home"
 import { type ExtractedProcurementSpecs } from "../../services/aiService"
 import { useStepTransition } from "../../hooks/useStartupGSAP"
+import { trackTelemetryEvent } from "../../services/telemetryService"
 
 interface StartupGuidedBuilderProps {
   navigate: (screen: Screen) => void
@@ -86,6 +87,7 @@ export default function StartupGuidedBuilder({
   useStepTransition(stepContainerRef, builderStep)
 
   // Form local state
+  const [isLaunching, setIsLaunching] = useState(false)
   const [newSpecInput, setNewSpecInput] = useState("")
   const [validationError, setValidationError] = useState<string | null>(null)
   const [aiProcessingStage, setAiProcessingStage] = useState<string>("")
@@ -210,6 +212,14 @@ export default function StartupGuidedBuilder({
 
   // Step 7 Launch Procurement Event
   const handleLaunchProcurement = () => {
+    if (isLaunching) return
+    setIsLaunching(true)
+    trackTelemetryEvent("rfq_dispatched", {
+      category: selectedCategory,
+      quantity,
+      targetBudget,
+      suppliersCount: shortlistedSupplierIds.length,
+    })
     createAndDispatchRFQ(shortlistedSupplierIds)
     navigate("startup.home")
   }
@@ -1020,10 +1030,11 @@ export default function StartupGuidedBuilder({
               <button
                 type="button"
                 onClick={handleLaunchProcurement}
-                className="px-6 py-3.5 rounded-xl font-bold text-sm bg-[#051F16] text-[#A3F65C] hover:bg-[#0A3525] transition-all cursor-pointer shadow-md flex items-center justify-center gap-2 group"
+                disabled={isLaunching}
+                className="px-6 py-3.5 rounded-xl font-bold text-sm bg-[#051F16] text-[#A3F65C] hover:bg-[#0A3525] transition-all cursor-pointer shadow-md flex items-center justify-center gap-2 group disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 <Icons.Sparkles className="w-4 h-4 text-[#A3F65C]" />
-                <span>Launch Procurement Event & Dispatch RFQ</span>
+                <span>{isLaunching ? "Dispatching RFQ..." : "Launch Procurement Event & Dispatch RFQ"}</span>
                 <Icons.ArrowRight className="w-4 h-4 text-[#A3F65C] transition-transform group-hover:translate-x-1" />
               </button>
             </div>

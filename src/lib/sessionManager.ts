@@ -9,6 +9,7 @@ import { Screen } from "../App"
 import { RoleKey, GoogleAuthUser } from "./mockAuth"
 import { supabase } from "./supabaseClient"
 import { checkIdempotentExecution, recordIdempotentExecution, createApiSuccess } from "./apiContract"
+import { trackTelemetryEvent, TelemetryEventType } from "../services/telemetryService"
 
 export interface PendingActionContext {
   id: string
@@ -277,6 +278,30 @@ export function logUserJourney(event: string, meta?: Record<string, unknown>): v
   if (typeof window !== "undefined" && (import.meta as any).env?.DEV) {
     const timestamp = new Date().toLocaleTimeString()
     console.info(`%c[MPI Journey ${timestamp}] ${event}`, "color: #10B981; font-weight: bold;", meta || "")
+  }
+
+  // Bridge known funnel transitions into privacy-safe telemetry
+  const telemetryMapping: Record<string, TelemetryEventType> = {
+    CTA_CLICKED: "cta_rfq_clicked",
+    AUTH_SIGNIN_SUCCESS: "signup_completed",
+  }
+
+  const mapped = telemetryMapping[event]
+  if (mapped) {
+    const safeMeta: Record<string, string | number | boolean | null> = {}
+    if (meta) {
+      for (const [k, v] of Object.entries(meta)) {
+        if (
+          typeof v === "string" ||
+          typeof v === "number" ||
+          typeof v === "boolean" ||
+          v === null
+        ) {
+          safeMeta[k] = v
+        }
+      }
+    }
+    trackTelemetryEvent(mapped, safeMeta)
   }
 }
 

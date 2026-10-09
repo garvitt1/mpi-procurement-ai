@@ -28,6 +28,7 @@ import useScrollReveal from "../hooks/useScrollReveal"
 import MaterialIcon from "../components/ui/MaterialIcon"
 import CountUpNumber from "../components/ui/CountUpNumber"
 import { openCookiePreferencesModal } from "../services/cookieConsentService"
+import { trackTelemetryEvent } from "../services/telemetryService"
 
 export function formatScopeDisplay(category: CatalogCategory, qty: number): string {
   if (category === "Packaging & Printing") {
@@ -92,6 +93,14 @@ export default function Home({
 
   // Viewport scroll reveal observer
   useScrollReveal()
+
+  // Track privacy-safe landing page view event on initial mount
+  useEffect(() => {
+    trackTelemetryEvent("landing_view", {
+      path: "/",
+      referrer: typeof document !== "undefined" ? document.referrer || null : null,
+    })
+  }, [])
 
   // Auth modal state for Login and Sign In with contextual portal gates
   const [authModal, setAuthModal] = useState<{
@@ -253,6 +262,12 @@ export default function Home({
           `Need sourcing quote for ${prod.name} (${prod.category}) with standard institutional specifications`,
       )
       setSelectedCategory(prod.category as CatalogCategory)
+      if (pending.procurementContext?.quantity) {
+        setQuantity(pending.procurementContext.quantity)
+      }
+      if (pending.procurementContext?.targetBudget) {
+        setTargetBudget(pending.procurementContext.targetBudget)
+      }
       logUserJourney("RESTORED_PRODUCT_CONTEXT", {
         productId: prod.id,
         name: prod.name,
@@ -263,10 +278,19 @@ export default function Home({
       if (pending.procurementContext.category) {
         setSelectedCategory(pending.procurementContext.category as CatalogCategory)
       }
+      if (pending.procurementContext.quantity) {
+        setQuantity(pending.procurementContext.quantity)
+      }
+      if (pending.procurementContext.targetBudget) {
+        setTargetBudget(pending.procurementContext.targetBudget)
+      }
     }
 
     // Check profile completion for startups entering procurement
-    if (pending.requiredRole === "startup" && pending.targetScreen === "startup.procurement") {
+    if (
+      pending.requiredRole === "startup" &&
+      (pending.targetScreen === "startup.procurement" || pending.targetScreen === "startup.rfq")
+    ) {
       if (!isProfileComplete("startup")) {
         navigate("startup.onboarding")
         return
@@ -653,20 +677,30 @@ export default function Home({
                     <div className="absolute right-3 bottom-3 flex items-center gap-2">
                       <button
                         type="button"
-                        onClick={() =>
+                        onClick={() => {
+                          trackTelemetryEvent("cta_rfq_clicked", {
+                            source: "hero_demo",
+                            category: currentHeroPrompt.cat,
+                            quantity: currentHeroPrompt.qty,
+                            budget: currentHeroPrompt.budget,
+                          })
                           handleProtectedJourney({
-                            targetScreen: "startup.rfq",
+                            targetScreen: "startup.procurement",
                             actionType: "run_rfq",
                             actionLabel: "Run Full RFQ",
                             requiredRole: "startup",
                             procurementContext: {
                               requirementText: currentHeroPrompt.text,
                               category: currentHeroPrompt.cat,
+                              quantity: currentHeroPrompt.qty,
+                              targetBudget: currentHeroPrompt.budget,
                             },
                             onExecuteIfAuthenticated: () => {
                               setRequirementText(currentHeroPrompt.text)
                               setSelectedCategory(currentHeroPrompt.cat)
-                              navigate("startup.rfq")
+                              setQuantity(currentHeroPrompt.qty)
+                              setTargetBudget(currentHeroPrompt.budget)
+                              navigate("startup.procurement")
                             },
                             portalContext: {
                               badge: "AI RFQ Generation",
@@ -675,7 +709,7 @@ export default function Home({
                               icon: "auto_awesome",
                             },
                           })
-                        }
+                        }}
                         className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg bg-[#051F16] hover:bg-[#083A28] text-white cursor-pointer shadow-2xs"
                       >
                         <MaterialIcon name="auto_awesome" size={14} className="text-[#A3F65C]" />

@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { NavProps } from "../../App"
 import {
   useProcurement,
@@ -12,6 +12,7 @@ import {
 import { MPILogo } from "../../components/shared"
 import { mockRegister } from "../../lib/mockAuth"
 import { getPendingAction, clearPendingAction } from "../../lib/sessionManager"
+import { trackTelemetryEvent } from "../../services/telemetryService"
 
 const STAGES = [
   {
@@ -107,11 +108,38 @@ const SCHEME_INTEREST_OPTIONS = [
 ]
 
 export default function StartupOnboarding({ navigate, goBack }: NavProps) {
-  const { startupProfile, updateStartupProfile } = useProcurement()
+  const {
+    startupProfile,
+    updateStartupProfile,
+    setRequirementText,
+    setSelectedCategory,
+    setQuantity,
+    setTargetBudget,
+  } = useProcurement()
 
   // Current Step (1 to 9)
   const [currentStep, setCurrentStep] = useState(1)
   const totalSteps = 9
+
+  // Track onboarding step views for conversion funnel analysis
+  useEffect(() => {
+    const stepTitles = [
+      "Identity & Legal Entity",
+      "Stage & Market Alignment",
+      "Procurement Needs & Categories",
+      "Volume & Target Spend",
+      "Technical Specs & Compliance",
+      "Factory Preferences & Clusters",
+      "Government Schemes Eligibility",
+      "Payment & Escrow Preferences",
+      "Verification & Activation",
+    ]
+    trackTelemetryEvent("onboarding_step_viewed", {
+      stepNumber: currentStep,
+      stepName: stepTitles[currentStep - 1] || `Step ${currentStep}`,
+      role: "startup",
+    })
+  }, [currentStep])
 
   const googleUser = (() => {
     try {
@@ -342,6 +370,18 @@ export default function StartupOnboarding({ navigate, goBack }: NavProps) {
 
     const pending = getPendingAction()
     if (pending && pending.targetScreen && pending.targetScreen !== "startup.onboarding") {
+      if (pending.procurementContext?.requirementText) {
+        setRequirementText(pending.procurementContext.requirementText)
+        if (pending.procurementContext.category) {
+          setSelectedCategory(pending.procurementContext.category as CatalogCategory)
+        }
+        if (pending.procurementContext.quantity) {
+          setQuantity(pending.procurementContext.quantity)
+        }
+        if (pending.procurementContext.targetBudget) {
+          setTargetBudget(pending.procurementContext.targetBudget)
+        }
+      }
       clearPendingAction()
       navigate(pending.targetScreen)
     } else {

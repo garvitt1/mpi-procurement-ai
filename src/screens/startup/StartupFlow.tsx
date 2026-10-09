@@ -372,25 +372,29 @@ export default function StartupFlow({
 
   // Builder step state (1 to 7)
   const [builderStep, setBuilderStep] = useState(
-    currentScreen === "startup.rfq"
-      ? 6
-      : currentScreen === "startup.match-results" || currentScreen === "startup.shortlist"
+    currentScreen === "startup.match-results" || currentScreen === "startup.shortlist"
       ? 5
       : currentScreen === "startup.ai-analysis"
       ? 2
+      : currentScreen === "startup.rfq" || currentScreen === "startup.procurement"
+      ? (specifications.length > 0 ? 2 : 1)
       : 1,
   )
 
   // Sync builderStep if screen changes while component is mounted
   useEffect(() => {
-    if (currentScreen === "startup.rfq") {
-      setBuilderStep(6)
-    } else if (currentScreen === "startup.match-results" || currentScreen === "startup.shortlist") {
+    if (currentScreen === "startup.match-results" || currentScreen === "startup.shortlist") {
       setBuilderStep(5)
     } else if (currentScreen === "startup.ai-analysis") {
       setBuilderStep(2)
+    } else if (currentScreen === "startup.rfq" || currentScreen === "startup.procurement") {
+      // Enter the RFQ creation flow at Step 1 (or Step 2 if specifications are already extracted)
+      setBuilderStep((prev) => {
+        if (prev >= 1 && prev <= 7 && prev !== 6) return prev
+        return specifications.length > 0 ? 2 : 1
+      })
     }
-  }, [currentScreen])
+  }, [currentScreen, specifications.length])
   const [step1Guidance, setStep1Guidance] = useState<string | null>(null)
   const [newSpecInput, setNewSpecInput] = useState("")
   const [complianceChecks, setComplianceChecks] = useState<string[]>([
