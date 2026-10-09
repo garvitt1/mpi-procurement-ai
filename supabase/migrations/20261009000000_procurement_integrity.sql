@@ -302,12 +302,3 @@ grant select on table public.quotes to anon;
 grant all on table public.telemetry_events to anon, authenticated;
 grant usage, select on all sequences in schema public to anon, authenticated;
 
--- ============================================================================
--- ROLLBACK SCRIPT (Reference)
--- ============================================================================
--- alter publication supabase_realtime drop table public.quotes;
--- alter publication supabase_realtime drop table public.rfqs;
--- drop table if exists public.telemetry_events cascade;
--- drop table if exists public.quotes cascade;
--- drop table if exists public.rfqs cascade;
--- drop table if exists public.profiles cascade;

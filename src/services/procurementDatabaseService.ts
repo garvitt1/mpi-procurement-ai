@@ -292,3 +292,4 @@ export async function fetchQuotesForRFQFromSupabase(
     return { quotes: [], fromDatabase: false }
   }
 }
+
