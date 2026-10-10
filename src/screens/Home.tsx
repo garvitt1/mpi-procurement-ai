@@ -25,6 +25,7 @@ import {
 import GlobalNavBar from "../components/navigation/GlobalNavBar"
 import ProductCatalogue from "../components/catalogue/ProductCatalogue"
 import useScrollReveal from "../hooks/useScrollReveal"
+import useHomepageCinematicGSAP from "../hooks/useHomepageCinematicGSAP"
 import MaterialIcon from "../components/ui/MaterialIcon"
 import CountUpNumber from "../components/ui/CountUpNumber"
 import { openCookiePreferencesModal } from "../services/cookieConsentService"
@@ -97,6 +98,9 @@ export default function Home({
 
   // Viewport scroll reveal observer
   useScrollReveal()
+
+  // Hardware-accelerated cinematic scroll animations for target homepage sections
+  useHomepageCinematicGSAP()
 
   // Track privacy-safe landing page view event on initial mount
   useEffect(() => {
@@ -1322,8 +1326,8 @@ export default function Home({
       <section id="how-it-works" className="py-20 bg-white border-t border-slate-200/80 space-y-24 scroll-reveal">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-24">
           {/* Chapter A: Intelligent Discovery */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-4">
+          <div data-cinematic-section="discovery" className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div data-cinematic="discovery-text" className="space-y-4">
               <span className="font-mono text-xs font-semibold uppercase tracking-widest text-emerald-800">
                 Intelligent Discovery
               </span>
@@ -1365,37 +1369,37 @@ export default function Home({
             </div>
 
             {/* Visual A */}
-            <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200 shadow-2xs space-y-4">
+            <div data-cinematic="discovery-visual" className="bg-slate-50 rounded-2xl p-6 border border-slate-200 shadow-2xs space-y-4">
               <div className="flex items-center justify-between text-xs font-mono text-slate-500 border-b border-slate-200 pb-3">
                 <span>INPUT: Raw Natural Language Prompt</span>
                 <span className="text-emerald-700 font-bold">● AI PARSER READY</span>
               </div>
-              <div className="p-4 bg-white rounded-xl border border-slate-200 text-xs sm:text-sm text-slate-800 leading-relaxed font-medium">
+              <div data-cinematic="discovery-input" className="p-4 bg-white rounded-xl border border-slate-200 text-xs sm:text-sm text-slate-800 leading-relaxed font-medium">
                 "We need custom packaging for an upcoming product launch, with a premium finish, a protective insert, and a specific delivery deadline."
               </div>
-              <div className="p-4 bg-[#051F16] text-white rounded-xl text-xs space-y-2.5 font-mono border border-[#0A3525]">
+              <div data-cinematic="discovery-output" className="p-4 bg-[#051F16] text-white rounded-xl text-xs space-y-2.5 font-mono border border-[#0A3525]">
                 <div className="flex items-center justify-between border-b border-white/10 pb-2">
                   <span className="text-[#A3F65C] font-bold tracking-wider">STRUCTURED REQUEST DRAFT</span>
                   <span className="text-[10px] text-slate-400 font-sans">Draft Preview • Not Dispatched</span>
                 </div>
                 <div className="text-slate-200 text-[11px] space-y-1.5 pt-1">
-                  <div className="flex items-start gap-2">
+                  <div data-cinematic="discovery-item" className="flex items-start gap-2">
                     <span className="text-[#A3F65C]">•</span>
                     <span><strong className="text-white font-semibold">Product requirements:</strong> Custom rigid packaging box</span>
                   </div>
-                  <div className="flex items-start gap-2">
+                  <div data-cinematic="discovery-item" className="flex items-start gap-2">
                     <span className="text-[#A3F65C]">•</span>
                     <span><strong className="text-white font-semibold">Quantity and specifications:</strong> 500 units target batch</span>
                   </div>
-                  <div className="flex items-start gap-2">
+                  <div data-cinematic="discovery-item" className="flex items-start gap-2">
                     <span className="text-[#A3F65C]">•</span>
                     <span><strong className="text-white font-semibold">Materials and customization:</strong> Premium finish, protective insert</span>
                   </div>
-                  <div className="flex items-start gap-2">
+                  <div data-cinematic="discovery-item" className="flex items-start gap-2">
                     <span className="text-[#A3F65C]">•</span>
                     <span><strong className="text-white font-semibold">Delivery requirements:</strong> Specified launch deadline</span>
                   </div>
-                  <div className="flex items-start gap-2">
+                  <div data-cinematic="discovery-item" className="flex items-start gap-2">
                     <span className="text-[#A3F65C]">•</span>
                     <span><strong className="text-white font-semibold">Missing details to confirm:</strong> Exact dimensions, print artwork files</span>
                   </div>
@@ -1405,16 +1409,16 @@ export default function Home({
           </div>
 
           {/* Chapter B: Verified Marketplace */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div data-cinematic-section="transparency" className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             {/* Visual B */}
-            <div className="order-2 lg:order-1 bg-slate-50 rounded-2xl p-6 border border-slate-200 shadow-2xs space-y-4">
+            <div data-cinematic="transparency-visual" className="order-2 lg:order-1 bg-slate-50 rounded-2xl p-6 border border-slate-200 shadow-2xs space-y-4">
               <div className="flex items-center justify-between text-xs font-mono text-slate-500 border-b border-slate-200 pb-3">
                 <span>SUPPLIER PROFILE REVIEW PROCESS</span>
                 <span className="text-emerald-800 font-bold">VERIFICATION CRITERIA</span>
               </div>
               <div className="bg-white rounded-xl p-4 border border-slate-200 space-y-3">
                 <div className="space-y-2.5 text-xs text-slate-700">
-                  <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100 flex items-start justify-between gap-3">
+                  <div data-cinematic="transparency-stage" className="p-2.5 rounded-lg bg-slate-50 border border-slate-100 flex items-start justify-between gap-3">
                     <div>
                       <div className="font-bold text-slate-900">Business identity</div>
                       <div className="text-[11px] text-slate-500">Review status of submitted documents.</div>
@@ -1424,7 +1428,7 @@ export default function Home({
                     </span>
                   </div>
 
-                  <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100 flex items-start justify-between gap-3">
+                  <div data-cinematic="transparency-stage" className="p-2.5 rounded-lg bg-slate-50 border border-slate-100 flex items-start justify-between gap-3">
                     <div>
                       <div className="font-bold text-slate-900">Manufacturing capabilities</div>
                       <div className="text-[11px] text-slate-500">Declared capabilities and available evidence.</div>
@@ -1434,7 +1438,7 @@ export default function Home({
                     </span>
                   </div>
 
-                  <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100 flex items-start justify-between gap-3">
+                  <div data-cinematic="transparency-stage" className="p-2.5 rounded-lg bg-slate-50 border border-slate-100 flex items-start justify-between gap-3">
                     <div>
                       <div className="font-bold text-slate-900">Supporting documentation</div>
                       <div className="text-[11px] text-slate-500">Documents provided for review.</div>
@@ -1444,7 +1448,7 @@ export default function Home({
                     </span>
                   </div>
 
-                  <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100 flex items-start justify-between gap-3">
+                  <div data-cinematic="transparency-stage" className="p-2.5 rounded-lg bg-slate-50 border border-slate-100 flex items-start justify-between gap-3">
                     <div>
                       <div className="font-bold text-slate-900">MPI review status</div>
                       <div className="text-[11px] text-slate-500">Self-declared, under review, or admin-reviewed, as applicable.</div>
@@ -1455,14 +1459,14 @@ export default function Home({
                   </div>
                 </div>
 
-                <div className="pt-3 border-t border-slate-100 text-[11px] text-slate-500 flex items-center gap-1.5 leading-tight">
+                <div data-cinematic="transparency-disclosure" className="pt-3 border-t border-slate-100 text-[11px] text-slate-500 flex items-center gap-1.5 leading-tight">
                   <MaterialIcon name="info" size={14} className="text-slate-400 shrink-0" />
                   <span>A registered profile does not automatically mean an independently verified supplier.</span>
                 </div>
               </div>
             </div>
 
-            <div className="order-1 lg:order-2 space-y-4">
+            <div data-cinematic="transparency-text" className="order-1 lg:order-2 space-y-4">
               <span className="font-mono text-xs font-semibold uppercase tracking-widest text-emerald-800">
                 Supplier Transparency
               </span>
@@ -1510,8 +1514,8 @@ export default function Home({
           </div>
 
           {/* Chapter C: Smart Comparison */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-4">
+          <div data-cinematic-section="comparison" className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div data-cinematic="comparison-text" className="space-y-4">
               <span className="font-mono text-xs font-semibold uppercase tracking-widest text-emerald-800">
                 Smart Comparison
               </span>
@@ -1553,14 +1557,14 @@ export default function Home({
             </div>
 
             {/* Visual C */}
-            <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200 shadow-2xs space-y-3">
+            <div data-cinematic="comparison-visual" className="bg-slate-50 rounded-2xl p-6 border border-slate-200 shadow-2xs space-y-3">
               <div className="flex items-center justify-between text-xs font-mono text-slate-500 border-b border-slate-200 pb-3">
                 <span>COMPARATIVE BID ANALYSIS</span>
                 <span className="text-emerald-700 font-bold">GENERIC PREVIEW</span>
               </div>
               <div className="space-y-2.5 text-xs">
                 {/* Quotation A */}
-                <div className="p-3.5 bg-white rounded-xl border border-slate-200 space-y-1.5">
+                <div data-cinematic="comparison-card" className="p-3.5 bg-white rounded-xl border border-slate-200 space-y-1.5">
                   <div className="flex items-center justify-between border-b border-slate-100 pb-1.5">
                     <span className="font-bold text-slate-900 text-xs">Quotation A</span>
                     <span className="text-[10px] font-mono bg-slate-100 text-slate-600 px-2 py-0.5 rounded">Sample Option</span>
@@ -1574,7 +1578,7 @@ export default function Home({
                 </div>
 
                 {/* Quotation B */}
-                <div className="p-3.5 bg-white rounded-xl border border-slate-200 space-y-1.5">
+                <div data-cinematic="comparison-card" className="p-3.5 bg-white rounded-xl border border-slate-200 space-y-1.5">
                   <div className="flex items-center justify-between border-b border-slate-100 pb-1.5">
                     <span className="font-bold text-slate-900 text-xs">Quotation B</span>
                     <span className="text-[10px] font-mono bg-slate-100 text-slate-600 px-2 py-0.5 rounded">Sample Option</span>
@@ -1588,7 +1592,7 @@ export default function Home({
                 </div>
 
                 {/* Quotation C */}
-                <div className="p-3.5 bg-white rounded-xl border border-slate-200 space-y-1.5">
+                <div data-cinematic="comparison-card" className="p-3.5 bg-white rounded-xl border border-slate-200 space-y-1.5">
                   <div className="flex items-center justify-between border-b border-slate-100 pb-1.5">
                     <span className="font-bold text-slate-900 text-xs">Quotation C</span>
                     <span className="text-[10px] font-mono bg-slate-100 text-slate-600 px-2 py-0.5 rounded">Sample Option</span>
@@ -1602,7 +1606,7 @@ export default function Home({
                 </div>
               </div>
 
-              <div className="pt-2 border-t border-slate-200/80 text-[11px] text-slate-500 text-center leading-tight">
+              <div data-cinematic="comparison-disclosure" className="pt-2 border-t border-slate-200/80 text-[11px] text-slate-500 text-center leading-tight">
                 Illustrative interface — no live quotation amounts, supplier identities, or commercial records are displayed.
               </div>
             </div>
@@ -1754,30 +1758,33 @@ export default function Home({
       />
 
       {/* ─── 8. PARTNER / ECOSYSTEM VISUALIZATION SECTION ──────────────────── */}
-      <section className="py-20 bg-white border-y border-slate-200/80 scroll-reveal">
+      <section data-cinematic-section="ecosystem" className="py-20 bg-white border-y border-slate-200/80 scroll-reveal">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
-          <span className="font-mono text-xs font-semibold uppercase tracking-widest text-emerald-800">
-            The Connected Ecosystem
-          </span>
-
-          <h2
-            className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#051F16] tracking-tight leading-tight"
-            style={{ fontFamily: "Plus Jakarta Sans" }}
-          >
-            Connect every step of your{" "}
-            <span className="font-editorial italic font-normal text-[#083A28]">
-              procurement journey.
+          <div data-cinematic="ecosystem-header" className="space-y-6">
+            <span className="font-mono text-xs font-semibold uppercase tracking-widest text-emerald-800">
+              The Connected Ecosystem
             </span>
-          </h2>
 
-          <p className="text-sm sm:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed">
-            MPI brings AI-assisted requirement intake, RFQ workflows, supplier quotations, commercial comparison, and government scheme discovery into one connected procurement experience.
-          </p>
+            <h2
+              className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#051F16] tracking-tight leading-tight"
+              style={{ fontFamily: "Plus Jakarta Sans" }}
+            >
+              Connect every step of your{" "}
+              <span className="font-editorial italic font-normal text-[#083A28]">
+                procurement journey.
+              </span>
+            </h2>
+
+            <p className="text-sm sm:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed">
+              MPI brings AI-assisted requirement intake, RFQ workflows, supplier quotations, commercial comparison, and government scheme discovery into one connected procurement experience.
+            </p>
+          </div>
 
           {/* Ecosystem Visual Network */}
           <div className="mt-12 p-8 sm:p-12 bg-slate-50/70 rounded-3xl border border-slate-200 relative overflow-hidden">
             {/* Dynamic Animated Vector Bridge Connecting Hub to Network */}
             <svg
+              data-cinematic="ecosystem-lines"
               className="absolute inset-0 w-full h-full pointer-events-none hidden md:block opacity-35"
               xmlns="http://www.w3.org/2000/svg"
             >
@@ -1794,7 +1801,7 @@ export default function Home({
             </svg>
 
             {/* Center Node */}
-            <div className="flex flex-col items-center justify-center relative z-10">
+            <div data-cinematic="ecosystem-hub" className="flex flex-col items-center justify-center relative z-10">
               <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl bg-[#051F16] text-white flex flex-col items-center justify-center border-4 border-white z-10 animate-pulse-hub">
                 <span className="text-xl sm:text-2xl font-black tracking-tight" style={{ fontFamily: "Plus Jakarta Sans" }}>
                   MPI
@@ -1807,7 +1814,7 @@ export default function Home({
 
             {/* Orbiting Satellite Nodes */}
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mt-8 max-w-4xl mx-auto relative z-10">
-              <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs text-left space-y-1">
+              <div data-cinematic="ecosystem-node" className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs text-left space-y-1">
                 <div className="flex items-center gap-2 font-bold text-slate-900 text-xs">
                   <MaterialIcon name="rocket_launch" size={16} className="text-emerald-700" />
                   <span>Startup & Buyer Teams</span>
@@ -1817,7 +1824,7 @@ export default function Home({
                 </div>
               </div>
 
-              <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs text-left space-y-1">
+              <div data-cinematic="ecosystem-node" className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs text-left space-y-1">
                 <div className="flex items-center gap-2 font-bold text-slate-900 text-xs">
                   <MaterialIcon name="precision_manufacturing" size={16} className="text-emerald-700" />
                   <span>MSME Suppliers</span>
@@ -1827,7 +1834,7 @@ export default function Home({
                 </div>
               </div>
 
-              <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs text-left space-y-1">
+              <div data-cinematic="ecosystem-node" className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs text-left space-y-1">
                 <div className="flex items-center gap-2 font-bold text-slate-900 text-xs">
                   <MaterialIcon name="policy" size={16} className="text-emerald-700" />
                   <span>Government Scheme Discovery</span>
@@ -1837,7 +1844,7 @@ export default function Home({
                 </div>
               </div>
 
-              <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs text-left space-y-1">
+              <div data-cinematic="ecosystem-node" className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs text-left space-y-1">
                 <div className="flex items-center gap-2 font-bold text-slate-900 text-xs">
                   <MaterialIcon name="compare_arrows" size={16} className="text-[#051F16]" />
                   <span>Quotation Comparison</span>
@@ -1847,7 +1854,7 @@ export default function Home({
                 </div>
               </div>
 
-              <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs text-left space-y-1">
+              <div data-cinematic="ecosystem-node" className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs text-left space-y-1">
                 <div className="flex items-center gap-2 font-bold text-slate-900 text-xs">
                   <MaterialIcon name="fact_check" size={16} className="text-emerald-700" />
                   <span>Supplier Profile Review</span>
@@ -1857,7 +1864,7 @@ export default function Home({
                 </div>
               </div>
 
-              <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs text-left space-y-1">
+              <div data-cinematic="ecosystem-node" className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs text-left space-y-1">
                 <div className="flex items-center gap-2 font-bold text-slate-900 text-xs">
                   <MaterialIcon name="alt_route" size={16} className="text-slate-700" />
                   <span>Procurement Workflow</span>
@@ -1872,9 +1879,9 @@ export default function Home({
       </section>
 
       {/* ─── 9. INTEGRATION & WORKFLOW CENTER ──────────────────────────────── */}
-      <section className="py-20 bg-[#FAFAFC] scroll-reveal">
+      <section data-cinematic-section="workflow" className="py-20 bg-[#FAFAFC] scroll-reveal">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mx-auto text-center space-y-4 mb-14">
+          <div data-cinematic="workflow-header" className="max-w-3xl mx-auto text-center space-y-4 mb-14">
             <span className="font-mono text-xs font-semibold uppercase tracking-widest text-emerald-800">
               Workflow Consolidation
             </span>
@@ -1893,7 +1900,7 @@ export default function Home({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-2.5">
+            <div data-cinematic="workflow-card" className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-2.5">
               <span className="text-xs font-bold text-[#051F16] bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">
                 01 • Requirement Intake
               </span>
@@ -1905,7 +1912,7 @@ export default function Home({
               </p>
             </div>
 
-            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-2.5">
+            <div data-cinematic="workflow-card" className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-2.5">
               <span className="text-xs font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">
                 02 • RFQ Creation & Dispatch
               </span>
@@ -1917,7 +1924,7 @@ export default function Home({
               </p>
             </div>
 
-            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-2.5">
+            <div data-cinematic="workflow-card" className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-2.5">
               <span className="text-xs font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">
                 03 • Quotation Collection
               </span>
@@ -1929,7 +1936,7 @@ export default function Home({
               </p>
             </div>
 
-            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-2.5">
+            <div data-cinematic="workflow-card" className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-2.5">
               <span className="text-xs font-bold text-[#051F16] bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
                 04 • Commercial Comparison
               </span>
