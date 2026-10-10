@@ -11,11 +11,16 @@
   },
   "dependencies": {
     "@google/genai": "^2.24.0",
+    "@remotion/bundler": "^4.0.534",
+    "@remotion/cli": "^4.0.534",
+    "@remotion/player": "^4.0.534",
     "@supabase/supabase-js": "^2.117.2",
     "gsap": "^3.15.0",
+    "lucide-react": "^1.55.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "recharts": "^3.10.1"
+    "recharts": "^3.10.1",
+    "remotion": "^4.0.534"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.0.0",

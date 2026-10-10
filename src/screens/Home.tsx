@@ -31,6 +31,8 @@ import { openCookiePreferencesModal } from "../services/cookieConsentService"
 import { trackTelemetryEvent } from "../services/telemetryService"
 import TrustStandardsModal from "../components/trust/TrustStandardsModal"
 import StickyPrimaryCTA from "../components/navigation/StickyPrimaryCTA"
+import { Player } from "@remotion/player"
+import { MpiDemoVideo } from "../video/MpiDemoVideo"
 
 export function formatScopeDisplay(category: CatalogCategory, qty: number): string {
   if (category === "Packaging & Printing") {
@@ -130,6 +132,9 @@ export default function Home({
     requiredRole: "startup",
     actionName: "",
   })
+
+  // Homepage Spec Engine Preview Mode: Interactive Simulator vs Remotion Video Playback
+  const [previewMode, setPreviewMode] = useState<"interactive" | "video">("interactive")
 
   // Trust, Verification & Governance Modal State
   const [trustModalOpen, setTrustModalOpen] = useState(false)
@@ -663,41 +668,146 @@ export default function Home({
 
             {/* Outer Product Frame */}
             <div className="relative mx-auto rounded-2xl sm:rounded-3xl border border-slate-200/80 bg-white shadow-[0_20px_60px_-15px_rgba(11,31,75,0.12)] overflow-hidden">
-              {/* Product Window Header Bar */}
-              <div className="px-4 sm:px-6 py-3.5 bg-slate-50/90 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3 text-xs">
+              {/* Product Window Header Bar with Mode Toggle */}
+              <div className="px-4 sm:px-6 py-3 bg-slate-50/90 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3 text-xs">
                 <div className="flex items-center gap-2.5">
                   <div className="flex gap-1.5">
-                    <span className="w-3 h-3 rounded-full bg-slate-300" />
-                    <span className="w-3 h-3 rounded-full bg-slate-300" />
-                    <span className="w-3 h-3 rounded-full bg-slate-300" />
+                    <span className="w-3 h-3 rounded-full bg-rose-400/90 border border-rose-500/30" />
+                    <span className="w-3 h-3 rounded-full bg-amber-400/90 border border-amber-500/30" />
+                    <span className="w-3 h-3 rounded-full bg-emerald-400/90 border border-emerald-500/30" />
                   </div>
                   <span className="h-4 w-px bg-slate-200 mx-1" />
                   <span className="font-mono text-[11px] font-semibold text-slate-600">
-                    app.mpi.market / procurement-intelligence
+                    app.mpi.gov.in / procurement-os
                   </span>
                 </div>
 
+                {/* Mode Segmented Switcher */}
                 <div className="flex items-center gap-3">
-                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200 font-medium text-[11px]">
+                  <div className="inline-flex items-center p-1 rounded-xl bg-slate-200/80 border border-slate-300/70 text-xs shadow-inner">
+                    <button
+                      type="button"
+                      onClick={() => setPreviewMode("interactive")}
+                      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg font-bold transition-all cursor-pointer text-xs ${
+                        previewMode === "interactive"
+                          ? "bg-white text-[#051F16] shadow-2xs"
+                          : "text-slate-600 hover:text-slate-900"
+                      }`}
+                    >
+                      <MaterialIcon name="tune" size={14} className={previewMode === "interactive" ? "text-emerald-700" : ""} />
+                      <span>Interactive Simulator</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPreviewMode("video")}
+                      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg font-bold transition-all cursor-pointer text-xs ${
+                        previewMode === "video"
+                          ? "bg-[#051F16] text-[#A3F65C] shadow-2xs"
+                          : "text-slate-600 hover:text-slate-900"
+                      }`}
+                    >
+                      <MaterialIcon name="play_circle" size={14} className={previewMode === "video" ? "text-[#A3F65C]" : "text-emerald-700"} />
+                      <span>Video Playback (17s)</span>
+                    </button>
+                  </div>
+
+                  <div className="hidden lg:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200 font-medium text-[11px]">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    <span>Engine Active • 28 Industrial Hubs Matched</span>
+                    <span>Engine Active • 1,240 Factories Connected</span>
                   </div>
                 </div>
               </div>
 
-              {/* Product Interface Body */}
-              <div className="p-4 sm:p-6 lg:p-8 space-y-6">
-                {/* Real Requirement Intake Bar */}
-                <div className="bg-slate-50/80 rounded-2xl p-4 sm:p-5 border border-slate-200/90 space-y-3">
-                  <div className="flex items-center justify-between text-xs font-semibold text-slate-700">
-                    <div className="flex items-center gap-2">
-                      <MaterialIcon name="terminal" size={16} className="text-[#051F16]" />
-                      <span>Natural Language Sourcing Requirement</span>
-                    </div>
-                    <span className="text-[11px] text-slate-500">
-                      Click any sample below to simulate:
-                    </span>
+              {/* ─── CONDITIONAL BODY: VIDEO PLAYBACK vs INTERACTIVE SIMULATOR ─── */}
+              {previewMode === "video" ? (
+                <div className="relative bg-[#051F16] overflow-hidden">
+                  {/* Remotion High-Definition 16:9 Video Canvas */}
+                  <div className="w-full aspect-[16/9] max-h-[640px] flex items-center justify-center bg-[#051F16] relative">
+                    <Player
+                      component={MpiDemoVideo}
+                      durationInFrames={510}
+                      compositionWidth={1920}
+                      compositionHeight={1080}
+                      fps={30}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                      }}
+                      controls
+                      autoPlay
+                      loop
+                    />
                   </div>
+
+                  {/* Video Sub-Bar with scene labels and quick CTA */}
+                  <div className="px-5 py-4 bg-[#03150F] border-t border-white/10 flex flex-wrap items-center justify-between gap-3 text-xs">
+                    <div className="flex items-center gap-2.5 text-white/80">
+                      <span className="text-[10px] font-mono font-bold uppercase tracking-wider bg-emerald-950 text-[#A3F65C] border border-[#A3F65C]/30 px-2 py-0.5 rounded-full">
+                        Remotion Motion Engine
+                      </span>
+                      <span className="text-white/60 hidden md:inline">
+                        17s High-Definition Simulation • 5 Procurement Lifecycle Scenes
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setPreviewMode("interactive")}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-semibold transition-colors cursor-pointer border border-white/10"
+                      >
+                        <MaterialIcon name="tune" size={14} className="text-[#A3F65C]" />
+                        <span>Interactive Mode</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          handleProtectedJourney({
+                            targetScreen: "startup.procurement",
+                            actionType: "start_mpi",
+                            actionLabel: "Start a Procurement Request",
+                            requiredRole: "startup",
+                            portalContext: {
+                              badge: "Startup Buyer Portal",
+                              title: "Start Sourcing with MPI",
+                              description: "Log in or register your startup to synthesize engineering specs and match verified Indian manufacturers.",
+                              icon: "rocket_launch",
+                            },
+                          })
+                        }
+                        className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-[#A3F65C] hover:bg-[#8EE446] text-[#051F16] text-xs font-bold transition-all cursor-pointer shadow-sm"
+                      >
+                        <span>Start Sourcing Now</span>
+                        <MaterialIcon name="arrow_forward" size={14} className="text-[#051F16]" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                /* Product Interface Body (Interactive Simulator) */
+                <div className="p-4 sm:p-6 lg:p-8 space-y-6">
+                  {/* Real Requirement Intake Bar */}
+                  <div className="bg-slate-50/80 rounded-2xl p-4 sm:p-5 border border-slate-200/90 space-y-3">
+                    <div className="flex items-center justify-between text-xs font-semibold text-slate-700">
+                      <div className="flex items-center gap-2">
+                        <MaterialIcon name="terminal" size={16} className="text-[#051F16]" />
+                        <span>Natural Language Sourcing Requirement</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[11px] text-slate-500 hidden sm:inline">
+                          Click any sample below to simulate:
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setPreviewMode("video")}
+                          className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-800 hover:text-emerald-950 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/80 px-2 py-0.5 rounded-md transition-colors cursor-pointer"
+                          title="Watch 17-second Remotion video demo"
+                        >
+                          <MaterialIcon name="play_arrow" size={13} className="text-emerald-700" />
+                          <span>Watch 17s Video</span>
+                        </button>
+                      </div>
+                    </div>
 
                   {/* Sample Prompt Pills */}
                   <div className="flex flex-wrap gap-2">
@@ -940,9 +1050,10 @@ export default function Home({
                   </button>
                 </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
+      </div>
       </section>
 
       {/* ─── 4. CREDIBILITY & METRICS BAND ─────────────────────────────────── */}
