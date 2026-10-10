@@ -369,7 +369,7 @@ export default function Home({
       tolerance: "±0.5 mm",
       material: "1200 GSM Kappa Board with Matte Lamination",
       savings: "28%",
-      factory: "Apex Precision Packaging (Bengaluru)",
+      factory: "MPI Verified Supplier #001",
     },
     {
       label: "5-Axis CNC Drone Arm",
@@ -381,7 +381,7 @@ export default function Home({
       tolerance: "±0.05 mm",
       material: "Aero-Grade 6061-T6 Aluminum (Black Anodized)",
       savings: "32%",
-      factory: "Bharat Precision Tooling (Peenya, KA)",
+      factory: "MPI Verified Supplier #002",
     },
     {
       label: "Cloud ERP & Supabase",
@@ -393,7 +393,7 @@ export default function Home({
       tolerance: "SOC 2 Type II",
       material: "Next.js 15 + Supabase PostgreSQL Enterprise",
       savings: "24%",
-      factory: "Zenith Digital Systems (Pune, MH)",
+      factory: "MPI Verified Supplier #003",
     },
     {
       label: "DPIIT Seed Fund Incubation",
@@ -405,7 +405,7 @@ export default function Home({
       tolerance: "Statutory 100%",
       material: "Startup India SISFS Mandate + ZED Audit File",
       savings: "35%",
-      factory: "Bharat Innovation Foundry (New Delhi)",
+      factory: "MPI Verified Supplier #004",
     },
   ]
 
