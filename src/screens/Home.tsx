@@ -549,7 +549,10 @@ export default function Home({
           <div className="max-w-4xl mx-auto text-center space-y-6">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-100 border border-slate-200/80 text-xs font-semibold text-slate-800 shadow-2xs">
               <span className="w-2 h-2 rounded-full bg-[#A3F65C] ring-2 ring-emerald-600/30" />
-              <span className="font-mono text-[11px] tracking-wider uppercase text-slate-700">
+              <span
+                className="text-[11px] font-bold tracking-wider uppercase text-slate-700 font-sans"
+                style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
+              >
                 AI-Powered Procurement Intelligence
               </span>
             </div>
@@ -566,7 +569,7 @@ export default function Home({
 
             <p className="text-base sm:text-lg md:text-xl text-slate-600 max-w-2xl mx-auto font-normal leading-relaxed">
               AI-powered procurement intelligence that helps businesses discover,
-              compare, verify and procure products and services with greater
+              compare, verify and procure products as well as services with greater
               speed, visibility and savings.
             </p>
 
