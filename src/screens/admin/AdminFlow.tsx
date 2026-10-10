@@ -314,7 +314,7 @@ Select a quick analysis pill below or ask me any question!`,
     setAdminCopilotMessages([
       {
         role: "ai",
-        text: `New operations analysis session initialized. Live database context active across **55 Startups**, **55 MSMEs**, and **₹2,75,250 In-Flight Escrow**. How may I assist your administrative review?`,
+        text: `New operations analysis session initialized. Platform context active across **55 Startups**, **55 MSMEs**, and **₹2,75,250 In-Flight Escrow**. How may I assist your administrative review?`,
         time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
         isLive: true,
         category: "General Overview",
@@ -1811,8 +1811,8 @@ Select a quick analysis pill below or ask me any question!`,
                     telemetryData.fromDatabase ? "bg-emerald-600 animate-pulse" : "bg-amber-500"
                   }`} />
                   {telemetryData.fromDatabase
-                    ? `PostgreSQL Confirmed: ${telemetryData.totalCount} events`
-                    : "PostgreSQL: RLS Restricted / 0 Public Rows"}
+                    ? `Persisted Events: ${telemetryData.totalCount}`
+                    : "Protected Telemetry: 0 Public Rows"}
                 </span>
                 <span className="text-[11px] font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-full flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
@@ -1901,8 +1901,8 @@ Select a quick analysis pill below or ask me any question!`,
                 >
                   <div className="flex items-center justify-between text-[10px] font-bold text-slate-500 uppercase tracking-tight">
                     <span>{stage.label}</span>
-                    <span className={`text-[9px] px-1 rounded ${stage.isDb ? "bg-emerald-100 text-emerald-800 font-mono" : "bg-slate-200 text-slate-700"}`}>
-                      {stage.isDb ? "Postgres" : "Session"}
+                    <span className={`text-[9px] px-1 rounded ${stage.isDb ? "bg-emerald-100 text-emerald-800 font-medium" : "bg-slate-200 text-slate-700"}`}>
+                      {stage.isDb ? "Persisted" : "Session"}
                     </span>
                   </div>
                   <div className={`text-xl sm:text-2xl font-extrabold ${stage.color}`}>
@@ -2002,8 +2002,8 @@ Select a quick analysis pill below or ask me any question!`,
                 >
                   <div className="flex items-center justify-between text-[10px] font-bold text-slate-500 uppercase tracking-tight truncate">
                     <span>{stage.label}</span>
-                    <span className={`text-[9px] px-1 rounded shrink-0 ${stage.isDb ? "bg-emerald-100 text-emerald-800 font-mono" : "bg-slate-200 text-slate-700"}`}>
-                      {stage.isDb ? "Postgres" : "Session"}
+                    <span className={`text-[9px] px-1 rounded shrink-0 ${stage.isDb ? "bg-emerald-100 text-emerald-800 font-medium" : "bg-slate-200 text-slate-700"}`}>
+                      {stage.isDb ? "Persisted" : "Session"}
                     </span>
                   </div>
                   <div className={`text-xl sm:text-2xl font-extrabold ${stage.color}`}>
@@ -2021,7 +2021,7 @@ Select a quick analysis pill below or ask me any question!`,
           {telemetryData.recentEvents.length > 0 && (
             <div className="pt-3 border-t border-slate-100">
               <div className="text-xs font-bold text-slate-700 mb-2 flex items-center justify-between">
-                <span>Recent Database Telemetry Ingestion (Audit Feed)</span>
+                <span>Recent Telemetry Ingestion (Audit Feed)</span>
                 <span className="text-[10px] text-slate-400 font-mono">
                   Showing last {Math.min(5, telemetryData.recentEvents.length)} of {telemetryData.totalCount} events
                 </span>

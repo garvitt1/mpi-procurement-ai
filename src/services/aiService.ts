@@ -344,7 +344,7 @@ async function callGeminiGenerateContent(
       }
     }
 
-    throw new Error(proxyResult.error || "Failed to generate response from Gemini API.")
+    throw new Error(proxyResult.error || "MPI Requirement Intelligence is temporarily unavailable. Please try again.")
   })()
 
   inFlightRequests.set(requestKey, promise)
@@ -1221,11 +1221,11 @@ function fallbackExtraction(text: string): ExtractedProcurementSpecs {
   } else if (category === "IT & Digital Services") {
     specifications = [
       "Next.js 15 & TypeScript frontend with responsive Tailwind CSS design system",
-      "Supabase PostgreSQL database with Row-Level Security (RLS) policies",
+      "Enterprise Cloud Database with Row-Level Security (RLS) policies",
       "Automated CI/CD pipeline with zero-downtime deployment",
       "SOC2 Type II compliance readiness and OWASP Top 10 penetration testing pass",
     ]
-    suggestedKeywords = ["Next.js", "Supabase PostgreSQL", "SOC2 Compliance", "REST API"]
+    suggestedKeywords = ["Next.js", "Enterprise Cloud Architecture", "SOC2 Compliance", "REST API"]
   } else if (category === "Compliance & Legal Support") {
     specifications = [
       "DPIIT startup recognition & statutory registration audit dossier",
@@ -1496,13 +1496,13 @@ Thank you for sharing your startup support requirement. To ensure your startup e
     subsidies = "DPIIT-registered startups qualify for **Section 80-IAC 3-year tax holidays** and fast-track IP patent filing subsidies covering up to 80% of government fees."
     specsToSuggest = [
       "Next.js 15 & TypeScript Responsive Frontend Design System",
-      "Supabase PostgreSQL Database with Row-Level Security (RLS) Policies",
+      "Enterprise Cloud Database with Row-Level Security (RLS) Policies",
       "SOC2 Type II Readiness & OWASP Top 10 Security Penetration Pass",
       "Automated CI/CD Pipeline with Zero-Downtime Multi-Region Hosting",
     ]
     requirementAnalysis = `### 🎯 Requirement Deepening: Software & Architecture
 Thank you for outlining your digital requirement. To ensure scalable, secure software delivery:
-- **Architecture & Security**: Establishing PostgreSQL Row-Level Security (RLS) and typed API contracts prevents downstream refactoring.
+- **Architecture & Security**: Establishing Row-Level Security (RLS) and typed API contracts prevents downstream refactoring.
 - **Phased Escrow**: Structuring deliverables into 3 verified milestones (Wireframe, Beta, and Post-QA release) protects your capital.`
     clarifyingQuestions = `1. **User Scale & Integrations**: What is your projected user concurrency and third-party API integration scope?
 2. **Security Compliance**: Do you require SOC2 Type II or HIPAA compliance protocols?`

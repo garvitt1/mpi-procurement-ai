@@ -9,6 +9,7 @@
 import { supabase } from "../lib/supabaseClient"
 import { RFQDetails, SupplierQuote, PublicMSMERFQ } from "../context/ProcurementContext"
 import { GoogleAuthUser } from "../lib/mockAuth"
+import { sanitizeErrorMessage } from "../lib/errorSanitizer"
 
 export interface BackendSyncState {
   isConnected: boolean
@@ -38,17 +39,16 @@ export async function checkDatabaseHealth(): Promise<BackendSyncState> {
         isTableExposed: false,
         backendUrl: url,
         lastChecked: Date.now(),
-        statusMessage: `Backend unreachable: HTTP ${healthRes.status}`,
+        statusMessage: "Cloud services temporarily unreachable. Local session buffer active.",
         pendingMigration: false,
       }
       return cachedSyncState
     }
 
-    // 2. Check if authoritative tables exist in PostgREST schema cache
+    // 2. Check if authoritative tables exist in schema cache
     const { error } = await supabase.from("rfqs").select("id").limit(1)
 
     if (error) {
-      // PGRST205 indicates the database is connected, but tables have not yet been migrated
       const isMissingTable = error.code === "PGRST205" || error.message.includes("schema cache")
       cachedSyncState = {
         isConnected: true,
@@ -56,8 +56,8 @@ export async function checkDatabaseHealth(): Promise<BackendSyncState> {
         backendUrl: url,
         lastChecked: Date.now(),
         statusMessage: isMissingTable
-          ? "Database online. Migration pending in Supabase SQL editor."
-          : `Database notice (${error.code}): ${error.message}`,
+          ? "Cloud sync initializing. Local session buffer active."
+          : "MPI sync temporarily unavailable. Local session buffer active.",
         pendingMigration: isMissingTable,
       }
       return cachedSyncState
@@ -69,7 +69,7 @@ export async function checkDatabaseHealth(): Promise<BackendSyncState> {
       isTableExposed: true,
       backendUrl: url,
       lastChecked: Date.now(),
-      statusMessage: "Authoritative Supabase database connected and synchronized.",
+      statusMessage: "MPI cloud synchronization active.",
       pendingMigration: false,
     }
     return cachedSyncState
@@ -79,7 +79,7 @@ export async function checkDatabaseHealth(): Promise<BackendSyncState> {
       isTableExposed: false,
       backendUrl: url,
       lastChecked: Date.now(),
-      statusMessage: err instanceof Error ? err.message : "Network error connecting to Supabase",
+      statusMessage: "Network connection offline. Local session buffer active.",
       pendingMigration: false,
     }
     return cachedSyncState
@@ -111,7 +111,7 @@ export async function persistRFQToSupabase(
       return {
         success: false,
         fromDatabase: false,
-        error: "Authentication required: Log in with an authenticated account to persist RFQ to Supabase.",
+        error: "Authentication required: Log in with an authenticated account to dispatch RFQ.",
       }
     }
 
@@ -137,7 +137,7 @@ export async function persistRFQToSupabase(
     const { error } = await supabase.from("rfqs").upsert(payload, { onConflict: "id" })
     if (error) {
       console.error("[Database] persistRFQ error:", error)
-      return { success: false, fromDatabase: false, error: `${error.code}: ${error.message}` }
+      return { success: false, fromDatabase: false, error: sanitizeErrorMessage(error, "Unable to save RFQ to cloud. Saved to local session.") }
     }
 
     return { success: true, fromDatabase: true }
@@ -145,7 +145,7 @@ export async function persistRFQToSupabase(
     return {
       success: false,
       fromDatabase: false,
-      error: err instanceof Error ? err.message : "Persistence failure",
+      error: sanitizeErrorMessage(err, "Unable to complete cloud save. Stored in session buffer."),
     }
   }
 }
@@ -176,7 +176,7 @@ export async function persistQuoteToSupabase(
       return {
         success: false,
         fromDatabase: false,
-        error: "Authentication required: Log in as an MSME supplier to persist quote to Supabase.",
+        error: "Authentication required: Log in as an MSME supplier to submit quotation.",
       }
     }
 
@@ -210,7 +210,7 @@ export async function persistQuoteToSupabase(
     const { error } = await supabase.from("quotes").upsert(payload, { onConflict: "id" })
     if (error) {
       console.error("[Database] persistQuote error:", error)
-      return { success: false, fromDatabase: false, error: `${error.code}: ${error.message}` }
+      return { success: false, fromDatabase: false, error: sanitizeErrorMessage(error, "Unable to save quotation to cloud. Saved to local session.") }
     }
 
     return { success: true, fromDatabase: true }
@@ -218,7 +218,7 @@ export async function persistQuoteToSupabase(
     return {
       success: false,
       fromDatabase: false,
-      error: err instanceof Error ? err.message : "Quote transmission failure",
+      error: sanitizeErrorMessage(err, "Unable to complete cloud save. Stored in session buffer."),
     }
   }
 }
@@ -245,7 +245,7 @@ export async function fetchDispatchedRFQsFromSupabase(): Promise<{
 
     if (error) {
       console.warn("[Database] fetchDispatchedRFQs error:", error.message)
-      return { rfqs: [], fromDatabase: false, error: error.message }
+      return { rfqs: [], fromDatabase: false, error: sanitizeErrorMessage(error, "Unable to load dispatched requests.") }
     }
 
     if (!data || data.length === 0) {
@@ -271,7 +271,7 @@ export async function fetchDispatchedRFQsFromSupabase(): Promise<{
     return {
       rfqs: [],
       fromDatabase: false,
-      error: err instanceof Error ? err.message : "Fetch failure",
+      error: sanitizeErrorMessage(err, "Unable to load dispatched requests."),
     }
   }
 }
@@ -296,7 +296,7 @@ export async function fetchQuotesForRFQFromSupabase(
 
     if (error) {
       console.warn("[Database] fetchQuotes error:", error.message)
-      return { quotes: [], fromDatabase: false, error: error.message }
+      return { quotes: [], fromDatabase: false, error: sanitizeErrorMessage(error, "Unable to load quotations.") }
     }
 
     if (!data || data.length === 0) {
@@ -333,7 +333,7 @@ export async function fetchQuotesForRFQFromSupabase(
     return {
       quotes: [],
       fromDatabase: false,
-      error: err instanceof Error ? err.message : "Fetch quotes failure",
+      error: sanitizeErrorMessage(err, "Unable to load quotations."),
     }
   }
 }
@@ -362,7 +362,7 @@ export async function fetchBuyerActiveRFQFromSupabase(): Promise<{
       .maybeSingle()
 
     if (error || !data) {
-      return { rfq: null, fromDatabase: false, error: error?.message }
+      return { rfq: null, fromDatabase: false, error: sanitizeErrorMessage(error, "Unable to retrieve active RFQ.") }
     }
 
     const rfq: RFQDetails = {
@@ -380,6 +380,6 @@ export async function fetchBuyerActiveRFQFromSupabase(): Promise<{
 
     return { rfq, fromDatabase: true }
   } catch (err: unknown) {
-    return { rfq: null, fromDatabase: false, error: err instanceof Error ? err.message : "Fetch error" }
+    return { rfq: null, fromDatabase: false, error: sanitizeErrorMessage(err, "Unable to retrieve active RFQ.") }
   }
 }

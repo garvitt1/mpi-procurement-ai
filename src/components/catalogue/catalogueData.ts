@@ -35,7 +35,7 @@ export const CATEGORIES_METADATA: CategoryMetadata[] = [
     displayName: "IT & Digital Services",
     subtitle: "Cloud Infrastructure • Custom ERP • App Dev • Security",
     description:
-      "Full-stack software engineering, Supabase/AWS cloud architecture, custom ERP inventory integrations, and SOC-2 audit preparations.",
+      "Full-stack software engineering, enterprise cloud architecture, custom ERP inventory integrations, and SOC-2 audit preparations.",
     iconName: "code",
     sampleDeliverables: [
       "Custom ERP Integrations",
@@ -194,7 +194,7 @@ export const ENRICHED_CATALOG_PRODUCTS: EnrichedCatalogProduct[] = MPI_CATALOG.m
       startingPrice = "From ₹35,000"
       specs = [
         "Full IP & Code Ownership",
-        "Supabase / AWS Architecture",
+        "Enterprise Cloud Architecture",
         "Enterprise SLA Guarantee",
         "Dedicated Engineering PM",
       ]

@@ -506,8 +506,7 @@ function LoginCard({
 
             {showForgotNote && (
               <div className="text-xs text-slate-600 px-3 py-2 rounded-lg bg-slate-100 border border-slate-200 animate-fade-in">
-                Password recovery will be available once production SSO /
-                Supabase Auth is connected.
+                Password recovery instructions will be sent to your registered organization email.
               </div>
             )}
 

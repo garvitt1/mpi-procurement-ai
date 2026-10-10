@@ -374,7 +374,7 @@ export default function AuthModal({
                 <span>⚡ 1-Click Test Accounts</span>
               </div>
               <span className="text-[10px] font-semibold text-emerald-800 bg-emerald-100/80 px-2 py-0.5 rounded-full">
-                Supabase Auth
+                MPI Secure Auth
               </span>
             </div>
             <div className="grid grid-cols-3 gap-2">

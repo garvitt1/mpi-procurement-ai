@@ -384,14 +384,14 @@ export default function Home({
       factory: "MPI Verified Supplier #002",
     },
     {
-      label: "Cloud ERP & Supabase",
-      text: "Need full-stack development team for custom ERP inventory workflow with Supabase PostgreSQL and Next.js 15, budget ₹1.8 Lakh",
+      label: "Cloud ERP & Secure Architecture",
+      text: "Need full-stack development team for custom ERP inventory workflow with enterprise cloud architecture and Next.js 15, budget ₹1.8 Lakh",
       cat: "IT & Digital Services" as CatalogCategory,
       qty: 1,
       budget: 180000,
       leadTime: "21 Days",
       tolerance: "SOC 2 Type II",
-      material: "Next.js 15 + Supabase PostgreSQL Enterprise",
+      material: "Next.js 15 + Enterprise Cloud Architecture",
       savings: "24%",
       factory: "MPI Verified Supplier #003",
     },
@@ -483,7 +483,7 @@ export default function Home({
     },
     {
       q: "How does the AI requirement synthesis work?",
-      a: "When you type a plain-language requirement (e.g., 'Need 500 rigid boxes with foam inserts'), our Gemini-powered engine parses your prompt into engineering-grade parameters: GSM paper weights, dimensional tolerances, material grades, bill of materials (BOM), and production lead times.",
+      a: "When you type a plain-language requirement (e.g., 'Need 500 rigid boxes with foam inserts'), our MPI requirement engine parses your prompt into engineering-grade parameters: GSM paper weights, dimensional tolerances, material grades, bill of materials (BOM), and production lead times.",
     },
   ]
 

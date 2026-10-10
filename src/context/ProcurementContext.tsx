@@ -651,11 +651,11 @@ const INITIAL_SUPPLIERS: MatchedSupplier[] = [
     certifications: ["ISO 27001:2022", "SOC2 Type II", "CMMI Level 3"],
     capabilities: [
       "Next.js 15 & TypeScript Web Engineering",
-      "Supabase PostgreSQL Architecture with RLS",
+      "Enterprise Cloud Database Architecture with RLS",
       "Custom ERP & Inventory Pipeline Deployment",
       "Secure REST / GraphQL API Gateways",
     ],
-    machinery: ["Multi-Zone AWS & Google Cloud Infrastructure", "Automated CI/CD DevOps Pipeline"],
+    machinery: ["Multi-Zone High-Availability Cloud Infrastructure", "Automated CI/CD DevOps Pipeline"],
     capacityPerMonth: "40 software sprint deployments/mo",
     verifiedBadgeDate: "14 Jan 2026",
     contactPerson: "Arjun Nambiar (VP Technology)",
@@ -1609,7 +1609,7 @@ export const ProcurementProvider: React.FC<{ children: React.ReactNode }> = ({
     isTableExposed: false,
     backendUrl: "https://utjysxkaidvbrmatngyb.supabase.co",
     lastChecked: 0,
-    statusMessage: "Checking Supabase connection...",
+    statusMessage: "Checking cloud service connection...",
     pendingMigration: false,
   })
 

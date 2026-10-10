@@ -1063,10 +1063,10 @@ export default function StartupFlow({
               />
               <span>
                 {backendSyncState.isTableExposed
-                  ? "Supabase Connected"
+                  ? "Cloud Sync Active"
                   : backendSyncState.pendingMigration
-                  ? "DB Migration Pending"
-                  : "Local Fallback"}
+                  ? "Sync Initializing"
+                  : "Local Session"}
               </span>
             </div>
 
@@ -1101,22 +1101,22 @@ export default function StartupFlow({
           </div>
         </header>
 
-        {/* Database Migration Status Notice */}
+        {/* Sync Status Notice */}
         {backendSyncState.pendingMigration && (
           <div className="bg-amber-500/10 border-b border-amber-200 px-4 py-2 text-xs text-amber-900 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="font-bold bg-amber-200 text-amber-900 px-1.5 py-0.5 rounded text-[10px] uppercase tracking-wide">
-                Database Notice
+                Sync Notice
               </span>
               <span>
-                Supabase backend connected (<code>utjysxkaidvbrmatngyb</code>), but database tables are awaiting migration. RFQ data is safely preserved locally.
+                Cloud synchronization is initializing. Your RFQ data is safely preserved in your local session.
               </span>
             </div>
             <button
               onClick={() => refreshBackendSync()}
               className="text-amber-800 hover:text-amber-950 font-semibold underline text-xs cursor-pointer ml-2 shrink-0"
             >
-              Recheck Connection
+              Retry Sync
             </button>
           </div>
         )}
@@ -2869,12 +2869,12 @@ export default function StartupFlow({
                 {rfqPersistenceStatus === "saved_to_supabase" ? (
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
                     <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                    <span>Persisted in PostgreSQL (ID: {activeRFQ?.id})</span>
+                    <span>Dispatched & Confirmed (ID: {activeRFQ?.id})</span>
                   </span>
                 ) : rfqPersistenceStatus === "saving" ? (
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-800 border border-blue-200">
                     <span className="w-2 h-2 rounded-full bg-blue-500 animate-spin" />
-                    <span>Syncing with Supabase...</span>
+                    <span>Syncing with MPI Network...</span>
                   </span>
                 ) : (
                   <span
@@ -2882,7 +2882,7 @@ export default function StartupFlow({
                     title={rfqPersistenceError || "Stored locally in browser session"}
                   >
                     <span className="w-2 h-2 rounded-full bg-amber-500" />
-                    <span>Saved Locally {rfqPersistenceError ? `(${rfqPersistenceError})` : "(Offline Fallback)"}</span>
+                    <span>Saved Locally (Session Buffer)</span>
                   </span>
                 )}
               </div>

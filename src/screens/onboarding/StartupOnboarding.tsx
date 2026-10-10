@@ -47,7 +47,7 @@ const SAMPLE_PROMPT_CHIPS = [
   {
     label: "Cloud ERP & Integration",
     cat: "IT & Digital Services" as CatalogCategory,
-    text: "Need full-stack development team for custom ERP inventory workflow with Supabase PostgreSQL and Next.js 15, budget ₹1.8 Lakh",
+    text: "Need full-stack development team for custom ERP inventory workflow with enterprise cloud architecture and Next.js 15, budget ₹1.8 Lakh",
     qty: 1,
     budget: 180000,
   },

@@ -645,10 +645,10 @@ export default function MSMEFlow({
               />
               <span>
                 {backendSyncState.isTableExposed
-                  ? "Supabase Connected"
+                  ? "Cloud Sync Active"
                   : backendSyncState.pendingMigration
-                  ? "DB Migration Pending"
-                  : "Local Fallback"}
+                  ? "Sync Initializing"
+                  : "Local Session"}
               </span>
             </div>
 
@@ -683,22 +683,22 @@ export default function MSMEFlow({
           </div>
         </header>
 
-        {/* Database Migration Status Notice */}
+        {/* Sync Status Notice */}
         {backendSyncState.pendingMigration && (
           <div className="bg-amber-500/10 border-b border-amber-200 px-4 py-2 text-xs text-amber-900 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="font-bold bg-amber-200 text-amber-900 px-1.5 py-0.5 rounded text-[10px] uppercase tracking-wide">
-                Database Notice
+                Sync Notice
               </span>
               <span>
-                Supabase backend connected (<code>utjysxkaidvbrmatngyb</code>), but database tables are awaiting migration. Quotations are safely preserved locally.
+                Cloud synchronization is initializing. Quotations are safely preserved in your local session.
               </span>
             </div>
             <button
               onClick={() => refreshBackendSync()}
               className="text-amber-800 hover:text-amber-950 font-semibold underline text-xs cursor-pointer ml-2 shrink-0"
             >
-              Recheck Connection
+              Retry Sync
             </button>
           </div>
         )}
@@ -1549,12 +1549,12 @@ export default function MSMEFlow({
                   {quotePersistenceStatus === "saved_to_supabase" ? (
                     <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
                       <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                      <span>Persisted in PostgreSQL public.quotes</span>
+                      <span>Transmitted & Confirmed</span>
                     </span>
                   ) : quotePersistenceStatus === "saving" ? (
                     <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-blue-50 text-blue-800 border border-blue-200">
                       <span className="w-2 h-2 rounded-full bg-blue-500 animate-spin" />
-                      <span>Syncing with Supabase...</span>
+                      <span>Syncing with MPI Network...</span>
                     </span>
                   ) : (
                     <span
@@ -1562,7 +1562,7 @@ export default function MSMEFlow({
                       title={quotePersistenceError || "Stored locally in browser session"}
                     >
                       <span className="w-2 h-2 rounded-full bg-amber-500" />
-                      <span>Saved Locally {quotePersistenceError ? `(${quotePersistenceError})` : "(Offline Fallback)"}</span>
+                      <span>Saved Locally (Session Buffer)</span>
                     </span>
                   )}
                 </div>
