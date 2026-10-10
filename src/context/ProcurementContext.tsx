@@ -18,6 +18,7 @@ import {
   type BackendSyncState,
 } from "../services/procurementDatabaseService"
 import { getActiveUser } from "../lib/mockAuth"
+import { trackTelemetryEvent } from "../services/telemetryService"
 
 // ----------------------------------------------------------------------------
 // Business Onboarding Profile Models
@@ -1967,6 +1968,16 @@ export const ProcurementProvider: React.FC<{ children: React.ReactNode }> = ({
     // Synchronize with Supabase PostgreSQL (if tables exist)
     const currentRfqId = targetRfqId || activeRFQ?.id || "RFQ-2026-0891"
     const currentUser = getActiveUser()
+
+    // Track MSME Quote Submission conversion funnel telemetry
+    trackTelemetryEvent("msme_quote_submitted", {
+      quoteId: quote.id,
+      supplierId: quote.supplierId,
+      rfqId: currentRfqId,
+      totalAmount: quote.totalAmount || quote.finalLandedCost || 0,
+      deliveryDays: quote.deliveryDays,
+    })
+
     persistQuoteToSupabase(quote, currentRfqId, currentUser)
       .then((res) => {
         if (res.fromDatabase) {

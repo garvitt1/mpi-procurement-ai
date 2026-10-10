@@ -14,14 +14,20 @@ export type TelemetryEventType =
   | "cta_rfq_clicked"
   | "signup_completed"
   | "onboarding_step_viewed"
+  | "procurement_started"
   | "rfq_dispatched"
+  | "msme_quote_submitted"
+  | "scheme_matcher_opened"
+  | "scheme_eligibility_started"
+  | "scheme_eligibility_completed"
+  | "scheme_official_link_clicked"
+  | "scheme_saved"
   | "requirement_started"
   | "requirement_submitted"
   | "ai_parsing_completed"
   | "match_generated"
   | "comparison_started"
   | "quote_requested"
-  | "procurement_started"
   | "escrow_milestone_created"
   | "ai_latency"
   | "ai_error"
@@ -37,6 +43,41 @@ export interface TelemetryEvent {
 // In-memory telemetry buffer with localStorage persistence
 const TELEMETRY_STORAGE_KEY = "mpi_telemetry_events"
 const MAX_BUFFERED_EVENTS = 100
+
+// Sensitive key patterns that must NEVER be included in telemetry payloads
+const SENSITIVE_KEY_PATTERNS = [
+  "password",
+  "token",
+  "secret",
+  "key",
+  "auth",
+  "credential",
+  "gstin",
+  "bank",
+  "account",
+  "document",
+  "rawspec",
+  "requirementtext",
+]
+
+function sanitizeTelemetryMetadata(
+  meta?: Record<string, string | number | boolean | null>,
+): Record<string, string | number | boolean | null> {
+  if (!meta) return {}
+  const clean: Record<string, string | number | boolean | null> = {}
+  for (const [k, v] of Object.entries(meta)) {
+    const lowerKey = k.toLowerCase().replace(/[^a-z]/g, "")
+    const isSensitive = SENSITIVE_KEY_PATTERNS.some((pattern) => lowerKey.includes(pattern))
+    if (!isSensitive) {
+      if (typeof v === "string") {
+        clean[k] = v.length > 120 ? v.slice(0, 117) + "..." : v
+      } else {
+        clean[k] = v
+      }
+    }
+  }
+  return clean
+}
 
 function getSessionId(): string {
   if (typeof window === "undefined") return "server"
@@ -79,7 +120,7 @@ async function dispatchToProductionDestination(item: TelemetryEvent): Promise<bo
     }
   }
 
-  // 2. Dispatch to Supabase if client credentials are configured
+  // 2. Dispatch to Supabase PostgreSQL if client is configured
   try {
     const supabaseUrl = import.meta.env?.VITE_SUPABASE_URL
     const supabaseKey = import.meta.env?.VITE_SUPABASE_PUBLISHABLE_KEY
@@ -105,18 +146,21 @@ export function trackTelemetryEvent(
   event: TelemetryEventType,
   metadata?: Record<string, string | number | boolean | null>,
 ): void {
-  // Enforce GDPR/DPDP analytics consent: if user has made a choice and analytics is disabled,
-  // do not record optional usage telemetry (essential error logs are exempted for platform stability)
+  // Enforce GDPR/DPDP analytics consent:
+  // Do NOT record optional analytics telemetry until user has granted explicit 'analytics' consent.
+  // Essential error alerts (ai_error, rate_limit_exceeded) are exempted for platform stability.
   const isEssentialError = event === "ai_error" || event === "rate_limit_exceeded"
-  if (!isEssentialError && hasUserDecided() && !hasConsent("analytics")) {
+  if (!isEssentialError && !hasConsent("analytics")) {
     return
   }
+
+  const cleanMetadata = sanitizeTelemetryMetadata(metadata)
 
   const telemetryItem: TelemetryEvent = {
     event,
     timestamp: new Date().toISOString(),
     sessionId: getSessionId(),
-    metadata: metadata || {},
+    metadata: cleanMetadata,
   }
 
   // Debug logging in development mode
@@ -157,7 +201,7 @@ export function trackAILatency(capabilityId: string, latencyMs: number, status: 
 }
 
 /**
- * Retrieves recent telemetry events for Admin platform telemetry analytics
+ * Retrieves recent telemetry events from local storage buffer
  */
 export function getRecentTelemetryEvents(): TelemetryEvent[] {
   if (typeof window === "undefined") return []
@@ -166,5 +210,78 @@ export function getRecentTelemetryEvents(): TelemetryEvent[] {
     return raw ? JSON.parse(raw) : []
   } catch {
     return []
+  }
+}
+
+/**
+ * Aggregates local conversion funnel totals
+ */
+export function getLocalTelemetrySummary(): Record<string, number> {
+  const events = getRecentTelemetryEvents()
+  const summary: Record<string, number> = {}
+  events.forEach((e) => {
+    summary[e.event] = (summary[e.event] || 0) + 1
+  })
+  return summary
+}
+
+/**
+ * Queries authoritative telemetry events from Supabase PostgreSQL (admin inspection)
+ */
+export async function fetchLiveTelemetrySummary(): Promise<{
+  fromDatabase: boolean
+  totalCount: number
+  eventCounts: Record<string, number>
+  recentEvents: Array<{
+    id: number
+    event: string
+    sessionId: string
+    createdAt: string
+    metadata: Record<string, any>
+  }>
+  error?: string
+}> {
+  try {
+    const { data, error } = await supabase
+      .from("telemetry_events")
+      .select("id, event, session_id, metadata, created_at")
+      .order("created_at", { ascending: false })
+      .limit(100)
+
+    if (error) {
+      return {
+        fromDatabase: false,
+        totalCount: 0,
+        eventCounts: {},
+        recentEvents: [],
+        error: error.message,
+      }
+    }
+
+    const counts: Record<string, number> = {}
+    ;(data || []).forEach((row) => {
+      counts[row.event] = (counts[row.event] || 0) + 1
+    })
+
+    return {
+      fromDatabase: true,
+      totalCount: data ? data.length : 0,
+      eventCounts: counts,
+      recentEvents: (data || []).map((r) => ({
+        id: r.id,
+        event: r.event,
+        sessionId: r.session_id,
+        createdAt: r.created_at,
+        metadata: r.metadata || {},
+      })),
+    }
+  } catch (err) {
+    return {
+      fromDatabase: false,
+      totalCount: 0,
+      eventCounts: {},
+      recentEvents: [],
+      error: err instanceof Error ? err.message : "Network error",
+    }
   }
 }

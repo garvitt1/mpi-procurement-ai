@@ -21,6 +21,7 @@ import {
   MPIStatusBadge,
 } from "../../components/design-system/MPIDesignSystem"
 import MaterialIcon from "../../components/ui/MaterialIcon"
+import { trackTelemetryEvent } from "../../services/telemetryService"
 import {
   BarChart,
   Bar,
@@ -4020,13 +4021,29 @@ export default function StartupFlow({
               {startupProfile.stage || "MVP"} Stage) in {selectedCategory}.
             </p>
           </div>
-          <MPIButton
-            variant="outline"
-            size="sm"
-            onClick={() => navigate("government-schemes.browse")}
-          >
-            Browse All 30 Schemes →
-          </MPIButton>
+          <div className="flex items-center gap-2">
+            <MPIButton
+              variant="ai"
+              size="sm"
+              onClick={() => {
+                trackTelemetryEvent("scheme_matcher_opened", {
+                  source: "startup_schemes_dashboard",
+                  role: "startup",
+                })
+                navigate("government-schemes.match")
+              }}
+              icon={<Icons.Sparkles className="w-3.5 h-3.5" />}
+            >
+              Interactive Matcher →
+            </MPIButton>
+            <MPIButton
+              variant="outline"
+              size="sm"
+              onClick={() => navigate("government-schemes.browse")}
+            >
+              Browse All 30 Schemes →
+            </MPIButton>
+          </div>
         </div>
 
         {/* Schemes Match Summary */}
@@ -4056,7 +4073,7 @@ export default function StartupFlow({
             </div>
             <div className="flex items-center justify-between pt-2 border-t border-slate-100">
               <span className="text-[11px] text-emerald-700 font-bold">
-                Auto-applied on Live Quotes
+                Post-Procurement Reimbursement · Directly Claimable from DC-MSME
               </span>
               <div className="flex items-center gap-2">
                 <MPIButton
@@ -4073,6 +4090,13 @@ export default function StartupFlow({
                   href="https://zed.msme.gov.in"
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => {
+                    trackTelemetryEvent("scheme_official_link_clicked", {
+                      schemeId: "SCH-ZED-01",
+                      schemeName: "ZED Certification Quality Reimbursement Scheme",
+                      url: "https://zed.msme.gov.in",
+                    })
+                  }}
                   className="text-xs font-bold text-emerald-800 hover:underline flex items-center gap-1 p-1"
                 >
                   <Icons.ExternalLink className="w-3.5 h-3.5" />
@@ -4105,7 +4129,7 @@ export default function StartupFlow({
             </div>
             <div className="flex items-center justify-between pt-2 border-t border-slate-100">
               <span className="text-[11px] text-slate-500">
-                Applicable on Packaging & Prototyping
+                Applicable on Packaging & Prototyping · Post-Procurement Grant
               </span>
               <div className="flex items-center gap-2">
                 <MPIButton
@@ -4122,6 +4146,13 @@ export default function StartupFlow({
                   href="https://designclinicsmsme.org"
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => {
+                    trackTelemetryEvent("scheme_official_link_clicked", {
+                      schemeId: "SCH-DESIGN-01",
+                      schemeName: "Design Clinic Sourcing Assistance Scheme",
+                      url: "https://designclinicsmsme.org",
+                    })
+                  }}
                   className="text-xs font-bold text-emerald-800 hover:underline flex items-center gap-1 p-1"
                 >
                   <Icons.ExternalLink className="w-3.5 h-3.5" />

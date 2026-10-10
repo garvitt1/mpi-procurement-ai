@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { NavProps } from "../../App"
 import { useProcurement } from "../../context/ProcurementContext"
 import {
@@ -13,6 +13,9 @@ import {
   MPICard,
 } from "../../components/design-system/MPIDesignSystem"
 import { MPILogo } from "../../components/shared"
+import MaterialIcon from "../../components/ui/MaterialIcon"
+import { getActiveUser } from "../../lib/mockAuth"
+import { trackTelemetryEvent } from "../../services/telemetryService"
 
 interface GovernmentSchemesFlowProps extends NavProps {
   initialMode?: "match" | "browse" | "detail"
@@ -30,7 +33,11 @@ export default function GovernmentSchemesFlow({
     startupProfile,
     msmeProfile,
     selectedCategory,
+    activeRFQ,
   } = useProcurement()
+
+  const activeUser = getActiveUser()
+  const isMSMEContext = currentScreen === "msme.schemes" || activeUser?.role === "msme"
 
   // Mode derivation
   const isMatchScreen = currentScreen === "government-schemes.match"
@@ -47,8 +54,36 @@ export default function GovernmentSchemesFlow({
   // Selected scheme for detail drawer / page
   const [selectedSchemeId, setSelectedSchemeId] = useState<string>("SCH-ZED-01")
 
-  // Matcher Questionnaire Form State
-  const initialBusinessType = isMSMESchemesScreen ? "msme" : "startup"
+  // Saved / Bookmarked schemes state backed by localStorage
+  const [savedSchemeIds, setSavedSchemeIds] = useState<string[]>(() => {
+    try {
+      const raw = localStorage.getItem("mpi_saved_schemes")
+      return raw ? JSON.parse(raw) : []
+    } catch {
+      return []
+    }
+  })
+
+  const toggleSaveScheme = (schemeId: string, schemeName: string) => {
+    setSavedSchemeIds((prev) => {
+      const isSaved = prev.includes(schemeId)
+      const next = isSaved ? prev.filter((id) => id !== schemeId) : [...prev, schemeId]
+      try {
+        localStorage.setItem("mpi_saved_schemes", JSON.stringify(next))
+      } catch {}
+      if (!isSaved) {
+        trackTelemetryEvent("scheme_saved", {
+          schemeId,
+          schemeName,
+          role: matchBusinessType,
+        })
+      }
+      return next
+    })
+  }
+
+  // Matcher Questionnaire Form State — prefilled from authenticated profile and procurement context
+  const initialBusinessType = isMSMEContext ? "msme" : "startup"
   const [matchBusinessType, setMatchBusinessType] =
     useState<"startup" | "msme">(initialBusinessType)
   const [matchStage, setMatchStage] = useState<SchemeMatcherProfile["stage"]>(
@@ -59,17 +94,34 @@ export default function GovernmentSchemesFlow({
       msmeProfile.enterpriseType || "Micro",
     )
   const [matchSelectedCategories, setMatchSelectedCategories] =
-    useState<CatalogCategory[]>([selectedCategory || "Packaging & Printing"])
+    useState<CatalogCategory[]>([selectedCategory || (activeRFQ?.category as CatalogCategory) || "Packaging & Printing"])
   const [matchProcurementIntent, setMatchProcurementIntent] = useState<string>(
-    "Packaging tooling, quality testing, and batch production",
+    activeRFQ?.title || `${selectedCategory || "Packaging & Printing"} tooling, testing, and batch production`,
   )
-  const [hasUdyam, setHasUdyam] = useState<boolean>(true)
-  const [hasDpiit, setHasDpiit] = useState<boolean>(true)
+  const [hasUdyam, setHasUdyam] = useState<boolean>(
+    Boolean(msmeProfile.udyamNumber || true)
+  )
+  const [hasDpiit, setHasDpiit] = useState<boolean>(
+    Boolean(startupProfile.hasDpiit || startupProfile.dpiitNumber || true)
+  )
   const [isWomenOrScSt, setIsWomenOrScSt] = useState<boolean>(false)
   const [targetInterests, setTargetInterests] = useState<string[]>([
     "Quality & Testing Subsidy",
     "Tooling & Design Grant",
   ])
+
+  // Track Scheme Matcher Telemetry
+  useEffect(() => {
+    trackTelemetryEvent("scheme_matcher_opened", {
+      source: isStartupSchemesScreen ? "startup_schemes" : isMSMESchemesScreen ? "msme_schemes" : "schemes_portal",
+      role: initialBusinessType,
+      activeTab,
+    })
+    trackTelemetryEvent("scheme_eligibility_started", {
+      role: initialBusinessType,
+      category: selectedCategory || "Packaging & Printing",
+    })
+  }, [])
 
   // Browse search & filter state
   const [browseSearch, setBrowseSearch] = useState("")
@@ -107,6 +159,19 @@ export default function GovernmentSchemesFlow({
   const matchedResults = useMemo<SchemeMatchResult[]>(() => {
     return matchSchemes(currentMatcherProfile)
   }, [matchSchemes, currentMatcherProfile])
+
+  // Track Scheme Eligibility Completed when matches recalculate
+  useEffect(() => {
+    if (matchedResults.length > 0) {
+      trackTelemetryEvent("scheme_eligibility_completed", {
+        role: matchBusinessType,
+        qualifiedCount: matchedResults.length,
+        topSchemeId: matchedResults[0]?.scheme.id,
+        topScore: matchedResults[0]?.relevanceScore,
+        category: matchSelectedCategories[0] || selectedCategory || "General",
+      })
+    }
+  }, [matchedResults.length, matchBusinessType, matchSelectedCategories])
 
   // Selected scheme object
   const currentDetailScheme = useMemo<MpiScheme>(() => {
@@ -304,6 +369,32 @@ export default function GovernmentSchemesFlow({
           </span>
         </div>
       </div>
+
+      {/* ─── CONTEXTUAL RETURN BANNER TO PRESERVE ACTIVE PROCUREMENT ───────── */}
+      {activeRFQ && (
+        <div className="bg-emerald-50 border-b border-emerald-200 px-4 py-2.5">
+          <div className="max-w-7xl mx-auto w-full flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+            <div className="flex items-center gap-2 text-emerald-950 font-medium">
+              <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse shrink-0" />
+              <span>
+                <strong>Active Procurement Preserved:</strong> {activeRFQ.title || activeRFQ.category} (RFQ #{activeRFQ.id})
+              </span>
+            </div>
+            <button
+              onClick={() => {
+                if (isStartupSchemesScreen) navigate("startup.home")
+                else if (isMSMESchemesScreen) navigate("msme.home")
+                else if (goBack) goBack()
+                else navigate("startup.home")
+              }}
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-900 bg-white hover:bg-emerald-100 px-3 py-1 rounded-lg border border-emerald-300 transition-colors cursor-pointer self-start sm:self-auto shadow-2xs"
+            >
+              <Icons.ArrowLeft className="w-3.5 h-3.5" />
+              <span>← Return to Active Procurement Workflow</span>
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* ─── MAIN CONTENT ────────────────────────────────────────────────────── */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
@@ -569,6 +660,7 @@ export default function GovernmentSchemesFlow({
                     matchReasons,
                   } = result
                   const isTopMatch = idx === 0
+                  const isSaved = savedSchemeIds.includes(scheme.id)
 
                   return (
                     <MPICard
@@ -589,6 +681,9 @@ export default function GovernmentSchemesFlow({
                             </span>
                             <span className="text-[11px] text-slate-500">
                               {scheme.ministry}
+                            </span>
+                            <span className="text-[10px] font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
+                              Potential Match • Requires Confirmation
                             </span>
                           </div>
 
@@ -680,9 +775,26 @@ export default function GovernmentSchemesFlow({
                             {scheme.sourceDocument}
                           </span>{" "}
                           ({scheme.sourceChapter})
+                          <div className="text-[10px] text-slate-400 mt-0.5">
+                            Post-procurement benefit · Does not deduct from supplier invoice
+                          </div>
                         </div>
 
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+                          <button
+                            type="button"
+                            onClick={() => toggleSaveScheme(scheme.id, scheme.name)}
+                            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border font-bold text-xs transition-colors cursor-pointer ${
+                              isSaved
+                                ? "bg-emerald-50 border-emerald-300 text-emerald-800"
+                                : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
+                            }`}
+                            title={isSaved ? "Remove from saved schemes" : "Save this scheme"}
+                          >
+                            <span>{isSaved ? "★" : "☆"}</span>
+                            <span>{isSaved ? "Saved" : "Save Scheme"}</span>
+                          </button>
+
                           <MPIButton
                             variant="outline"
                             size="sm"
@@ -691,15 +803,22 @@ export default function GovernmentSchemesFlow({
                               setActiveTab("detail")
                             }}
                           >
-                            Full Dossier & Eligibility
+                            Full Dossier
                           </MPIButton>
                           <a
                             href={scheme.officialUrl}
                             target="_blank"
                             rel="noopener noreferrer"
+                            onClick={() => {
+                              trackTelemetryEvent("scheme_official_link_clicked", {
+                                schemeId: scheme.id,
+                                schemeName: scheme.name,
+                                url: scheme.officialUrl,
+                              })
+                            }}
                             className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#051F16] hover:bg-[#083A28] text-white font-bold text-xs transition-colors cursor-pointer"
                           >
-                            <span>Verify on Portal</span>
+                            <span>Official Portal</span>
                             <Icons.ExternalLink className="w-3 h-3" />
                           </a>
                         </div>
@@ -707,6 +826,33 @@ export default function GovernmentSchemesFlow({
                     </MPICard>
                   )
                 })}
+
+                {matchedResults.length === 0 && (
+                  <div className="bg-white p-12 text-center rounded-2xl border border-slate-200 shadow-xs space-y-3">
+                    <div className="w-12 h-12 rounded-full bg-slate-100 text-slate-400 mx-auto flex items-center justify-center text-xl font-bold">
+                      🔍
+                    </div>
+                    <h3 className="text-base font-extrabold text-[#051F16]">
+                      No Schemes Directly Matching Current Filter Criteria
+                    </h3>
+                    <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
+                      Try selecting additional procurement categories, broadening your business stage, or enabling statutory registrations (Udyam/DPIIT).
+                    </p>
+                    <div className="pt-2">
+                      <MPIButton
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setMatchSelectedCategories(CATALOG_CATEGORIES.slice(0, 3))
+                          setHasUdyam(true)
+                          setHasDpiit(true)
+                        }}
+                      >
+                        Reset to Recommended Parameters
+                      </MPIButton>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -854,15 +1000,37 @@ export default function GovernmentSchemesFlow({
                       <Icons.ChevronRight className="w-3.5 h-3.5" />
                     </button>
 
-                    <a
-                      href={scheme.officialUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[11px] text-slate-500 hover:text-slate-800 flex items-center gap-1"
-                    >
-                      <span>Official Portal</span>
-                      <Icons.ExternalLink className="w-3 h-3" />
-                    </a>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => toggleSaveScheme(scheme.id, scheme.name)}
+                        className={`text-[11px] font-bold px-2 py-1 rounded border transition-colors cursor-pointer ${
+                          savedSchemeIds.includes(scheme.id)
+                            ? "bg-emerald-50 border-emerald-300 text-emerald-800"
+                            : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+                        }`}
+                        title={savedSchemeIds.includes(scheme.id) ? "Saved" : "Save Scheme"}
+                      >
+                        {savedSchemeIds.includes(scheme.id) ? "★ Saved" : "☆ Save"}
+                      </button>
+
+                      <a
+                        href={scheme.officialUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() => {
+                          trackTelemetryEvent("scheme_official_link_clicked", {
+                            schemeId: scheme.id,
+                            schemeName: scheme.name,
+                            url: scheme.officialUrl,
+                          })
+                        }}
+                        className="text-[11px] text-slate-500 hover:text-slate-800 flex items-center gap-1"
+                      >
+                        <span>Official Portal</span>
+                        <Icons.ExternalLink className="w-3 h-3" />
+                      </a>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -1090,6 +1258,19 @@ export default function GovernmentSchemesFlow({
                 </div>
 
                 <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => toggleSaveScheme(currentDetailScheme.id, currentDetailScheme.name)}
+                    className={`inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl border font-bold text-xs transition-colors cursor-pointer ${
+                      savedSchemeIds.includes(currentDetailScheme.id)
+                        ? "bg-emerald-50 border-emerald-300 text-emerald-800"
+                        : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
+                    }`}
+                  >
+                    <span>{savedSchemeIds.includes(currentDetailScheme.id) ? "★" : "☆"}</span>
+                    <span>{savedSchemeIds.includes(currentDetailScheme.id) ? "Saved Scheme" : "Save Scheme"}</span>
+                  </button>
+
                   <MPIButton
                     variant="outline"
                     onClick={() => {
@@ -1104,6 +1285,13 @@ export default function GovernmentSchemesFlow({
                     href={currentDetailScheme.officialUrl}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() => {
+                      trackTelemetryEvent("scheme_official_link_clicked", {
+                        schemeId: currentDetailScheme.id,
+                        schemeName: currentDetailScheme.name,
+                        url: currentDetailScheme.officialUrl,
+                      })
+                    }}
                     className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#051F16] hover:bg-[#083A28] text-white font-extrabold text-xs transition-colors cursor-pointer shadow-sm"
                   >
                     <span>Visit Official Ministry Portal</span>

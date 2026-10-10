@@ -185,6 +185,13 @@ export default function StartupGuidedBuilder({
     }
     setValidationError(null)
 
+    trackTelemetryEvent("procurement_started", {
+      category: selectedCategory,
+      targetBudget,
+      quantity,
+      intakeLength: requirementText.trim().length,
+    })
+
     // Meaningful processing stage feedback
     setAiProcessingStage("Submitting requirement...")
     setTimeout(() => setAiProcessingStage("Understanding specification & extracting tolerances..."), 400)
@@ -1018,6 +1025,45 @@ export default function StartupGuidedBuilder({
                     </span>
                   ))}
                 </div>
+              </div>
+            </div>
+
+            {/* Contextual Non-Blocking Government Schemes Callout */}
+            <div className="p-4 bg-emerald-50/70 border border-emerald-200 rounded-xl space-y-2.5">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  <span className="p-1 rounded-md bg-emerald-600 text-white">
+                    <Icons.Award className="w-3.5 h-3.5" />
+                  </span>
+                  <span className="text-xs font-bold text-emerald-950">
+                    Government Subsidy Opportunities for this Procurement
+                  </span>
+                </div>
+                <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100/80 px-2 py-0.5 rounded-full border border-emerald-200">
+                  Non-Dilutive Benefit
+                </span>
+              </div>
+              <p className="text-xs text-emerald-900 leading-relaxed">
+                Depending on your supplier&apos;s statutory certifications (e.g. ZED Gold, MSME Udyam), your startup may qualify for up to 80% reimbursement on quality testing, tooling, or intellectual property fees post-procurement through central DC-MSME and DPIIT schemes.
+              </p>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-1 border-t border-emerald-200/60 text-[11px]">
+                <span className="text-emerald-800">
+                  Subsidies are post-procurement statutory claims and do NOT reduce the payable PO amount to the supplier.
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    trackTelemetryEvent("scheme_matcher_opened", {
+                      source: "guided_builder_step7",
+                      category: selectedCategory,
+                      targetBudget,
+                    })
+                    navigate("startup.schemes")
+                  }}
+                  className="font-bold text-emerald-900 hover:text-emerald-950 underline cursor-pointer shrink-0"
+                >
+                  Explore Schemes for this RFQ →
+                </button>
               </div>
             </div>
 

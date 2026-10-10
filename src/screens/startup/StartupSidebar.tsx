@@ -111,6 +111,12 @@ export default function StartupSidebar({
           label: "Spend Analytics",
           icon: <Icons.BarChart3 className="w-4 h-4" />,
         },
+        {
+          screen: "startup.schemes",
+          label: "Govt Subsidies & Schemes",
+          icon: <Icons.Award className="w-4 h-4" />,
+          badge: "30 Schemes",
+        },
       ],
     },
     {

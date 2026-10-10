@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { NavProps, Screen } from "../../App"
 import {
   useProcurement,
@@ -32,6 +32,10 @@ import {
 } from "../../services/aiService"
 import MaterialIcon from "../../components/ui/MaterialIcon"
 import { MPI_AI_CAPABILITIES } from "../../services/ai/capabilityRegistry"
+import {
+  fetchLiveTelemetrySummary,
+  getLocalTelemetrySummary,
+} from "../../services/telemetryService"
 
 // Markdown parser for Admin Copilot rich generative text
 function parseInlineFormatting(text: string): React.ReactNode[] {
@@ -109,6 +113,53 @@ export default function AdminFlow({
     pricing: 25,
     compliance: 15,
   })
+
+  // Live Telemetry Funnel State (PostgreSQL authoritative with local buffer fallback)
+  const [telemetryData, setTelemetryData] = useState<{
+    fromDatabase: boolean
+    totalCount: number
+    eventCounts: Record<string, number>
+    recentEvents: Array<{
+      id: number
+      event: string
+      sessionId: string
+      createdAt: string
+      metadata: Record<string, any>
+    }>
+    error?: string
+  }>({
+    fromDatabase: false,
+    totalCount: 0,
+    eventCounts: {},
+    recentEvents: [],
+  })
+  const [isRefreshingTelemetry, setIsRefreshingTelemetry] = useState(false)
+
+  const reloadTelemetry = () => {
+    setIsRefreshingTelemetry(true)
+    fetchLiveTelemetrySummary()
+      .then((res) => {
+        setTelemetryData(res)
+        setIsRefreshingTelemetry(false)
+      })
+      .catch(() => {
+        const local = getLocalTelemetrySummary()
+        setTelemetryData({
+          fromDatabase: false,
+          totalCount: Object.values(local).reduce((a, b) => a + b, 0),
+          eventCounts: local,
+          recentEvents: [],
+          error: "Local buffer active",
+        })
+        setIsRefreshingTelemetry(false)
+      })
+  }
+
+  useEffect(() => {
+    if (currentScreen === "admin.analytics" || currentScreen === "admin.home") {
+      reloadTelemetry()
+    }
+  }, [currentScreen])
 
   // 62-Capability Architecture Registry Filter State
   const [capCategoryFilter, setCapCategoryFilter] = useState<string>("all")
@@ -1730,6 +1781,174 @@ Select a quick analysis pill below or ask me any question!`,
               and Udyam statutory records.
             </p>
           </div>
+        </div>
+
+        {/* LIVE CONVERSION FUNNEL & SCHEME TELEMETRY (POSTGRESQL AUDITED) */}
+        <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-extrabold uppercase tracking-wider bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded-full">
+                  Phase 5 Funnel Analytics
+                </span>
+                <span className={`text-[11px] font-bold flex items-center gap-1 ${
+                  telemetryData.fromDatabase ? "text-emerald-700" : "text-amber-700"
+                }`}>
+                  <span className={`w-2 h-2 rounded-full ${
+                    telemetryData.fromDatabase ? "bg-emerald-600 animate-pulse" : "bg-amber-500"
+                  }`} />
+                  {telemetryData.fromDatabase
+                    ? "Live Supabase PostgreSQL Connected (public.telemetry_events)"
+                    : "Local Session Telemetry Buffer"}
+                </span>
+              </div>
+              <h3
+                className="text-lg font-extrabold text-[#051F16] mt-1"
+                style={{ fontFamily: "Plus Jakarta Sans" }}
+              >
+                Procurement & Scheme Conversion Funnel
+              </h3>
+              <p className="text-xs text-slate-500">
+                Audited conversion events across Startup Buyer, MSME Supplier, and Scheme Matcher workflows.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] bg-slate-100 text-slate-600 border border-slate-200 font-bold px-2.5 py-1 rounded-lg hidden md:inline">
+                🔒 Strict Opt-in Consent · Zero PII/GSTIN
+              </span>
+              <button
+                type="button"
+                onClick={reloadTelemetry}
+                disabled={isRefreshingTelemetry}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-xs font-bold text-slate-700 transition-colors cursor-pointer disabled:opacity-50"
+              >
+                <Icons.Refresh className={`w-3.5 h-3.5 ${isRefreshingTelemetry ? "animate-spin" : ""}`} />
+                <span>{isRefreshingTelemetry ? "Refreshing..." : "Refresh Funnel"}</span>
+              </button>
+            </div>
+          </div>
+
+          {/* 8-Stage Canonical Funnel Grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+            {[
+              {
+                id: "scheme_matcher_opened",
+                label: "1. Matcher Opened",
+                desc: "Discovery initiated",
+                count: telemetryData.eventCounts["scheme_matcher_opened"] || 0,
+                color: "text-emerald-700",
+                bg: "bg-emerald-50/50",
+              },
+              {
+                id: "scheme_eligibility_started",
+                label: "2. Eligibility Started",
+                desc: "Profiling calibrated",
+                count: telemetryData.eventCounts["scheme_eligibility_started"] || 0,
+                color: "text-emerald-800",
+                bg: "bg-emerald-50/70",
+              },
+              {
+                id: "scheme_eligibility_completed",
+                label: "3. Qualified Matches",
+                desc: "Scores generated",
+                count: telemetryData.eventCounts["scheme_eligibility_completed"] || 0,
+                color: "text-emerald-900",
+                bg: "bg-emerald-100/60",
+              },
+              {
+                id: "scheme_official_link_clicked",
+                label: "4. Portal Clicked",
+                desc: "Ministry portal verified",
+                count: telemetryData.eventCounts["scheme_official_link_clicked"] || 0,
+                color: "text-teal-700",
+                bg: "bg-teal-50",
+              },
+              {
+                id: "scheme_saved",
+                label: "5. Scheme Bookmarked",
+                desc: "Saved to watchlist",
+                count: telemetryData.eventCounts["scheme_saved"] || 0,
+                color: "text-amber-800",
+                bg: "bg-amber-50/70",
+              },
+              {
+                id: "procurement_started",
+                label: "6. Sourcing Intake",
+                desc: "RFQ Builder started",
+                count: telemetryData.eventCounts["procurement_started"] || 0,
+                color: "text-blue-700",
+                bg: "bg-blue-50/60",
+              },
+              {
+                id: "rfq_dispatched",
+                label: "7. RFQ Dispatched",
+                desc: "Broadcast to MSMEs",
+                count: telemetryData.eventCounts["rfq_dispatched"] || 0,
+                color: "text-indigo-800",
+                bg: "bg-indigo-50/60",
+              },
+              {
+                id: "msme_quote_submitted",
+                label: "8. Quote Submitted",
+                desc: "Supplier bid persisted",
+                count: telemetryData.eventCounts["msme_quote_submitted"] || 0,
+                color: "text-emerald-700",
+                bg: "bg-emerald-50",
+              },
+            ].map((stage) => (
+              <div
+                key={stage.id}
+                className={`p-3 rounded-xl border border-slate-200/80 ${stage.bg} flex flex-col justify-between space-y-1.5`}
+              >
+                <div className="text-[10px] font-bold text-slate-500 uppercase tracking-tight truncate">
+                  {stage.label}
+                </div>
+                <div className={`text-xl sm:text-2xl font-extrabold ${stage.color}`}>
+                  {stage.count}
+                </div>
+                <div className="text-[9px] text-slate-500 leading-tight">
+                  {stage.desc}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Recent Events Sample Stream */}
+          {telemetryData.recentEvents.length > 0 && (
+            <div className="pt-3 border-t border-slate-100">
+              <div className="text-xs font-bold text-slate-700 mb-2 flex items-center justify-between">
+                <span>Recent Database Telemetry Ingestion (Audit Feed)</span>
+                <span className="text-[10px] text-slate-400 font-mono">
+                  Showing last {Math.min(5, telemetryData.recentEvents.length)} of {telemetryData.totalCount} events
+                </span>
+              </div>
+              <div className="space-y-1.5">
+                {telemetryData.recentEvents.slice(0, 5).map((ev) => (
+                  <div
+                    key={ev.id}
+                    className="p-2 rounded-lg bg-slate-50 border border-slate-200/70 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-slate-600"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono text-[10px] bg-white px-1.5 py-0.5 rounded border border-slate-200 text-slate-800 font-bold">
+                        {ev.event}
+                      </span>
+                      <span className="text-[11px] text-slate-500 truncate max-w-xs">
+                        Session: {ev.sessionId.slice(0, 16)}...
+                      </span>
+                    </div>
+                    <div className="text-[10px] text-slate-400 font-mono shrink-0">
+                      {new Date(ev.createdAt).toLocaleTimeString("en-IN", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        second: "2-digit",
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* PENDING AUDITS SECTION WITH TABS AND CONFIRMATION DIALOGS */}

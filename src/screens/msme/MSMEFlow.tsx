@@ -24,6 +24,7 @@ import {
 } from "../../services/aiService"
 import MaterialIcon from "../../components/ui/MaterialIcon"
 import { getActiveUser } from "../../lib/mockAuth"
+import { trackTelemetryEvent } from "../../services/telemetryService"
 
 export default function MSMEFlow({
   navigate,
@@ -2177,6 +2178,11 @@ export default function MSMEFlow({
       },
     ]
 
+    const activeUserObj = getActiveUser()
+    const displayEnterpriseName = activeUserObj?.orgName || msmeProfile.enterpriseName || "Apex Precision Packaging"
+    const displayUdyam = msmeProfile.udyamNumber || "UDYAM-MH-12-0048192"
+    const displayType = msmeProfile.enterpriseType || "Micro"
+
     return renderShell(
       <div className="space-y-6">
         {/* Header Strip */}
@@ -2187,14 +2193,14 @@ export default function MSMEFlow({
                 MSME Central Scheme Registry
               </span>
               <span className="text-xs text-[#FFF7D6] font-semibold">
-                Udyam: UDYAM-MH-12-0048192
+                Udyam: {displayUdyam} ({displayType} Enterprise)
               </span>
             </div>
             <h3
               className="text-lg sm:text-xl font-extrabold text-white"
               style={{ fontFamily: "Plus Jakarta Sans" }}
             >
-              Statutory Subsidies & Modernization Grants for Apex Packaging
+              Statutory Subsidies & Modernization Grants for {displayEnterpriseName}
             </h3>
             <p className="text-xs text-slate-300 max-w-2xl leading-relaxed">
               MPI monitors 30 central government schemes across MSME, DC-MSME,
@@ -2206,7 +2212,14 @@ export default function MSMEFlow({
             <MPIButton
               variant="ai"
               size="md"
-              onClick={() => navigate("government-schemes.match")}
+              onClick={() => {
+                trackTelemetryEvent("scheme_matcher_opened", {
+                  source: "msme_dashboard",
+                  role: "msme",
+                  enterpriseType: displayType,
+                })
+                navigate("government-schemes.match")
+              }}
               icon={<Icons.Sparkles className="w-4 h-4" />}
             >
               Run Scheme Matcher →
@@ -2237,13 +2250,13 @@ export default function MSMEFlow({
           </div>
           <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-1">
             <div className="text-xs text-slate-500 font-semibold uppercase tracking-wider">
-              Auto-Pass-Through Status
+              Statutory Program Status
             </div>
             <div className="text-2xl font-extrabold text-[#8C6B00]">
               ZED Gold Active
             </div>
             <div className="text-[11px] text-slate-500">
-              10% landed cost reduction applied on live bids
+              Reimbursement filed with Ministry · Subsidies do not deduct from quote amount
             </div>
           </div>
           <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-1">
@@ -2311,6 +2324,13 @@ export default function MSMEFlow({
                   href={sch.portalUrl}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => {
+                    trackTelemetryEvent("scheme_official_link_clicked", {
+                      schemeId: sch.id,
+                      schemeName: sch.name,
+                      url: sch.portalUrl,
+                    })
+                  }}
                   className="font-bold text-emerald-800 hover:underline flex items-center gap-1"
                 >
                   <span>Official Portal</span>
