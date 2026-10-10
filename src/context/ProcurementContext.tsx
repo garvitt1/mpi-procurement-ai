@@ -376,7 +376,7 @@ export interface ProcurementContextType {
   publicStartupQuotes: PublicStartupQuote[]
   selectedQuoteId: string | null
   selectQuote: (quoteId: string) => void
-  submitMSMEQuote: (quote: SupplierQuote) => void
+  submitMSMEQuote: (quote: SupplierQuote, targetRfqId?: string) => void
   loadDemoQuotes: () => void
 
   // Backend Database Synchronization Status
@@ -1930,7 +1930,7 @@ export const ProcurementProvider: React.FC<{ children: React.ReactNode }> = ({
       })
   }
 
-  const submitMSMEQuote = (quote: SupplierQuote) => {
+  const submitMSMEQuote = (quote: SupplierQuote, targetRfqId?: string) => {
     setReceivedQuotes((prev) => {
       const existing = prev.findIndex((q) => q.supplierId === quote.supplierId)
       let updated: SupplierQuote[]
@@ -1965,7 +1965,7 @@ export const ProcurementProvider: React.FC<{ children: React.ReactNode }> = ({
     setQuotePersistenceError(undefined)
 
     // Synchronize with Supabase PostgreSQL (if tables exist)
-    const currentRfqId = activeRFQ?.id || "RFQ-2026-0891"
+    const currentRfqId = targetRfqId || activeRFQ?.id || "RFQ-2026-0891"
     const currentUser = getActiveUser()
     persistQuoteToSupabase(quote, currentRfqId, currentUser)
       .then((res) => {

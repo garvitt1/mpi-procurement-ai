@@ -379,7 +379,7 @@ export default function MSMEFlow({
         recommendationReason: `Submitted by ${supplierEnterpriseName} (Udyam: ${supplierId}) via MSME Portal with ${repeatDiscountPercent}% repeat client concession and separate post-procurement ZED Gold scheme assessment.`,
       }
 
-      submitMSMEQuote(newQuote)
+      submitMSMEQuote(newQuote, selectedOpp.id)
       // Update opportunity status to "Quote Transmitted"
       setOpportunities((prev) =>
         prev.map((o) =>
