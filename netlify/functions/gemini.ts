@@ -154,7 +154,7 @@ export async function processGeminiApiRequest(params: {
         error: {
           code: "API_KEY_MISSING",
           message:
-            "Gemini API key is not configured on Netlify. Please set GEMINI_API_KEY in the Netlify Dashboard (Site Configuration -> Environment Variables).",
+            "AI service key is not configured. Please set GEMINI_API_KEY in environment configuration.",
         },
         isLive: false,
       }),
@@ -195,7 +195,7 @@ export async function processGeminiApiRequest(params: {
             headers: CORS_HEADERS,
             body: JSON.stringify({
               success: true,
-              message: `Successfully connected to MPI AI Neural Engine (${m}) on Netlify!`,
+              message: `Successfully connected to MPI AI Neural Engine (${m})!`,
               model: m,
             }),
           }
@@ -212,7 +212,7 @@ export async function processGeminiApiRequest(params: {
         success: false,
         error: {
           code: "UPSTREAM_ERROR",
-          message: "Failed to connect to Google Gemini API with configured key.",
+          message: "Failed to connect to AI service with configured key.",
         },
       }),
     }
@@ -334,7 +334,7 @@ export async function processGeminiApiRequest(params: {
           const isAbort = (err as { name?: string })?.name === "AbortError"
           lastError = {
             status: isAbort ? 504 : 500,
-            text: isAbort ? "Gemini request timed out" : String(err),
+            text: isAbort ? "AI request timed out" : String(err),
           }
         }
       }
@@ -346,7 +346,7 @@ export async function processGeminiApiRequest(params: {
         ? "AI service is temporarily busy. Please try again shortly."
         : statusCode === 504
           ? "Request timed out while waiting for AI model. Please try with a shorter requirement description."
-          : "Failed to generate response from Gemini API on Netlify."
+          : "Failed to generate response from AI service."
 
     return {
       statusCode,
@@ -473,7 +473,7 @@ export async function processGeminiApiRequest(params: {
           message:
             statusCode === 429
               ? "AI service is temporarily busy. Please try again shortly."
-              : "Failed to generate chat response on Netlify.",
+              : "Failed to generate chat response from AI service.",
         },
         isLive: false,
       }),

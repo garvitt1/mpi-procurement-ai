@@ -66,3 +66,4 @@ export function sanitizeErrorMessage(error: unknown, fallback = "Unable to compl
 
   return fallback
 }
+
