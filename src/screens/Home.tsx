@@ -1337,10 +1337,7 @@ export default function Home({
                 </span>
               </h2>
               <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
-                No complex engineering jargon required. Whether you need custom
-                biodegradable pouches, 5-axis CNC titanium drone arms, or full-stack
-                cloud ERP infrastructure, MPI converts plain descriptions into
-                institutional-grade specifications in seconds.
+                Describe your procurement requirements in everyday language. MPI helps structure product details, quantities, specifications, customization needs, and delivery timelines into a procurement request you can review before dispatch.
               </p>
               <div className="pt-2">
                 <button
@@ -1349,7 +1346,7 @@ export default function Home({
                     handleProtectedJourney({
                       targetScreen: "startup.procurement",
                       actionType: "experience_intake",
-                      actionLabel: "Experience Natural Language Intake",
+                      actionLabel: "Try Natural-Language Intake",
                       requiredRole: "startup",
                       portalContext: {
                         badge: "AI Sourcing Intake",
@@ -1361,7 +1358,7 @@ export default function Home({
                   }
                   className="group inline-flex items-center gap-2 text-xs font-bold text-[#051F16] hover:text-[#083A28] cursor-pointer"
                 >
-                  <span>Experience Natural Language Intake</span>
+                  <span>Try Natural-Language Intake</span>
                   <Icons.ArrowRight className="w-3.5 h-3.5 text-[#051F16] group-hover:translate-x-1 transition-transform" />
                 </button>
               </div>
@@ -1374,15 +1371,34 @@ export default function Home({
                 <span className="text-emerald-700 font-bold">● AI PARSER READY</span>
               </div>
               <div className="p-4 bg-white rounded-xl border border-slate-200 text-xs sm:text-sm text-slate-800 leading-relaxed font-medium">
-                "Looking for 500 units rigid cardboard packaging boxes with gold foil logo stamping and custom black EVA foam inserts for perfume launch next month."
+                "We need custom packaging for an upcoming product launch, with a premium finish, a protective insert, and a specific delivery deadline."
               </div>
-              <div className="p-4 bg-[#051F16] text-white rounded-xl text-xs space-y-2 font-mono border border-[#0A3525]">
-                <div className="text-[#A3F65C] font-bold">OUTPUT: Institutional RFQ BOM</div>
-                <div className="text-slate-300 text-[11px] space-y-1">
-                  <div>• Material: 1200 GSM Kappa Board + 157 GSM Art Paper</div>
-                  <div>• Finish: Matte Lamination + Micro Spot UV Gold Foil</div>
-                  <div>• Insert: Custom Die-Cut EVA Foam (High Density)</div>
-                  <div>• Target Batch MOQ: 500 Units • Lead Time: 12 Days</div>
+              <div className="p-4 bg-[#051F16] text-white rounded-xl text-xs space-y-2.5 font-mono border border-[#0A3525]">
+                <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                  <span className="text-[#A3F65C] font-bold tracking-wider">STRUCTURED REQUEST DRAFT</span>
+                  <span className="text-[10px] text-slate-400 font-sans">Draft Preview • Not Dispatched</span>
+                </div>
+                <div className="text-slate-200 text-[11px] space-y-1.5 pt-1">
+                  <div className="flex items-start gap-2">
+                    <span className="text-[#A3F65C]">•</span>
+                    <span><strong className="text-white font-semibold">Product requirements:</strong> Custom rigid packaging box</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-[#A3F65C]">•</span>
+                    <span><strong className="text-white font-semibold">Quantity and specifications:</strong> 500 units target batch</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-[#A3F65C]">•</span>
+                    <span><strong className="text-white font-semibold">Materials and customization:</strong> Premium finish, protective insert</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-[#A3F65C]">•</span>
+                    <span><strong className="text-white font-semibold">Delivery requirements:</strong> Specified launch deadline</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-[#A3F65C]">•</span>
+                    <span><strong className="text-white font-semibold">Missing details to confirm:</strong> Exact dimensions, print artwork files</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1393,48 +1409,74 @@ export default function Home({
             {/* Visual B */}
             <div className="order-2 lg:order-1 bg-slate-50 rounded-2xl p-6 border border-slate-200 shadow-2xs space-y-4">
               <div className="flex items-center justify-between text-xs font-mono text-slate-500 border-b border-slate-200 pb-3">
-                <span>FACTORY DOSSIER #MCH-4819</span>
-                <span className="text-emerald-800 font-bold">100% STATUTORY AUDITED</span>
+                <span>SUPPLIER PROFILE REVIEW PROCESS</span>
+                <span className="text-emerald-800 font-bold">VERIFICATION CRITERIA</span>
               </div>
               <div className="bg-white rounded-xl p-4 border border-slate-200 space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="font-bold text-slate-900 text-sm">
-                    Apex Precision Packaging Ltd.
+                <div className="space-y-2.5 text-xs text-slate-700">
+                  <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100 flex items-start justify-between gap-3">
+                    <div>
+                      <div className="font-bold text-slate-900">Business identity</div>
+                      <div className="text-[11px] text-slate-500">Review status of submitted documents.</div>
+                    </div>
+                    <span className="text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded">
+                      Document Check
+                    </span>
                   </div>
-                  <span className="text-[10px] bg-emerald-50 text-emerald-800 font-bold px-2 py-0.5 rounded border border-emerald-200">
-                    ZED Gold Pass
-                  </span>
+
+                  <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100 flex items-start justify-between gap-3">
+                    <div>
+                      <div className="font-bold text-slate-900">Manufacturing capabilities</div>
+                      <div className="text-[11px] text-slate-500">Declared capabilities and available evidence.</div>
+                    </div>
+                    <span className="text-[10px] font-semibold bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 rounded">
+                      Declared Scope
+                    </span>
+                  </div>
+
+                  <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100 flex items-start justify-between gap-3">
+                    <div>
+                      <div className="font-bold text-slate-900">Supporting documentation</div>
+                      <div className="text-[11px] text-slate-500">Documents provided for review.</div>
+                    </div>
+                    <span className="text-[10px] font-semibold bg-purple-50 text-purple-700 border border-purple-200 px-2 py-0.5 rounded">
+                      Uploaded Files
+                    </span>
+                  </div>
+
+                  <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100 flex items-start justify-between gap-3">
+                    <div>
+                      <div className="font-bold text-slate-900">MPI review status</div>
+                      <div className="text-[11px] text-slate-500">Self-declared, under review, or admin-reviewed, as applicable.</div>
+                    </div>
+                    <span className="text-[10px] font-semibold bg-amber-50 text-amber-800 border border-amber-200 px-2 py-0.5 rounded">
+                      Tier Status
+                    </span>
+                  </div>
                 </div>
-                <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-600 pt-1">
-                  <div>Udyam: UDYAM-MH-12-0048192</div>
-                  <div>GSTIN: 27AABCA1234F1Z6</div>
-                  <div>Location: Bengaluru, KA</div>
-                  <div>ISO: 9001:2015 Certified</div>
-                </div>
-                <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
-                  <span className="text-slate-500">Live Heidelberg Press Capacity:</span>
-                  <span className="font-bold text-emerald-700">68% Utilized (32% Open)</span>
+
+                <div className="pt-3 border-t border-slate-100 text-[11px] text-slate-500 flex items-center gap-1.5 leading-tight">
+                  <MaterialIcon name="info" size={14} className="text-slate-400 shrink-0" />
+                  <span>A registered profile does not automatically mean an independently verified supplier.</span>
                 </div>
               </div>
             </div>
 
             <div className="order-1 lg:order-2 space-y-4">
               <span className="font-mono text-xs font-semibold uppercase tracking-widest text-emerald-800">
-                Verified Marketplace
+                Supplier Transparency
               </span>
               <h2
                 className="text-3xl sm:text-4xl font-extrabold text-[#051F16] tracking-tight leading-tight"
                 style={{ fontFamily: "Plus Jakarta Sans" }}
               >
-                Know exactly who you are{" "}
+                Know how each supplier profile is{" "}
                 <span className="font-editorial italic font-normal text-[#083A28]">
-                  buying from.
+                  reviewed.
                 </span>
               </h2>
               <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
-                Zero phantom brokers or fictitious trading houses. Every factory
-                profile on MPI reveals real machine capacity ledgers, statutory
-                Udyam certificates, and verified past order drop-test results.
+                MPI distinguishes information submitted by suppliers from checks completed through the platform. Review the available verification status and supporting evidence before making procurement decisions.
               </p>
               <div className="pt-2">
                 <button
@@ -1447,12 +1489,12 @@ export default function Home({
                       handleProtectedJourney({
                         targetScreen: "startup.match-results",
                         actionType: "inspect_suppliers",
-                        actionLabel: "Inspect Verified Suppliers",
+                        actionLabel: "Explore Supplier Verification Standards",
                         requiredRole: "startup",
                         portalContext: {
                           badge: "Supplier Verification",
-                          title: "Inspect Verified MSME Suppliers",
-                          description: "Access audited factory dossiers, ZED Gold certifications, and live machine capacity.",
+                          title: "Supplier Verification Standards",
+                          description: "Review supplier verification tiers, submitted documentation, and review processes.",
                           icon: "verified",
                         },
                       })
@@ -1460,7 +1502,7 @@ export default function Home({
                   }}
                   className="group inline-flex items-center gap-2 text-xs font-bold text-[#051F16] hover:text-[#083A28] cursor-pointer"
                 >
-                  <span>Inspect Verified Supplier Standards</span>
+                  <span>Explore Supplier Verification Standards</span>
                   <Icons.ArrowRight className="w-3.5 h-3.5 text-[#051F16] group-hover:translate-x-1 transition-transform" />
                 </button>
               </div>
@@ -1477,15 +1519,13 @@ export default function Home({
                 className="text-3xl sm:text-4xl font-extrabold text-[#051F16] tracking-tight leading-tight"
                 style={{ fontFamily: "Plus Jakarta Sans" }}
               >
-                Compare bids before you commit a{" "}
+                Compare quotations before you commit a{" "}
                 <span className="font-editorial italic font-normal text-[#083A28]">
-                  single Rupee.
+                  single rupee.
                 </span>
               </h2>
               <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
-                Side-by-side factory bid analysis normalized across tooling fees,
-                unit manufacturing rates, QA drop test protocols, and statutory
-                ZED subsidy offsets. You make procurement decisions backed by data.
+                Review supplier-submitted quotations side by side. Compare quoted prices, scope, delivery estimates, taxes, and other applicable charges using the information provided in each quotation.
               </p>
               <div className="pt-2">
                 <button
@@ -1494,19 +1534,19 @@ export default function Home({
                     handleProtectedJourney({
                       targetScreen: "startup.comparison",
                       actionType: "view_bidding",
-                      actionLabel: "View Side-by-Side Bidding Engine",
+                      actionLabel: "Explore Quote Comparison",
                       requiredRole: "startup",
                       portalContext: {
                         badge: "Comparative Bidding",
-                        title: "Side-by-Side Bidding Engine",
-                        description: "Sign in to compare factory quotes, tooling fees, and turnaround SLAs.",
+                        title: "Quote Comparison Engine",
+                        description: "Sign in to compare supplier-submitted quotations, scope details, and lead times.",
                         icon: "compare_arrows",
                       },
                     })
                   }
                   className="group inline-flex items-center gap-2 text-xs font-bold text-[#051F16] hover:text-[#083A28] cursor-pointer"
                 >
-                  <span>View Side-by-Side Bidding Engine</span>
+                  <span>Explore Quote Comparison</span>
                   <Icons.ArrowRight className="w-3.5 h-3.5 text-[#051F16] group-hover:translate-x-1 transition-transform" />
                 </button>
               </div>
@@ -1516,41 +1556,54 @@ export default function Home({
             <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200 shadow-2xs space-y-3">
               <div className="flex items-center justify-between text-xs font-mono text-slate-500 border-b border-slate-200 pb-3">
                 <span>COMPARATIVE BID ANALYSIS</span>
-                <span className="text-emerald-700 font-bold">3 ACTIVE FACTORY OFFERS</span>
+                <span className="text-emerald-700 font-bold">GENERIC PREVIEW</span>
               </div>
-              <div className="space-y-2 text-xs">
-                <div className="p-3 bg-white rounded-xl border border-slate-200 flex items-center justify-between">
-                  <div>
-                    <div className="font-bold text-slate-900">Apex Precision (Bangalore)</div>
-                    <div className="text-[11px] text-slate-500">12 Days • ZED Gold • Drop Test 99.4%</div>
+              <div className="space-y-2.5 text-xs">
+                {/* Quotation A */}
+                <div className="p-3.5 bg-white rounded-xl border border-slate-200 space-y-1.5">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-1.5">
+                    <span className="font-bold text-slate-900 text-xs">Quotation A</span>
+                    <span className="text-[10px] font-mono bg-slate-100 text-slate-600 px-2 py-0.5 rounded">Sample Option</span>
                   </div>
-                  <div className="text-right">
-                    <div className="font-bold text-emerald-700">₹72,000</div>
-                    <div className="text-[10px] text-slate-400">All Inclusive</div>
-                  </div>
-                </div>
-
-                <div className="p-3 bg-white rounded-xl border border-slate-200 flex items-center justify-between">
-                  <div>
-                    <div className="font-bold text-slate-900">Bharat Cartons (Pune)</div>
-                    <div className="text-[11px] text-slate-500">14 Days • ISO 9001 • Drop Test 98.8%</div>
-                  </div>
-                  <div className="text-right">
-                    <div className="font-bold text-slate-800">₹76,500</div>
-                    <div className="text-[10px] text-slate-400">All Inclusive</div>
+                  <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-[11px] text-slate-600 pt-0.5">
+                    <div><span className="text-slate-400 font-medium">Price:</span> Unit & tooling pricing</div>
+                    <div><span className="text-slate-400 font-medium">Scope:</span> Defined material specifications</div>
+                    <div><span className="text-slate-400 font-medium">Lead time:</span> Estimated production days</div>
+                    <div><span className="text-slate-400 font-medium">Taxes and delivery:</span> Itemized GST & dispatch terms</div>
                   </div>
                 </div>
 
-                <div className="p-3 bg-rose-50/60 rounded-xl border border-rose-200/80 flex items-center justify-between">
-                  <div>
-                    <div className="font-bold text-rose-900">Traditional Offline Broker</div>
-                    <div className="text-[11px] text-rose-600">Unverified Lead Time • No SLA</div>
+                {/* Quotation B */}
+                <div className="p-3.5 bg-white rounded-xl border border-slate-200 space-y-1.5">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-1.5">
+                    <span className="font-bold text-slate-900 text-xs">Quotation B</span>
+                    <span className="text-[10px] font-mono bg-slate-100 text-slate-600 px-2 py-0.5 rounded">Sample Option</span>
                   </div>
-                  <div className="text-right">
-                    <div className="font-bold text-rose-700 line-through">₹1,08,000</div>
-                    <div className="text-[10px] text-rose-500">+35% Margin</div>
+                  <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-[11px] text-slate-600 pt-0.5">
+                    <div><span className="text-slate-400 font-medium">Price:</span> Tiered volume pricing</div>
+                    <div><span className="text-slate-400 font-medium">Scope:</span> Standard manufacturing package</div>
+                    <div><span className="text-slate-400 font-medium">Lead time:</span> Standard batch turnaround</div>
+                    <div><span className="text-slate-400 font-medium">Taxes and delivery:</span> Included tax, freight extra</div>
                   </div>
                 </div>
+
+                {/* Quotation C */}
+                <div className="p-3.5 bg-white rounded-xl border border-slate-200 space-y-1.5">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-1.5">
+                    <span className="font-bold text-slate-900 text-xs">Quotation C</span>
+                    <span className="text-[10px] font-mono bg-slate-100 text-slate-600 px-2 py-0.5 rounded">Sample Option</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-[11px] text-slate-600 pt-0.5">
+                    <div><span className="text-slate-400 font-medium">Price:</span> Alternative supplier quote</div>
+                    <div><span className="text-slate-400 font-medium">Scope:</span> Custom finishing & testing scope</div>
+                    <div><span className="text-slate-400 font-medium">Lead time:</span> Expedited timeline option</div>
+                    <div><span className="text-slate-400 font-medium">Taxes and delivery:</span> Stated taxes and freight estimate</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-2 border-t border-slate-200/80 text-[11px] text-slate-500 text-center leading-tight">
+                Illustrative interface — no live quotation amounts, supplier identities, or commercial records are displayed.
               </div>
             </div>
           </div>
@@ -1711,15 +1764,14 @@ export default function Home({
             className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#051F16] tracking-tight leading-tight"
             style={{ fontFamily: "Plus Jakarta Sans" }}
           >
-            MPI unites India's{" "}
+            Connect every step of your{" "}
             <span className="font-editorial italic font-normal text-[#083A28]">
-              manufacturing grid.
+              procurement journey.
             </span>
           </h2>
 
           <p className="text-sm sm:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed">
-            Bridging fast-growing tech startups with regional manufacturing clusters,
-            statutory subsidy frameworks, certified quality labs, and milestone payment governance.
+            MPI brings AI-assisted requirement intake, RFQ workflows, supplier quotations, commercial comparison, and government scheme discovery into one connected procurement experience.
           </p>
 
           {/* Ecosystem Visual Network */}
@@ -1758,60 +1810,60 @@ export default function Home({
               <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs text-left space-y-1">
                 <div className="flex items-center gap-2 font-bold text-slate-900 text-xs">
                   <MaterialIcon name="rocket_launch" size={16} className="text-emerald-700" />
-                  <span>Startups & D2C Brands</span>
+                  <span>Startup & Buyer Teams</span>
                 </div>
                 <div className="text-[11px] text-slate-500">
-                  Natural language intake, fast prototyping, zero advance risk.
+                  Turn purchasing needs into structured procurement requests.
                 </div>
               </div>
 
               <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs text-left space-y-1">
                 <div className="flex items-center gap-2 font-bold text-slate-900 text-xs">
                   <MaterialIcon name="precision_manufacturing" size={16} className="text-emerald-700" />
-                  <span>MSME Factory Fleet</span>
+                  <span>MSME Suppliers</span>
                 </div>
                 <div className="text-[11px] text-slate-500">
-                  Curated MSME manufacturing facilities across 28 industrial corridors.
+                  Review eligible inquiries and submit quotations.
                 </div>
               </div>
 
               <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs text-left space-y-1">
                 <div className="flex items-center gap-2 font-bold text-slate-900 text-xs">
                   <MaterialIcon name="policy" size={16} className="text-emerald-700" />
-                  <span>Govt Grant Frameworks</span>
+                  <span>Government Scheme Discovery</span>
                 </div>
                 <div className="text-[11px] text-slate-500">
-                  ZED Subsidies, SISFS Seed grants, and Design Clinic assistance.
+                  Explore potentially relevant schemes and eligibility criteria.
                 </div>
               </div>
 
               <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs text-left space-y-1">
                 <div className="flex items-center gap-2 font-bold text-slate-900 text-xs">
-                  <MaterialIcon name="lock" size={16} className="text-[#051F16]" />
-                  <span>Milestone Payment Governance</span>
+                  <MaterialIcon name="compare_arrows" size={16} className="text-[#051F16]" />
+                  <span>Quotation Comparison</span>
                 </div>
                 <div className="text-[11px] text-slate-500">
-                  Phased milestone schedules with batch QC inspection sign-off gates.
+                  Review submitted commercial terms side by side.
                 </div>
               </div>
 
               <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs text-left space-y-1">
                 <div className="flex items-center gap-2 font-bold text-slate-900 text-xs">
                   <MaterialIcon name="fact_check" size={16} className="text-emerald-700" />
-                  <span>Quality Inspection Labs</span>
+                  <span>Supplier Profile Review</span>
                 </div>
                 <div className="text-[11px] text-slate-500">
-                  Standardized batch drop testing, burst strength, and tolerance audit.
+                  Understand profile status and available verification evidence.
                 </div>
               </div>
 
               <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs text-left space-y-1">
                 <div className="flex items-center gap-2 font-bold text-slate-900 text-xs">
-                  <MaterialIcon name="location_city" size={16} className="text-slate-700" />
-                  <span>Industrial Hub Corridors</span>
+                  <MaterialIcon name="alt_route" size={16} className="text-slate-700" />
+                  <span>Procurement Workflow</span>
                 </div>
                 <div className="text-[11px] text-slate-500">
-                  Peenya, Okhla, Coimbatore, Pune, Sivakasi cluster links.
+                  Manage RFQs and quotations through the available workflow.
                 </div>
               </div>
             </div>
@@ -1830,67 +1882,62 @@ export default function Home({
               className="text-3xl sm:text-4xl font-extrabold text-[#051F16] tracking-tight leading-tight"
               style={{ fontFamily: "Plus Jakarta Sans" }}
             >
-              Everything your procurement workflow needs,{" "}
+              From purchase requirement to an{" "}
               <span className="font-editorial italic font-normal text-[#083A28]">
-                connected in one place.
+                informed decision.
               </span>
             </h2>
             <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-normal">
-              From requirement drafting to statutory tax invoices, manage your entire
-              supply chain through a single unified command center.
+              Create a structured request, dispatch an RFQ, receive supplier quotations, and compare commercial terms through MPI's procurement workflow.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-2.5">
               <span className="text-xs font-bold text-[#051F16] bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">
-                01 • Instant RFQ Dispatch
+                01 • Requirement Intake
               </span>
               <h3 className="font-bold text-slate-900 text-sm">
-                Broadcast in Seconds
+                Requirement Intake
               </h3>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Send standardized technical RFQs to matched factories without
-                calling 15 different agents.
+                Describe your product, quantity, specifications, and timeline.
               </p>
             </div>
 
             <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-2.5">
               <span className="text-xs font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">
-                02 • Capacity Matching
+                02 • RFQ Creation & Dispatch
               </span>
               <h3 className="font-bold text-slate-900 text-sm">
-                Idle Machine Hours
+                RFQ Creation & Dispatch
               </h3>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Take advantage of verified factory downtime to negotiate the best
-                possible unit rates.
+                Review your requirement and send the procurement request.
               </p>
             </div>
 
             <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-2.5">
               <span className="text-xs font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">
-                03 • Subsidy Automation
+                03 • Quotation Collection
               </span>
               <h3 className="font-bold text-slate-900 text-sm">
-                Claim ZED & SISFS
+                Quotation Collection
               </h3>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Automatic statutory grant eligibility checks with ready-to-file
-                documentation.
+                Receive supplier-submitted quotations against the RFQ.
               </p>
             </div>
 
             <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-2.5">
               <span className="text-xs font-bold text-[#051F16] bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
-                04 • Milestone Payment Ledger
+                04 • Commercial Comparison
               </span>
               <h3 className="font-bold text-slate-900 text-sm">
-                Milestone Tracking & QA Gates
+                Commercial Comparison
               </h3>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Track production phases, batch QA inspections, and delivery dispatches
-                in real time.
+                Compare submitted prices, scope, lead time, and applicable charges.
               </p>
             </div>
           </div>
