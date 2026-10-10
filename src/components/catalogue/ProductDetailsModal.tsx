@@ -70,7 +70,7 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({
             </span>
             <span className="text-xs font-semibold bg-emerald-600/90 backdrop-blur-md px-2.5 py-1 rounded-lg flex items-center gap-1">
               <MaterialIcon name="verified" size={14} className="text-emerald-200" />
-              MPI Verified MSME
+              Verified Spec Standard
             </span>
           </div>
         </div>
@@ -144,6 +144,10 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({
               </ul>
             </div>
           )}
+
+          <div className="text-[10px] text-slate-400 italic">
+            *Specifications and pricing guidance represent institutional benchmark parameters. Final rates and delivery schedules are confirmed via formal factory RFQ bids.
+          </div>
 
           {/* Modal Footer CTAs */}
           <div className="pt-3 border-t border-slate-100 flex flex-col sm:flex-row items-center gap-3">

@@ -573,6 +573,18 @@ export function MPIStatusBadge({ status }: { status: string }) {
       border: "border-emerald-200",
       dot: "bg-emerald-600",
     },
+    "Admin Verified": {
+      bg: "bg-emerald-50",
+      text: "text-emerald-800",
+      border: "border-emerald-300",
+      dot: "bg-emerald-600",
+    },
+    "Self-Declared": {
+      bg: "bg-slate-100",
+      text: "text-slate-700",
+      border: "border-slate-300",
+      dot: "bg-slate-400",
+    },
     Matched: {
       bg: "bg-emerald-100/60",
       text: "text-[#051F16]",

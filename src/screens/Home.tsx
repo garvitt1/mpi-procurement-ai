@@ -29,6 +29,8 @@ import MaterialIcon from "../components/ui/MaterialIcon"
 import CountUpNumber from "../components/ui/CountUpNumber"
 import { openCookiePreferencesModal } from "../services/cookieConsentService"
 import { trackTelemetryEvent } from "../services/telemetryService"
+import TrustStandardsModal from "../components/trust/TrustStandardsModal"
+import StickyPrimaryCTA from "../components/navigation/StickyPrimaryCTA"
 
 export function formatScopeDisplay(category: CatalogCategory, qty: number): string {
   if (category === "Packaging & Printing") {
@@ -67,14 +69,14 @@ export const INDUSTRIAL_CLUSTERS = [
 ]
 
 export const STATUTORY_STANDARDS = [
-  { label: "DPIIT Recognized Startup Infrastructure", badge: "Govt of India", icon: "verified" },
-  { label: "ZED Gold Certified MSME Manufacturers", badge: "Zero Defect", icon: "military_tech" },
-  { label: "ISO 9001:2015 Quality Management Standard", badge: "Audited", icon: "fact_check" },
-  { label: "Udyam Ministry Verified Active GSTINs", badge: "MSME Ministry", icon: "policy" },
-  { label: "Milestone Tripartite Escrow Banking", badge: "Protected", icon: "lock" },
-  { label: "NABL Accredited Third-Party Testing Labs", badge: "QA Tested", icon: "science" },
-  { label: "Government e-Marketplace (GeM) Compliant", badge: "Institutional", icon: "account_balance" },
-  { label: "Startup India SISFS Seed Grant Assistance", badge: "Up to 80%", icon: "savings" },
+  { label: "DPIIT-Recognized Startup Framework", badge: "Scheme Aligned", icon: "verified", tab: "standards" as const },
+  { label: "ZED Gold Certified MSME Audit Standards", badge: "Zero Defect", icon: "military_tech", tab: "standards" as const },
+  { label: "ISO 9001:2015 Quality Management Standard", badge: "Audited", icon: "fact_check", tab: "standards" as const },
+  { label: "Active GSTIN & Udyam Verified MSMEs", badge: "Ministry Verified", icon: "policy", tab: "verification" as const },
+  { label: "Milestone-Governed Contract Terms", badge: "Inspection-Backed", icon: "lock", tab: "milestones" as const },
+  { label: "NABL Accredited Testing Standards", badge: "QA Tested", icon: "science", tab: "standards" as const },
+  { label: "Reverse-Margin Cost Decomposition", badge: "Direct Factory", icon: "trending_down", tab: "savings" as const },
+  { label: "Startup India SISFS Seed Grant Assistance", badge: "Up to 80% Subsidy", icon: "savings", tab: "standards" as const },
 ]
 
 export default function Home({
@@ -128,6 +130,15 @@ export default function Home({
     requiredRole: "startup",
     actionName: "",
   })
+
+  // Trust, Verification & Governance Modal State
+  const [trustModalOpen, setTrustModalOpen] = useState(false)
+  const [trustModalTab, setTrustModalTab] = useState<"verification" | "standards" | "milestones" | "savings">("verification")
+
+  const handleOpenTrustModal = (tab: "verification" | "standards" | "milestones" | "savings" = "verification") => {
+    setTrustModalTab(tab)
+    setTrustModalOpen(true)
+  }
 
   const handleOpenAuth = (options?: {
     mode?: "login" | "signin"
@@ -606,21 +617,36 @@ export default function Home({
             </div>
 
             {/* Credibility Micro-line */}
-            <div className="pt-2 flex items-center justify-center gap-6 text-xs text-slate-500 font-medium">
-              <span className="flex items-center gap-1.5">
-                <MaterialIcon name="verified" size={14} className="text-emerald-700" />
-                <span><CountUpNumber end={1240} suffix="+" /> Verified MSME Factories</span>
-              </span>
+            <div className="pt-2 flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-xs text-slate-600 font-medium">
+              <button
+                type="button"
+                onClick={() => handleOpenTrustModal("verification")}
+                className="inline-flex items-center gap-1.5 hover:text-[#051F16] cursor-pointer transition-colors"
+                title="View industrial cluster verification criteria"
+              >
+                <MaterialIcon name="verified" size={15} className="text-emerald-700" />
+                <span className="font-semibold text-slate-800">28+ Industrial Clusters Connected</span>
+              </button>
               <span className="hidden sm:inline text-slate-300">•</span>
-              <span className="hidden sm:flex items-center gap-1.5">
-                <MaterialIcon name="policy" size={14} className="text-emerald-700" />
-                <span>DPIIT & ZED Certified</span>
-              </span>
+              <button
+                type="button"
+                onClick={() => handleOpenTrustModal("standards")}
+                className="hidden sm:inline-flex items-center gap-1.5 hover:text-[#051F16] cursor-pointer transition-colors"
+                title="View statutory compliance alignment"
+              >
+                <MaterialIcon name="policy" size={15} className="text-emerald-700" />
+                <span>DPIIT & ZED Scheme Aligned</span>
+              </button>
               <span className="hidden sm:inline text-slate-300">•</span>
-              <span className="flex items-center gap-1.5">
-                <MaterialIcon name="lock" size={14} className="text-[#051F16]" />
-                <span>100% Milestone Escrow</span>
-              </span>
+              <button
+                type="button"
+                onClick={() => handleOpenTrustModal("milestones")}
+                className="inline-flex items-center gap-1.5 hover:text-[#051F16] cursor-pointer transition-colors"
+                title="View milestone payment governance"
+              >
+                <MaterialIcon name="lock" size={15} className="text-[#051F16]" />
+                <span>Milestone-Governed Payments</span>
+              </button>
             </div>
           </div>
 
@@ -644,14 +670,14 @@ export default function Home({
                   </div>
                   <span className="h-4 w-px bg-slate-200 mx-1" />
                   <span className="font-mono text-[11px] font-semibold text-slate-600">
-                    app.mpi.gov.in / procurement-os
+                    app.mpi.market / procurement-intelligence
                   </span>
                 </div>
 
                 <div className="flex items-center gap-3">
                   <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200 font-medium text-[11px]">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    <span>Engine Active • <CountUpNumber end={1240} /> Factories Connected</span>
+                    <span>Engine Active • 28 Industrial Hubs Matched</span>
                   </div>
                 </div>
               </div>
@@ -873,8 +899,8 @@ export default function Home({
                         </span>
                       </div>
                       <div className="flex justify-between py-1">
-                        <span className="text-slate-500">Escrow Milestone Gate</span>
-                        <span className="font-semibold text-slate-800">30% Advance Protected</span>
+                        <span className="text-slate-500">Payment Governance</span>
+                        <span className="font-semibold text-slate-800">30% Advance Gate-Protected</span>
                       </div>
                     </div>
                   </div>
@@ -885,7 +911,7 @@ export default function Home({
                   <div className="flex items-center gap-3">
                     <span className="w-2 h-2 rounded-full bg-[#A3F65C] animate-pulse" />
                     <span className="font-semibold text-slate-200">
-                      Milestone SLA Protection: 30% Mobilization Escrow → QA Drop Test Passed → Final 70% Released
+                      Milestone Governance: 30% Mobilization Deposit → Batch QA Drop Test Sign-off → Final 70% Released
                     </span>
                   </div>
                   <button
@@ -899,7 +925,7 @@ export default function Home({
                         portalContext: {
                           badge: "Startup Workspace",
                           title: "Launch Procurement Workspace",
-                          description: "Access your active RFQs, supplier bids, and milestone escrow ledgers.",
+                          description: "Access your active RFQs, supplier bids, and milestone ledgers.",
                           icon: "rocket_launch",
                         },
                       })
@@ -919,10 +945,18 @@ export default function Home({
       {/* ─── 4. CREDIBILITY & METRICS BAND ─────────────────────────────────── */}
       <section className="bg-white border-y border-slate-200/80 py-12 lg:py-16 scroll-reveal">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-8">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mb-8">
             <span className="font-mono text-xs uppercase tracking-widest text-slate-400 font-semibold">
-              Powering Institutional Sourcing Across India
+              Powering Structured Sourcing Across Indian Manufacturing Corridors
             </span>
+            <button
+              type="button"
+              onClick={() => handleOpenTrustModal("verification")}
+              className="text-xs font-bold text-emerald-800 hover:text-emerald-950 inline-flex items-center gap-1 cursor-pointer"
+            >
+              <span>View Audit & Trust Framework</span>
+              <Icons.ArrowRight className="w-3.5 h-3.5" />
+            </button>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 divide-y sm:divide-y-0 sm:divide-x divide-slate-200/80">
@@ -931,13 +965,13 @@ export default function Home({
                 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#051F16] tracking-tight"
                 style={{ fontFamily: "Plus Jakarta Sans" }}
               >
-                <CountUpNumber end={1240} suffix="+" />
+                <CountUpNumber end={28} suffix="+" />
               </div>
-              <div className="text-xs sm:text-sm text-slate-600 font-medium mt-1">
-                Verified MSME Suppliers
+              <div className="text-xs sm:text-sm text-slate-700 font-bold mt-1">
+                Active Manufacturing Hubs
               </div>
-              <div className="text-[11px] text-slate-400 mt-0.5">
-                Across 28 Industrial Hubs
+              <div className="text-[11px] text-slate-500 mt-0.5">
+                Across 8 Regional Corridors
               </div>
             </div>
 
@@ -948,11 +982,11 @@ export default function Home({
               >
                 <CountUpNumber end={75} suffix="+" />
               </div>
-              <div className="text-xs sm:text-sm text-slate-600 font-medium mt-1">
+              <div className="text-xs sm:text-sm text-slate-700 font-bold mt-1">
                 Procure-Ready Offerings
               </div>
-              <div className="text-[11px] text-slate-400 mt-0.5">
-                With Instant RFQ Synthesis
+              <div className="text-[11px] text-slate-500 mt-0.5">
+                Instant Technical Specs
               </div>
             </div>
 
@@ -963,10 +997,10 @@ export default function Home({
               >
                 <CountUpNumber end={7} />
               </div>
-              <div className="text-xs sm:text-sm text-slate-600 font-medium mt-1">
+              <div className="text-xs sm:text-sm text-slate-700 font-bold mt-1">
                 Core Procurement Verticals
               </div>
-              <div className="text-[11px] text-slate-400 mt-0.5">
+              <div className="text-[11px] text-slate-500 mt-0.5">
                 Packaging to Precision CNC
               </div>
             </div>
@@ -978,13 +1012,26 @@ export default function Home({
               >
                 <CountUpNumber start={18} end={32} prefix="18–" suffix="%" />
               </div>
-              <div className="text-xs sm:text-sm text-slate-600 font-medium mt-1">
-                Direct Cost Reduction
+              <div className="text-xs sm:text-sm text-slate-700 font-bold mt-1">
+                Target Cost Reduction
               </div>
-              <div className="text-[11px] text-slate-400 mt-0.5">
-                Via Factory Reverse Margins
+              <div className="text-[11px] text-slate-500 mt-0.5">
+                Via Reverse-Margin Discovery
               </div>
             </div>
+          </div>
+
+          <div className="mt-8 pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] text-slate-400">
+            <div>
+              *Savings benchmarks reflect itemized reverse-margin comparisons between traditional intermediary markups and direct factory tooling quotes across active manufacturing corridors.
+            </div>
+            <button
+              type="button"
+              onClick={() => handleOpenTrustModal("savings")}
+              className="text-emerald-700 hover:underline shrink-0 font-medium cursor-pointer"
+            >
+              Learn how savings are calculated →
+            </button>
           </div>
         </div>
       </section>
@@ -1026,16 +1073,19 @@ export default function Home({
           <div className="flex overflow-hidden">
             <div className="animate-marquee-right flex items-center gap-3">
               {[...STATUTORY_STANDARDS, ...STATUTORY_STANDARDS].map((std, idx) => (
-                <div
+                <button
+                  type="button"
                   key={`std-${idx}`}
-                  className="inline-flex items-center gap-2.5 px-3.5 py-2 rounded-xl bg-[#051F16] border border-[#0A3525] text-white shadow-2xs hover:border-emerald-600/50 transition-all whitespace-nowrap"
+                  onClick={() => handleOpenTrustModal(std.tab as any)}
+                  title={`View details on ${std.label}`}
+                  className="inline-flex items-center gap-2.5 px-3.5 py-2 rounded-xl bg-[#051F16] border border-[#0A3525] text-white shadow-2xs hover:border-emerald-600/50 hover:bg-[#083A28] transition-all whitespace-nowrap cursor-pointer text-left"
                 >
                   <MaterialIcon name={std.icon} size={15} className="text-[#A3F65C]" />
                   <span className="text-xs font-semibold text-slate-200">{std.label}</span>
                   <span className="text-[10px] font-mono font-bold bg-[#0A3525] text-[#A3F65C] px-2 py-0.5 rounded border border-emerald-900/60">
                     {std.badge}
                   </span>
-                </div>
+                </button>
               ))}
             </div>
           </div>
@@ -1084,43 +1134,71 @@ export default function Home({
               </p>
             </div>
 
-            <div className="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-2xs hover:shadow-xs transition-shadow space-y-3">
-              <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center">
-                <MaterialIcon name="verified" size={20} />
+            <div className="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-2xs hover:shadow-xs transition-shadow space-y-3 flex flex-col justify-between">
+              <div className="space-y-3">
+                <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center">
+                  <MaterialIcon name="verified" size={20} />
+                </div>
+                <h3 className="font-bold text-slate-900 text-base">
+                  Audited MSME Network
+                </h3>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Direct access to Indian manufacturers verified against Udyam, GSTIN, and ZED parameters, with transparent tier badges (Self-Declared vs Admin-Audited).
+                </p>
               </div>
-              <h3 className="font-bold text-slate-900 text-base">
-                100% Audited MSMEs
-              </h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Direct access to Tier-1 Indian manufacturers certified under ZED Gold,
-                ISO 9001, and Udyam with verified machine idle capacity.
-              </p>
+              <button
+                type="button"
+                onClick={() => handleOpenTrustModal("verification")}
+                className="text-[11px] font-bold text-emerald-800 hover:text-emerald-950 inline-flex items-center gap-1 cursor-pointer pt-2"
+              >
+                <span>View Verification Tiers</span>
+                <Icons.ArrowRight className="w-3 h-3" />
+              </button>
             </div>
 
-            <div className="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-2xs hover:shadow-xs transition-shadow space-y-3">
-              <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-800 flex items-center justify-center">
-                <MaterialIcon name="savings" size={20} />
+            <div className="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-2xs hover:shadow-xs transition-shadow space-y-3 flex flex-col justify-between">
+              <div className="space-y-3">
+                <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-800 flex items-center justify-center">
+                  <MaterialIcon name="savings" size={20} />
+                </div>
+                <h3 className="font-bold text-slate-900 text-base">
+                  Reverse-Margin Pricing
+                </h3>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Transparent factory-floor cost breakdowns across tooling, unit production,
+                  GST, and logistics with zero hidden middleman markups.
+                </p>
               </div>
-              <h3 className="font-bold text-slate-900 text-base">
-                Reverse-Margin Pricing
-              </h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Transparent factory-floor cost breakdowns across tooling, unit production,
-                GST, and logistics with zero hidden middleman markups.
-              </p>
+              <button
+                type="button"
+                onClick={() => handleOpenTrustModal("savings")}
+                className="text-[11px] font-bold text-emerald-800 hover:text-emerald-950 inline-flex items-center gap-1 cursor-pointer pt-2"
+              >
+                <span>Pricing Breakdown Logic</span>
+                <Icons.ArrowRight className="w-3 h-3" />
+              </button>
             </div>
 
-            <div className="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-2xs hover:shadow-xs transition-shadow space-y-3">
-              <div className="w-10 h-10 rounded-xl bg-slate-100 text-[#051F16] flex items-center justify-center">
-                <MaterialIcon name="security" size={20} />
+            <div className="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-2xs hover:shadow-xs transition-shadow space-y-3 flex flex-col justify-between">
+              <div className="space-y-3">
+                <div className="w-10 h-10 rounded-xl bg-slate-100 text-[#051F16] flex items-center justify-center">
+                  <MaterialIcon name="security" size={20} />
+                </div>
+                <h3 className="font-bold text-slate-900 text-base">
+                  Milestone-Governed SLAs
+                </h3>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Zero advance capital risk. Procurement funds remain gated under milestone terms and disburse only upon certified batch QA inspection sign-off.
+                </p>
               </div>
-              <h3 className="font-bold text-slate-900 text-base">
-                Escrow Milestone SLAs
-              </h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Zero advance capital risk. Procurement funds remain locked in escrow
-                and disburse only upon certified QA inspection pass.
-              </p>
+              <button
+                type="button"
+                onClick={() => handleOpenTrustModal("milestones")}
+                className="text-[11px] font-bold text-emerald-800 hover:text-emerald-950 inline-flex items-center gap-1 cursor-pointer pt-2"
+              >
+                <span>Milestone Gate Details</span>
+                <Icons.ArrowRight className="w-3 h-3" />
+              </button>
             </div>
           </div>
         </div>
@@ -1527,7 +1605,7 @@ export default function Home({
 
           <p className="text-sm sm:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed">
             Bridging fast-growing tech startups with regional manufacturing clusters,
-            statutory subsidy frameworks, certified quality labs, and escrow banking.
+            statutory subsidy frameworks, certified quality labs, and milestone payment governance.
           </p>
 
           {/* Ecosystem Visual Network */}
@@ -1579,7 +1657,7 @@ export default function Home({
                   <span>MSME Factory Fleet</span>
                 </div>
                 <div className="text-[11px] text-slate-500">
-                  1,240+ Tier-1 manufacturers filling idle machine capacity.
+                  Curated MSME manufacturing facilities across 28 industrial corridors.
                 </div>
               </div>
 
@@ -1596,10 +1674,10 @@ export default function Home({
               <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs text-left space-y-1">
                 <div className="flex items-center gap-2 font-bold text-slate-900 text-xs">
                   <MaterialIcon name="lock" size={16} className="text-[#051F16]" />
-                  <span>Milestone Escrow Banking</span>
+                  <span>Milestone Payment Governance</span>
                 </div>
                 <div className="text-[11px] text-slate-500">
-                  Tripartite escrow accounts with QC inspection release gates.
+                  Phased milestone schedules with batch QC inspection sign-off gates.
                 </div>
               </div>
 
@@ -1691,13 +1769,13 @@ export default function Home({
 
             <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-2.5">
               <span className="text-xs font-bold text-[#051F16] bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
-                04 • Single Escrow Ledger
+                04 • Milestone Payment Ledger
               </span>
               <h3 className="font-bold text-slate-900 text-sm">
-                Milestone Tracking
+                Milestone Tracking & QA Gates
               </h3>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Track production phases, batch inspections, and delivery dispatches
+                Track production phases, batch QA inspections, and delivery dispatches
                 in real time.
               </p>
             </div>
@@ -1705,27 +1783,36 @@ export default function Home({
         </div>
       </section>
 
-      {/* ─── 10. TESTIMONIALS / CREDIBILITY SECTION ────────────────────────── */}
+      {/* ─── 10. SOURCING CASE SCENARIOS & PILOT BENCHMARKS ───────────────── */}
       <section className="py-20 bg-white border-y border-slate-200/80 scroll-reveal">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center space-y-4 mb-14">
             <span className="font-mono text-xs font-semibold uppercase tracking-widest text-emerald-800">
-              Real Ecosystem Feedback
+              Sourcing Case Scenarios & Benchmarks
             </span>
             <h2
               className="text-3xl sm:text-4xl font-extrabold text-[#051F16] tracking-tight leading-tight"
               style={{ fontFamily: "Plus Jakarta Sans" }}
             >
-              Trusted by emerging founders and{" "}
+              Modeled on verified procurement workflows and{" "}
               <span className="font-editorial italic font-normal text-[#083A28]">
-                Tier-1 manufacturers.
+                manufacturing pilot data.
               </span>
             </h2>
+            <p className="text-xs sm:text-sm text-slate-500 max-w-2xl mx-auto">
+              The following operational scenarios illustrate real-world RFQ, matching, and cost-reduction paths based on typical specifications processed through the MPI framework.
+            </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="bg-slate-50/70 p-6 rounded-2xl border border-slate-200/90 shadow-2xs space-y-4 flex flex-col justify-between">
               <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200">
+                    Illustrative Scenario • D2C Packaging
+                  </span>
+                  <span className="text-[11px] font-mono text-slate-400">MOQ: 2,000 pcs</span>
+                </div>
                 <div className="flex text-emerald-600 text-xs">★★★★★</div>
                 <p className="text-xs sm:text-sm text-slate-700 leading-relaxed italic">
                   "We needed 2,000 custom rigid printed boxes for our D2C organic launch.
@@ -1741,6 +1828,12 @@ export default function Home({
 
             <div className="bg-slate-50/70 p-6 rounded-2xl border border-slate-200/90 shadow-2xs space-y-4 flex flex-col justify-between">
               <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200">
+                    Illustrative Scenario • Aerospace Prototyping
+                  </span>
+                  <span className="text-[11px] font-mono text-slate-400">±0.02mm CNC</span>
+                </div>
                 <div className="flex text-emerald-600 text-xs">★★★★★</div>
                 <p className="text-xs sm:text-sm text-slate-700 leading-relaxed italic">
                   "Sourcing 5-axis CNC machining with ±0.02mm tolerance for aeronautical
@@ -1756,11 +1849,17 @@ export default function Home({
 
             <div className="bg-slate-50/70 p-6 rounded-2xl border border-slate-200/90 shadow-2xs space-y-4 flex flex-col justify-between">
               <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200">
+                    Illustrative Scenario • MSME Machine Capacity
+                  </span>
+                  <span className="text-[11px] font-mono text-slate-400">6-Color Offset</span>
+                </div>
                 <div className="flex text-emerald-600 text-xs">★★★★★</div>
                 <p className="text-xs sm:text-sm text-slate-700 leading-relaxed italic">
                   "Our 6-color offset presses had 30% idle time between major export cycles.
                   MPI connects us to serious startups with structured technical specs and
-                  guaranteed escrow payments. It has completely optimized our machine hours."
+                  governed milestone payments. It has completely optimized our machine hours."
                 </p>
               </div>
               <div className="pt-2 border-t border-slate-200">
@@ -1768,6 +1867,10 @@ export default function Home({
                 <div className="text-[11px] text-slate-500">Managing Director, Apex Precision Ltd.</div>
               </div>
             </div>
+          </div>
+
+          <div className="mt-8 text-center text-[11px] text-slate-400">
+            *Representative operational scenarios derived from MPI benchmark pilot models and live RFQ matching parameters. Individual lead times and quotes depend on supplier capacity and technical BOM tolerances.
           </div>
         </div>
       </section>
@@ -1892,7 +1995,7 @@ export default function Home({
                       ₹{calculatedSchemeBenefit.netCost.toLocaleString("en-IN")}
                     </span>
                     <span className="text-[10px] text-slate-300 block mt-0.5">
-                      Protected Under Escrow
+                      Milestone-Protected Outlay
                     </span>
                   </div>
                 </div>
@@ -2038,10 +2141,10 @@ export default function Home({
               </div>
               <p className="text-slate-500 leading-relaxed text-xs max-w-sm">
                 Empowering Indian startups with verified MSME manufacturing capacity,
-                reverse-margin price discovery, and milestone escrow guarantees.
+                reverse-margin price discovery, and milestone payment protection.
               </p>
               <div className="text-[11px] text-slate-400 font-mono pt-1">
-                A Make In India & DPIIT Ecosystem Initiative
+                Supporting the Make In India & DPIIT Startup Ecosystem
               </div>
             </div>
 
@@ -2067,7 +2170,7 @@ export default function Home({
                           badge: "Startup Buyer Portal",
                           title: "Log in for Startups",
                           description:
-                            "Access verified MSME suppliers, AI procurement copilot, live RFQ generator & order escrow.",
+                            "Access verified MSME suppliers, AI procurement copilot, live RFQ generator & milestone governance.",
                           icon: "rocket_launch",
                         },
                       })
@@ -2088,7 +2191,7 @@ export default function Home({
                           badge: "MSME Supplier Network",
                           title: "Log in for MSMEs",
                           description:
-                            "Access verified OEM purchase orders, active startup tenders, and escrow payments.",
+                            "Access verified OEM purchase orders, active startup tenders, and milestone payments.",
                           icon: "precision_manufacturing",
                         },
                       })
@@ -2157,6 +2260,11 @@ export default function Home({
                 Governance
               </div>
               <ul className="space-y-2">
+                <li>
+                  <button onClick={() => handleOpenTrustModal("verification")} className="hover:text-[#051F16] transition-colors cursor-pointer font-medium text-emerald-800">
+                    Trust & Standards
+                  </button>
+                </li>
                 <li>
                   <button onClick={() => navigate("login.admin")} className="hover:text-[#051F16] transition-colors cursor-pointer">
                     Admin Portal
@@ -2403,6 +2511,48 @@ export default function Home({
         onClose={() => setRoleMismatch((prev) => ({ ...prev, open: false }))}
         onSwitchAccount={handleSwitchAccountFromMismatch}
         onContinueCurrentRole={handleContinueCurrentRoleFromMismatch}
+      />
+
+      {/* Interactive Trust, Verification & Governance Framework Modal */}
+      <TrustStandardsModal
+        isOpen={trustModalOpen}
+        initialTab={trustModalTab}
+        onClose={() => setTrustModalOpen(false)}
+        onPrimaryAction={() => {
+          setTrustModalOpen(false)
+          handleProtectedJourney({
+            targetScreen: "startup.procurement",
+            actionType: "start_mpi",
+            actionLabel: "Start a Procurement Request",
+            requiredRole: "startup",
+            portalContext: {
+              badge: "Startup Buyer Portal",
+              title: "Start Sourcing with MPI",
+              description: "Log in or register your startup to access verified Indian manufacturers.",
+              icon: "rocket_launch",
+            },
+          })
+        }}
+      />
+
+      {/* Sticky Primary CTA Bar */}
+      <StickyPrimaryCTA
+        onStartProcurement={() => {
+          handleProtectedJourney({
+            targetScreen: "startup.procurement",
+            actionType: "start_mpi",
+            actionLabel: "Start a Procurement Request",
+            requiredRole: "startup",
+            portalContext: {
+              badge: "Startup Buyer Portal",
+              title: "Start Sourcing with MPI",
+              description: "Log in or register your startup to access verified Indian manufacturers.",
+              icon: "rocket_launch",
+            },
+          })
+        }}
+        onViewStandards={() => handleOpenTrustModal("verification")}
+        isModalOpen={trustModalOpen || authModal.open || showSearchModal || roleMismatch.open}
       />
     </div>
   )
