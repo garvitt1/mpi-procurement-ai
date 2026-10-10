@@ -33,7 +33,7 @@ All five sections now feature verified, transparent copy, illustrative generic p
 ## 3. Five Section Audit & Updates
 
 ### Section 1 — Intelligent Discovery (Natural-Language Intake)
-- **Approved Heading:** `"Tell MPI what you need in plain English."`
+- **Approved Heading:** `"Tell MPI what you need in your own language."`
 - **Approved Body Copy:** `"Describe your procurement requirements in everyday language. MPI helps structure product details, quantities, specifications, customization needs, and delivery timelines into a procurement request you can review before dispatch."`
 - **CTA Label:** `"Try Natural-Language Intake"` (preserves protected handoff to `startup.procurement`).
 - **Interactive Visual Update:**
@@ -167,3 +167,4 @@ dist/assets/index-BQcydboB.js   2,333.86 kB │ gzip: 613.29 kB
 - **Pre-Execution Baseline Tag:** `pre-homepage-integrity-checkpoint` (`7d10d19`)
 - **Staged File:** `src/screens/Home.tsx`, `docs/MPI_HOMEPAGE_CONTENT_INTEGRITY.md`
 - **Completion Tag:** `homepage-integrity-complete`
+
