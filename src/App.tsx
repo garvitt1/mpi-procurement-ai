@@ -34,6 +34,78 @@ import CookieConsentExperience from "./components/cookie/CookieConsentExperience
 
 export type Screen = "home" | "landing" | "login.startup" | "login.msme" | "login.admin" | "register.startup" | "register.msme" | "government-schemes.match" | "government-schemes.browse" | "government-schemes.detail" | "analytics.detail.ai-insights" | "analytics.detail.total-sales" | "analytics.detail.revenue-comparison" | "analytics.detail.sales-trend" | "analytics.detail.age-range" | "analytics.add-widget" | "analytics.create-report" | "analytics.pulse" | "analytics.data" | "analytics.shared" | "analytics.notifications" | "analytics.messages" | "analytics.documents" | "analytics.support" | "analytics.profile" | "startup.home" | "startup.onboarding" | "startup.procurement" | "startup.ai-assistant" | "startup.ai-analysis" | "startup.match-results" | "startup.supplier-detail" | "startup.comparison" | "startup.shortlist" | "startup.rfq" | "startup.samples" | "startup.sample-new" | "startup.schemes" | "startup.status" | "startup.history" | "startup.profile" | "startup.settings" | "startup.analytics" | "msme.home" | "msme.onboarding" | "msme.profile" | "msme.capabilities" | "msme.products" | "msme.certifications" | "msme.verification" | "msme.verification-status" | "msme.match-readiness" | "msme.opportunities" | "msme.opportunity-detail" | "msme.proposal" | "msme.procurement-status" | "msme.schemes" | "msme.analytics" | "msme.settings" | "admin.home" | "admin.user-management" | "admin.startup-management" | "admin.msme-management" | "admin.verification" | "admin.procurement" | "admin.ai-matching" | "admin.analytics" | "admin.reports" | "admin.settings"
 
+export const VALID_SCREENS = new Set<Screen>([
+  "home",
+  "landing",
+  "login.startup",
+  "login.msme",
+  "login.admin",
+  "register.startup",
+  "register.msme",
+  "government-schemes.match",
+  "government-schemes.browse",
+  "government-schemes.detail",
+  "analytics.detail.ai-insights",
+  "analytics.detail.total-sales",
+  "analytics.detail.revenue-comparison",
+  "analytics.detail.sales-trend",
+  "analytics.detail.age-range",
+  "analytics.add-widget",
+  "analytics.create-report",
+  "analytics.pulse",
+  "analytics.data",
+  "analytics.shared",
+  "analytics.notifications",
+  "analytics.messages",
+  "analytics.documents",
+  "analytics.support",
+  "analytics.profile",
+  "startup.home",
+  "startup.onboarding",
+  "startup.procurement",
+  "startup.ai-assistant",
+  "startup.ai-analysis",
+  "startup.match-results",
+  "startup.supplier-detail",
+  "startup.comparison",
+  "startup.shortlist",
+  "startup.rfq",
+  "startup.samples",
+  "startup.sample-new",
+  "startup.schemes",
+  "startup.status",
+  "startup.history",
+  "startup.profile",
+  "startup.settings",
+  "startup.analytics",
+  "msme.home",
+  "msme.onboarding",
+  "msme.profile",
+  "msme.capabilities",
+  "msme.products",
+  "msme.certifications",
+  "msme.verification",
+  "msme.verification-status",
+  "msme.match-readiness",
+  "msme.opportunities",
+  "msme.opportunity-detail",
+  "msme.proposal",
+  "msme.procurement-status",
+  "msme.schemes",
+  "msme.analytics",
+  "msme.settings",
+  "admin.home",
+  "admin.user-management",
+  "admin.startup-management",
+  "admin.msme-management",
+  "admin.verification",
+  "admin.procurement",
+  "admin.ai-matching",
+  "admin.analytics",
+  "admin.reports",
+  "admin.settings",
+])
+
 export interface NavProps {
   navigate: (screen: Screen) => void
   goBack: () => void
@@ -54,6 +126,28 @@ function isAdminPath(): boolean {
 function getInitialScreen(): Screen {
   if (isAdminPath()) {
     return getAdminSession() ? "admin.home" : "login.admin"
+  }
+  if (typeof window !== "undefined") {
+    // 1. Direct deep-link URL hash (e.g., /#startup.procurement)
+    const hashScreen = window.location.hash.replace(/^#\/?/, "") as Screen
+    if (VALID_SCREENS.has(hashScreen)) {
+      if (hashScreen.startsWith("admin.") && !getAdminSession()) {
+        return "login.admin"
+      }
+      return hashScreen
+    }
+    // 2. Session storage fallback for browser refresh preservation
+    try {
+      const saved = sessionStorage.getItem("mpi_current_screen") as Screen
+      if (saved && VALID_SCREENS.has(saved)) {
+        if (saved.startsWith("admin.") && !getAdminSession()) {
+          return "login.admin"
+        }
+        return saved
+      }
+    } catch {
+      // Ignore storage access restrictions
+    }
   }
   return "home"
 }
@@ -81,16 +175,24 @@ export default function App() {
     }
     window.scrollTo({ top: 0, behavior: "smooth" })
 
-    // Sync browser URL
+    // Sync session storage and browser URL
     if (typeof window !== "undefined") {
+      try {
+        sessionStorage.setItem("mpi_current_screen", targetScreen)
+      } catch {
+        // Ignore session storage errors
+      }
+
       if (targetScreen.startsWith("admin.") || targetScreen === "login.admin") {
         if (window.location.pathname !== ADMIN_CONFIG.path) {
           window.history.pushState(null, "", ADMIN_CONFIG.path)
         }
       } else if (targetScreen === "home") {
-        if (window.location.pathname !== "/") {
-          window.history.pushState(null, "", "/")
+        if (window.location.hash) {
+          window.history.pushState(null, "", window.location.pathname)
         }
+      } else {
+        window.location.hash = targetScreen
       }
     }
   }, [])
@@ -99,7 +201,19 @@ export default function App() {
     const updateState = () => {
       setHistory((prev) => {
         if (prev.length > 1) {
-          return prev.slice(0, -1)
+          const next = prev.slice(0, -1)
+          const newCurrent = next[next.length - 1]
+          if (typeof window !== "undefined") {
+            try {
+              sessionStorage.setItem("mpi_current_screen", newCurrent)
+            } catch {}
+            if (newCurrent === "home") {
+              window.history.pushState(null, "", window.location.pathname)
+            } else {
+              window.location.hash = newCurrent
+            }
+          }
+          return next
         }
         // Intelligent fallback when user opened directly or refreshed
         const current = prev[0] || "home"
@@ -139,18 +253,33 @@ export default function App() {
       if (isAdminPath()) {
         const nextScreen: Screen = getAdminSession() ? "admin.home" : "login.admin"
         setHistory((prev) => [...prev, nextScreen])
-      } else if (window.location.pathname === "/") {
+      } else if (window.location.pathname === "/" && !window.location.hash) {
         setHistory((prev) => [...prev, "home"])
       }
     }
 
+    const handleHashChange = () => {
+      const hashScreen = window.location.hash.replace(/^#\/?/, "") as Screen
+      if (VALID_SCREENS.has(hashScreen)) {
+        if (hashScreen.startsWith("admin.") && !getAdminSession()) {
+          setHistory((prev) => [...prev, "login.admin"])
+        } else {
+          setHistory((prev) => [...prev, hashScreen])
+        }
+      }
+    }
+
     window.addEventListener("popstate", handlePopState)
+    window.addEventListener("hashchange", handleHashChange)
 
     if (isAdminPath() && window.location.pathname !== ADMIN_CONFIG.path) {
       window.history.replaceState(null, "", ADMIN_CONFIG.path)
     }
 
-    return () => window.removeEventListener("popstate", handlePopState)
+    return () => {
+      window.removeEventListener("popstate", handlePopState)
+      window.removeEventListener("hashchange", handleHashChange)
+    }
   }, [])
 
   const navProps: NavProps = { navigate, goBack, currentScreen, canGoBack }

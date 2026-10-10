@@ -37,7 +37,7 @@ export interface TelemetryEvent {
   event: TelemetryEventType
   timestamp: string
   sessionId: string
-  metadata?: Record<string, string | number | boolean | null>
+  metadata?: Record<string, any>
 }
 
 // In-memory telemetry buffer with localStorage persistence
@@ -51,33 +51,84 @@ const SENSITIVE_KEY_PATTERNS = [
   "secret",
   "key",
   "auth",
+  "bearer",
+  "cookie",
+  "session",
   "credential",
   "gstin",
+  "pan",
+  "aadhaar",
   "bank",
   "account",
   "document",
   "rawspec",
   "requirementtext",
+  "quotecontent",
+  "card",
+  "cvv",
+  "pin",
+  "phone",
+  "email",
 ]
 
-function sanitizeTelemetryMetadata(
-  meta?: Record<string, string | number | boolean | null>,
-): Record<string, string | number | boolean | null> {
-  if (!meta) return {}
-  const clean: Record<string, string | number | boolean | null> = {}
+const GSTIN_REGEX = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/
+const PAN_REGEX = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/
+
+/**
+ * Deeply sanitizes telemetry metadata:
+ * 1. Blacklists sensitive keys (tokens, passwords, secrets, financial, PII)
+ * 2. Recursively sanitizes nested objects and arrays
+ * 3. Scrubs GSTIN and PAN values even under non-sensitive keys
+ * 4. Truncates long strings to prevent arbitrary payload dumping
+ */
+export function sanitizeTelemetryMetadata(
+  meta?: Record<string, any>,
+): Record<string, any> {
+  if (!meta || typeof meta !== "object" || Array.isArray(meta)) return {}
+  const clean: Record<string, any> = {}
+
   for (const [k, v] of Object.entries(meta)) {
     const lowerKey = k.toLowerCase().replace(/[^a-z]/g, "")
     const isSensitive = SENSITIVE_KEY_PATTERNS.some((pattern) => lowerKey.includes(pattern))
-    if (!isSensitive) {
-      if (typeof v === "string") {
-        clean[k] = v.length > 120 ? v.slice(0, 117) + "..." : v
+    if (isSensitive) continue
+
+    if (v === null || v === undefined) {
+      clean[k] = null
+    } else if (typeof v === "number" || typeof v === "boolean") {
+      clean[k] = v
+    } else if (typeof v === "string") {
+      const trimmed = v.trim()
+      if (GSTIN_REGEX.test(trimmed)) {
+        clean[k] = "[REDACTED_GSTIN]"
+      } else if (PAN_REGEX.test(trimmed)) {
+        clean[k] = "[REDACTED_PAN]"
       } else {
-        clean[k] = v
+        clean[k] = trimmed.length > 150 ? trimmed.slice(0, 147) + "..." : trimmed
       }
+    } else if (Array.isArray(v)) {
+      clean[k] = v.slice(0, 10).map((item) => {
+        if (typeof item === "string") {
+          const trimmed = item.trim()
+          if (GSTIN_REGEX.test(trimmed)) return "[REDACTED_GSTIN]"
+          if (PAN_REGEX.test(trimmed)) return "[REDACTED_PAN]"
+          return trimmed.length > 120 ? trimmed.slice(0, 117) + "..." : trimmed
+        }
+        if (typeof item === "object" && item !== null) {
+          return sanitizeTelemetryMetadata(item)
+        }
+        return item
+      })
+    } else if (typeof v === "object") {
+      clean[k] = sanitizeTelemetryMetadata(v)
     }
   }
+
   return clean
 }
+
+// In-memory deduplication tracker to prevent rapid duplicate event creation
+let lastTrackedEventKey = ""
+let lastTrackedTimestamp = 0
 
 function getSessionId(): string {
   if (typeof window === "undefined") return "server"
@@ -155,6 +206,15 @@ export function trackTelemetryEvent(
   }
 
   const cleanMetadata = sanitizeTelemetryMetadata(metadata)
+
+  // Deduplication guard: ignore accidental duplicate rapid triggers within 1200ms
+  const currentKey = `${event}:${JSON.stringify(cleanMetadata)}`
+  const now = Date.now()
+  if (currentKey === lastTrackedEventKey && now - lastTrackedTimestamp < 1200) {
+    return
+  }
+  lastTrackedEventKey = currentKey
+  lastTrackedTimestamp = now
 
   const telemetryItem: TelemetryEvent = {
     event,

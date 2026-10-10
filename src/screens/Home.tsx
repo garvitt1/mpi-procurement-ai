@@ -565,7 +565,10 @@ export default function Home({
             <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
               <button
                 type="button"
-                onClick={() =>
+                onClick={() => {
+                  trackTelemetryEvent("cta_rfq_clicked", {
+                    source: "hero_primary",
+                  })
                   handleProtectedJourney({
                     targetScreen: "startup.procurement",
                     actionType: "start_mpi",
@@ -578,7 +581,7 @@ export default function Home({
                       icon: "rocket_launch",
                     },
                   })
-                }
+                }}
                 className="group inline-flex items-center gap-2.5 px-6 py-3.5 text-sm font-bold rounded-xl bg-[#051F16] hover:bg-[#083A28] active:scale-[0.98] text-white shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer border border-[#0A3525]"
               >
                 <span>Start a Procurement Request</span>
@@ -2538,6 +2541,9 @@ export default function Home({
       {/* Sticky Primary CTA Bar */}
       <StickyPrimaryCTA
         onStartProcurement={() => {
+          trackTelemetryEvent("cta_rfq_clicked", {
+            source: "sticky_dock",
+          })
           handleProtectedJourney({
             targetScreen: "startup.procurement",
             actionType: "start_mpi",

@@ -114,7 +114,7 @@ export default function AdminFlow({
     compliance: 15,
   })
 
-  // Live Telemetry Funnel State (PostgreSQL authoritative with local buffer fallback)
+  // Live Telemetry Funnel State (PostgreSQL authoritative and local session buffer tracked distinctly)
   const [telemetryData, setTelemetryData] = useState<{
     fromDatabase: boolean
     totalCount: number
@@ -126,30 +126,43 @@ export default function AdminFlow({
       createdAt: string
       metadata: Record<string, any>
     }>
+    localCount: number
+    localEventCounts: Record<string, number>
     error?: string
   }>({
     fromDatabase: false,
     totalCount: 0,
     eventCounts: {},
     recentEvents: [],
+    localCount: 0,
+    localEventCounts: {},
   })
   const [isRefreshingTelemetry, setIsRefreshingTelemetry] = useState(false)
+  const [showMetricStandardsModal, setShowMetricStandardsModal] = useState(false)
 
   const reloadTelemetry = () => {
     setIsRefreshingTelemetry(true)
+    const local = getLocalTelemetrySummary()
+    const localTotal = Object.values(local).reduce((a, b) => a + b, 0)
+
     fetchLiveTelemetrySummary()
       .then((res) => {
-        setTelemetryData(res)
+        setTelemetryData({
+          ...res,
+          localCount: localTotal,
+          localEventCounts: local,
+        })
         setIsRefreshingTelemetry(false)
       })
-      .catch(() => {
-        const local = getLocalTelemetrySummary()
+      .catch((err) => {
         setTelemetryData({
           fromDatabase: false,
-          totalCount: Object.values(local).reduce((a, b) => a + b, 0),
-          eventCounts: local,
+          totalCount: 0,
+          eventCounts: {},
           recentEvents: [],
-          error: "Local buffer active",
+          localCount: localTotal,
+          localEventCounts: local,
+          error: err instanceof Error ? err.message : "Database fetch failed",
         })
         setIsRefreshingTelemetry(false)
       })
@@ -1787,36 +1800,45 @@ Select a quick analysis pill below or ask me any question!`,
         <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-5">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
             <div>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <span className="text-[10px] font-extrabold uppercase tracking-wider bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded-full">
-                  Phase 5 Funnel Analytics
+                  Phase 6 Pilot Conversion Measurement
                 </span>
-                <span className={`text-[11px] font-bold flex items-center gap-1 ${
+                <span className={`text-[11px] font-bold flex items-center gap-1.5 ${
                   telemetryData.fromDatabase ? "text-emerald-700" : "text-amber-700"
                 }`}>
                   <span className={`w-2 h-2 rounded-full ${
                     telemetryData.fromDatabase ? "bg-emerald-600 animate-pulse" : "bg-amber-500"
                   }`} />
                   {telemetryData.fromDatabase
-                    ? "Live Supabase PostgreSQL Connected (public.telemetry_events)"
-                    : "Local Session Telemetry Buffer"}
+                    ? `PostgreSQL Confirmed: ${telemetryData.totalCount} events`
+                    : "PostgreSQL: RLS Restricted / 0 Public Rows"}
+                </span>
+                <span className="text-[11px] font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-full flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                  Local Session Buffer: {telemetryData.localCount} events
                 </span>
               </div>
               <h3
                 className="text-lg font-extrabold text-[#051F16] mt-1"
                 style={{ fontFamily: "Plus Jakarta Sans" }}
               >
-                Procurement & Scheme Conversion Funnel
+                Production Funnel Analytics — Pilot Measurement Baseline
               </h3>
               <p className="text-xs text-slate-500">
-                Audited conversion events across Startup Buyer, MSME Supplier, and Scheme Matcher workflows.
+                Authoritative conversion events across Acquisition, Procurement Intake, MSME Bidding, and Scheme Matching.
               </p>
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="text-[10px] bg-slate-100 text-slate-600 border border-slate-200 font-bold px-2.5 py-1 rounded-lg hidden md:inline">
-                🔒 Strict Opt-in Consent · Zero PII/GSTIN
-              </span>
+              <button
+                type="button"
+                onClick={() => setShowMetricStandardsModal(true)}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 border border-emerald-200 hover:bg-emerald-100 text-xs font-bold text-emerald-900 transition-colors cursor-pointer"
+              >
+                <MaterialIcon icon="insights" size={15} className="text-emerald-700" />
+                <span>10 Metric Standards</span>
+              </button>
               <button
                 type="button"
                 onClick={reloadTelemetry}
@@ -1829,89 +1851,170 @@ Select a quick analysis pill below or ask me any question!`,
             </div>
           </div>
 
-          {/* 8-Stage Canonical Funnel Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
-            {[
-              {
-                id: "scheme_matcher_opened",
-                label: "1. Matcher Opened",
-                desc: "Discovery initiated",
-                count: telemetryData.eventCounts["scheme_matcher_opened"] || 0,
-                color: "text-emerald-700",
-                bg: "bg-emerald-50/50",
-              },
-              {
-                id: "scheme_eligibility_started",
-                label: "2. Eligibility Started",
-                desc: "Profiling calibrated",
-                count: telemetryData.eventCounts["scheme_eligibility_started"] || 0,
-                color: "text-emerald-800",
-                bg: "bg-emerald-50/70",
-              },
-              {
-                id: "scheme_eligibility_completed",
-                label: "3. Qualified Matches",
-                desc: "Scores generated",
-                count: telemetryData.eventCounts["scheme_eligibility_completed"] || 0,
-                color: "text-emerald-900",
-                bg: "bg-emerald-100/60",
-              },
-              {
-                id: "scheme_official_link_clicked",
-                label: "4. Portal Clicked",
-                desc: "Ministry portal verified",
-                count: telemetryData.eventCounts["scheme_official_link_clicked"] || 0,
-                color: "text-teal-700",
-                bg: "bg-teal-50",
-              },
-              {
-                id: "scheme_saved",
-                label: "5. Scheme Bookmarked",
-                desc: "Saved to watchlist",
-                count: telemetryData.eventCounts["scheme_saved"] || 0,
-                color: "text-amber-800",
-                bg: "bg-amber-50/70",
-              },
-              {
-                id: "procurement_started",
-                label: "6. Sourcing Intake",
-                desc: "RFQ Builder started",
-                count: telemetryData.eventCounts["procurement_started"] || 0,
-                color: "text-blue-700",
-                bg: "bg-blue-50/60",
-              },
-              {
-                id: "rfq_dispatched",
-                label: "7. RFQ Dispatched",
-                desc: "Broadcast to MSMEs",
-                count: telemetryData.eventCounts["rfq_dispatched"] || 0,
-                color: "text-indigo-800",
-                bg: "bg-indigo-50/60",
-              },
-              {
-                id: "msme_quote_submitted",
-                label: "8. Quote Submitted",
-                desc: "Supplier bid persisted",
-                count: telemetryData.eventCounts["msme_quote_submitted"] || 0,
-                color: "text-emerald-700",
-                bg: "bg-emerald-50",
-              },
-            ].map((stage) => (
-              <div
-                key={stage.id}
-                className={`p-3 rounded-xl border border-slate-200/80 ${stage.bg} flex flex-col justify-between space-y-1.5`}
-              >
-                <div className="text-[10px] font-bold text-slate-500 uppercase tracking-tight truncate">
-                  {stage.label}
+          {/* Section 1: Acquisition & Buyer Activation */}
+          <div className="space-y-2">
+            <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+              Acquisition & Buyer Activation (Top-of-Funnel)
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {[
+                {
+                  id: "landing_view",
+                  label: "1. Landing View",
+                  desc: "Unique visitors",
+                  count: (telemetryData.fromDatabase && telemetryData.eventCounts["landing_view"]) || telemetryData.localEventCounts["landing_view"] || 0,
+                  isDb: Boolean(telemetryData.fromDatabase && telemetryData.eventCounts["landing_view"]),
+                  color: "text-slate-800",
+                  bg: "bg-slate-50",
+                },
+                {
+                  id: "cta_rfq_clicked",
+                  label: "2. RFQ CTA Click",
+                  desc: "Hero/Dock intents",
+                  count: (telemetryData.fromDatabase && telemetryData.eventCounts["cta_rfq_clicked"]) || telemetryData.localEventCounts["cta_rfq_clicked"] || 0,
+                  isDb: Boolean(telemetryData.fromDatabase && telemetryData.eventCounts["cta_rfq_clicked"]),
+                  color: "text-blue-700",
+                  bg: "bg-blue-50/50",
+                },
+                {
+                  id: "signup_completed",
+                  label: "3. Account Registered",
+                  desc: "Auth established",
+                  count: (telemetryData.fromDatabase && telemetryData.eventCounts["signup_completed"]) || telemetryData.localEventCounts["signup_completed"] || 0,
+                  isDb: Boolean(telemetryData.fromDatabase && telemetryData.eventCounts["signup_completed"]),
+                  color: "text-indigo-700",
+                  bg: "bg-indigo-50/50",
+                },
+                {
+                  id: "onboarding_step_viewed",
+                  label: "4. Onboarding Step",
+                  desc: "Profile calibrated",
+                  count: (telemetryData.fromDatabase && telemetryData.eventCounts["onboarding_step_viewed"]) || telemetryData.localEventCounts["onboarding_step_viewed"] || 0,
+                  isDb: Boolean(telemetryData.fromDatabase && telemetryData.eventCounts["onboarding_step_viewed"]),
+                  color: "text-teal-700",
+                  bg: "bg-teal-50/50",
+                },
+              ].map((stage) => (
+                <div
+                  key={stage.id}
+                  className={`p-3 rounded-xl border border-slate-200/80 ${stage.bg} flex flex-col justify-between space-y-1`}
+                >
+                  <div className="flex items-center justify-between text-[10px] font-bold text-slate-500 uppercase tracking-tight">
+                    <span>{stage.label}</span>
+                    <span className={`text-[9px] px-1 rounded ${stage.isDb ? "bg-emerald-100 text-emerald-800 font-mono" : "bg-slate-200 text-slate-700"}`}>
+                      {stage.isDb ? "Postgres" : "Session"}
+                    </span>
+                  </div>
+                  <div className={`text-xl sm:text-2xl font-extrabold ${stage.color}`}>
+                    {stage.count}
+                  </div>
+                  <div className="text-[9px] text-slate-500 leading-tight">
+                    {stage.desc}
+                  </div>
                 </div>
-                <div className={`text-xl sm:text-2xl font-extrabold ${stage.color}`}>
-                  {stage.count}
+              ))}
+            </div>
+          </div>
+
+          {/* Section 2: Procurement Execution & Scheme Matching Funnel */}
+          <div className="space-y-2 pt-2">
+            <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+              Procurement Execution & Government Scheme Integration
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+              {[
+                {
+                  id: "scheme_matcher_opened",
+                  label: "5. Scheme Opened",
+                  desc: "Discovery initiated",
+                  count: (telemetryData.fromDatabase && telemetryData.eventCounts["scheme_matcher_opened"]) || telemetryData.localEventCounts["scheme_matcher_opened"] || 0,
+                  isDb: Boolean(telemetryData.fromDatabase && telemetryData.eventCounts["scheme_matcher_opened"]),
+                  color: "text-emerald-700",
+                  bg: "bg-emerald-50/50",
+                },
+                {
+                  id: "scheme_eligibility_started",
+                  label: "6. Scheme Profile",
+                  desc: "Parameters entered",
+                  count: (telemetryData.fromDatabase && telemetryData.eventCounts["scheme_eligibility_started"]) || telemetryData.localEventCounts["scheme_eligibility_started"] || 0,
+                  isDb: Boolean(telemetryData.fromDatabase && telemetryData.eventCounts["scheme_eligibility_started"]),
+                  color: "text-emerald-800",
+                  bg: "bg-emerald-50/70",
+                },
+                {
+                  id: "scheme_eligibility_completed",
+                  label: "7. Matches Scored",
+                  desc: "Grants quantified",
+                  count: (telemetryData.fromDatabase && telemetryData.eventCounts["scheme_eligibility_completed"]) || telemetryData.localEventCounts["scheme_eligibility_completed"] || 0,
+                  isDb: Boolean(telemetryData.fromDatabase && telemetryData.eventCounts["scheme_eligibility_completed"]),
+                  color: "text-emerald-900",
+                  bg: "bg-emerald-100/60",
+                },
+                {
+                  id: "scheme_official_link_clicked",
+                  label: "8. Portal Exit",
+                  desc: "Ministry portal verified",
+                  count: (telemetryData.fromDatabase && telemetryData.eventCounts["scheme_official_link_clicked"]) || telemetryData.localEventCounts["scheme_official_link_clicked"] || 0,
+                  isDb: Boolean(telemetryData.fromDatabase && telemetryData.eventCounts["scheme_official_link_clicked"]),
+                  color: "text-teal-700",
+                  bg: "bg-teal-50",
+                },
+                {
+                  id: "scheme_saved",
+                  label: "9. Bookmarked",
+                  desc: "Saved to watchlist",
+                  count: (telemetryData.fromDatabase && telemetryData.eventCounts["scheme_saved"]) || telemetryData.localEventCounts["scheme_saved"] || 0,
+                  isDb: Boolean(telemetryData.fromDatabase && telemetryData.eventCounts["scheme_saved"]),
+                  color: "text-amber-800",
+                  bg: "bg-amber-50/70",
+                },
+                {
+                  id: "procurement_started",
+                  label: "10. Intake Started",
+                  desc: "RFQ Builder started",
+                  count: (telemetryData.fromDatabase && telemetryData.eventCounts["procurement_started"]) || telemetryData.localEventCounts["procurement_started"] || 0,
+                  isDb: Boolean(telemetryData.fromDatabase && telemetryData.eventCounts["procurement_started"]),
+                  color: "text-blue-700",
+                  bg: "bg-blue-50/60",
+                },
+                {
+                  id: "rfq_dispatched",
+                  label: "11. RFQ Dispatched",
+                  desc: "Broadcast to MSMEs",
+                  count: (telemetryData.fromDatabase && telemetryData.eventCounts["rfq_dispatched"]) || telemetryData.localEventCounts["rfq_dispatched"] || 0,
+                  isDb: Boolean(telemetryData.fromDatabase && telemetryData.eventCounts["rfq_dispatched"]),
+                  color: "text-indigo-800",
+                  bg: "bg-indigo-50/60",
+                },
+                {
+                  id: "msme_quote_submitted",
+                  label: "12. Quote Persisted",
+                  desc: "Supplier bid stored",
+                  count: (telemetryData.fromDatabase && telemetryData.eventCounts["msme_quote_submitted"]) || telemetryData.localEventCounts["msme_quote_submitted"] || 0,
+                  isDb: Boolean(telemetryData.fromDatabase && telemetryData.eventCounts["msme_quote_submitted"]),
+                  color: "text-emerald-700",
+                  bg: "bg-emerald-50",
+                },
+              ].map((stage) => (
+                <div
+                  key={stage.id}
+                  className={`p-3 rounded-xl border border-slate-200/80 ${stage.bg} flex flex-col justify-between space-y-1`}
+                >
+                  <div className="flex items-center justify-between text-[10px] font-bold text-slate-500 uppercase tracking-tight truncate">
+                    <span>{stage.label}</span>
+                    <span className={`text-[9px] px-1 rounded shrink-0 ${stage.isDb ? "bg-emerald-100 text-emerald-800 font-mono" : "bg-slate-200 text-slate-700"}`}>
+                      {stage.isDb ? "Postgres" : "Session"}
+                    </span>
+                  </div>
+                  <div className={`text-xl sm:text-2xl font-extrabold ${stage.color}`}>
+                    {stage.count}
+                  </div>
+                  <div className="text-[9px] text-slate-500 leading-tight">
+                    {stage.desc}
+                  </div>
                 </div>
-                <div className="text-[9px] text-slate-500 leading-tight">
-                  {stage.desc}
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
 
           {/* Recent Events Sample Stream */}
@@ -1950,6 +2053,154 @@ Select a quick analysis pill below or ask me any question!`,
             </div>
           )}
         </div>
+
+        {/* 10 METRIC CONVERSION STANDARDS MODAL */}
+        {showMetricStandardsModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+            <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] flex flex-col shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+              <div className="p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+                <div>
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-extrabold uppercase tracking-wider mb-1">
+                    Phase 6 Standard
+                  </div>
+                  <h3 className="text-lg font-extrabold text-[#051F16]" style={{ fontFamily: "Plus Jakarta Sans" }}>
+                    10 Pilot Conversion Metric Standards & Baselines
+                  </h3>
+                  <p className="text-xs text-slate-500">
+                    Formalized measurement specifications for pilot onboarding and statistical integrity.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowMetricStandardsModal(false)}
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-200/50 transition-colors"
+                >
+                  <MaterialIcon icon="close" size={20} className="text-slate-500" />
+                </button>
+              </div>
+
+              <div className="p-5 overflow-y-auto space-y-4 text-xs">
+                {[
+                  {
+                    num: "01",
+                    name: "Visitor to Procurement Intake Rate",
+                    formula: "cta_rfq_clicked (or procurement_started) / landing_view",
+                    source: "public.telemetry_events",
+                    target: "≥ 4.5% conversion",
+                    limitation: "Anonymous desktop vs mobile sessions without cookies excluded until consent granted.",
+                  },
+                  {
+                    num: "02",
+                    name: "Intake Completion Rate",
+                    formula: "rfq_dispatched / procurement_started",
+                    source: "public.rfqs & public.telemetry_events",
+                    target: "≥ 35.0% completion",
+                    limitation: "Founders abandoning to search technical drawing tolerances locally.",
+                  },
+                  {
+                    num: "03",
+                    name: "Supplier Quotation Response Rate",
+                    formula: "RFQs with ≥1 quote / Total RFQs Dispatched",
+                    source: "public.rfqs & public.quotes",
+                    target: "≥ 85.0% response within 24h",
+                    limitation: "Regional specialty constraints (e.g. specialized cleanroom injection molding).",
+                  },
+                  {
+                    num: "04",
+                    name: "Median Time to First Quote",
+                    formula: "median(quote.created_at - rfq.created_at)",
+                    source: "public.quotes & public.rfqs timestamps",
+                    target: "≤ 18.0 hours",
+                    limitation: "Weekend and national holiday RFQs have higher natural turnaround time.",
+                  },
+                  {
+                    num: "05",
+                    name: "Scheme Discovery Engagement Rate",
+                    formula: "scheme_matcher_opened / unique sessions",
+                    source: "public.telemetry_events",
+                    target: "≥ 12.0% engagement",
+                    limitation: "Higher on desktop compared to mobile quick scans.",
+                  },
+                  {
+                    num: "06",
+                    name: "Scheme Eligibility Completion Rate",
+                    formula: "scheme_eligibility_completed / scheme_eligibility_started",
+                    source: "public.telemetry_events",
+                    target: "≥ 60.0% completion",
+                    limitation: "Early founders lacking DPIIT recognition certificate numbers drop off.",
+                  },
+                  {
+                    num: "07",
+                    name: "Scheme Verification Exit Rate",
+                    formula: "scheme_official_link_clicked / scheme_eligibility_completed",
+                    source: "public.telemetry_events (outbound clicks)",
+                    target: "≥ 25.0% exit to official portal",
+                    limitation: "Outbound government portal clicks cannot track external application completion.",
+                  },
+                  {
+                    num: "08",
+                    name: "Cross-Side Marketplace Liquidity Ratio",
+                    formula: "Active verified MSMEs bidding / Active open RFQs",
+                    source: "public.profiles & public.rfqs",
+                    target: "≥ 3.2 : 1 active ratio",
+                    limitation: "Clustered around automotive/packaging hubs (Peenya, Okhla, Coimbatore).",
+                  },
+                  {
+                    num: "09",
+                    name: "Prototype Sample Request Rate",
+                    formula: "sample_requested / quotes reviewed",
+                    source: "public.quotes (status = 'sample_requested')",
+                    target: "≥ 20.0% of quoted RFQs",
+                    limitation: "High-cost tooling items (die-cast molds) rarely request physical sample pre-tooling.",
+                  },
+                  {
+                    num: "10",
+                    name: "End-to-End Buyer-to-Supplier Escrow Conversion",
+                    formula: "contract_accepted / rfq_dispatched",
+                    source: "public.quotes (status = 'accepted')",
+                    target: "≥ 15.0% overall conversion",
+                    limitation: "Requires physical inspection and bank tripartite escrow mobilization.",
+                  },
+                ].map((m) => (
+                  <div key={m.num} className="p-3.5 rounded-xl border border-slate-200 bg-slate-50/60 space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <span className="font-extrabold text-[#051F16] text-sm flex items-center gap-2">
+                        <span className="w-5 h-5 rounded-md bg-[#051F16] text-[#A3F65C] text-[10px] flex items-center justify-center font-bold">
+                          {m.num}
+                        </span>
+                        {m.name}
+                      </span>
+                      <span className="text-[10px] font-bold px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded-md">
+                        {m.target}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-slate-600 pt-1">
+                      <div>
+                        <strong className="text-slate-800">Formula:</strong> <code className="text-[11px] bg-white px-1 py-0.5 rounded border border-slate-200 text-slate-700">{m.formula}</code>
+                      </div>
+                      <div>
+                        <strong className="text-slate-800">Authoritative Source:</strong> <code className="text-[11px] bg-white px-1 py-0.5 rounded border border-slate-200 text-emerald-700">{m.source}</code>
+                      </div>
+                    </div>
+                    <div className="text-[11px] text-slate-500 pt-1">
+                      <strong className="text-slate-700">Measurement Caveat:</strong> {m.limitation}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="p-4 border-t border-slate-200 bg-slate-50 flex items-center justify-end">
+                <button
+                  type="button"
+                  onClick={() => setShowMetricStandardsModal(false)}
+                  className="px-4 py-2 bg-[#051F16] text-white rounded-xl font-bold text-xs hover:bg-[#083A28] transition-colors cursor-pointer"
+                >
+                  Close Standards
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* PENDING AUDITS SECTION WITH TABS AND CONFIRMATION DIALOGS */}
         <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-4">
