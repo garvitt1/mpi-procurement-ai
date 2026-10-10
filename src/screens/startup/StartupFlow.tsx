@@ -2080,6 +2080,10 @@ export default function StartupFlow({
               </div>
             ) : schemeModal.result ? (
               <div className="space-y-4">
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-50 border border-blue-200 text-[11px] font-medium text-blue-900">
+                  <MaterialIcon name="info" size={14} className="text-blue-700 shrink-0" />
+                  <span>AI Pre-Screening Estimate — Indicative guidance based on public scheme rules. Final eligibility and grant disbursements require statutory sanction by the nodal ministry.</span>
+                </div>
                 {/* Fit Score & Financial Assistance */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-emerald-50 border border-emerald-200 rounded-xl p-4">
                   <div>
@@ -2285,6 +2289,10 @@ export default function StartupFlow({
               </div>
             ) : disputeModal.result ? (
               <div className="space-y-4 animate-fade-in text-xs">
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-50 border border-amber-200 text-[11px] font-medium text-amber-900">
+                  <MaterialIcon name="gavel" size={14} className="text-amber-700 shrink-0" />
+                  <span>AI Mediation Draft — Non-binding recommendation for commercial alignment. Escrow fund release requires mutual party confirmation or appointed arbitrator sign-off.</span>
+                </div>
                 {/* Ruling banner */}
                 <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl space-y-2">
                   <div className="flex items-center justify-between">
@@ -2863,7 +2871,11 @@ export default function StartupFlow({
                 Awaiting MSME Quotations
               </h3>
               <p className="text-xs text-slate-500 leading-relaxed">
-                Your RFQ ({activeRFQ?.title || "Custom Batch Run"}) has been dispatched to verified manufacturing clusters. Suppliers in our audited network evaluate tooling specs and submit binding proposals within 24–48 hours.
+                {rfqPersistenceStatus === "saved_to_supabase"
+                  ? `Your RFQ (${activeRFQ?.title || "Custom Batch Run"}) has been authoritatively persisted and dispatched to verified manufacturing clusters. Suppliers in our audited network evaluate tooling specs and submit binding proposals within 24–48 hours.`
+                  : rfqPersistenceStatus === "saving"
+                  ? `Transmitting your RFQ (${activeRFQ?.title || "Custom Batch Run"}) to the MPI cloud network...`
+                  : `Your RFQ (${activeRFQ?.title || "Custom Batch Run"}) is saved locally in your session buffer. Cloud synchronization is pending; supplier dispatch will confirm once network persistence succeeds.`}
               </p>
               <div className="flex items-center justify-center gap-2 pt-1">
                 {rfqPersistenceStatus === "saved_to_supabase" ? (

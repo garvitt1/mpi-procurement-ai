@@ -38,7 +38,6 @@ export function validateEmail(email: string): boolean {
 
 export const ADMIN_CONFIG = {
   username: "admin",
-  password: "bhavesh@123",
   path: "/1982/admin",
 }
 
@@ -185,7 +184,11 @@ export function mockLogin(
           enteredUser === "admin@mpi.gov.in" ||
           enteredUser === "admin@mpi.org"
 
-        const isValidPass = enteredPass === ADMIN_CONFIG.password
+        const expectedPass =
+          (typeof import.meta !== "undefined" && import.meta.env?.VITE_ADMIN_PASSWORD) ||
+          (typeof import.meta !== "undefined" && import.meta.env?.DEV ? "AdminDev@2026" : "")
+
+        const isValidPass = Boolean(expectedPass && enteredPass === expectedPass)
 
         if (isValidUser && isValidPass) {
           setAdminSession(true)
@@ -193,7 +196,7 @@ export function mockLogin(
         } else {
           resolve({
             success: false,
-            error: "Invalid admin credentials. Please verify your username and password.",
+            error: "Invalid admin credentials. Please verify your administrative authorization.",
           })
         }
         return
@@ -246,9 +249,6 @@ export function mockGoogleAuth(role?: RoleKey): Promise<{ success: boolean; user
       try {
         localStorage.setItem("mpi_active_user", JSON.stringify(user))
         localStorage.setItem("mpi_user_role", role || "startup")
-        if (role === "admin") {
-          setAdminSession(true)
-        }
       } catch {
         // Ignore storage exceptions
       }

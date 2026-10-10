@@ -1048,6 +1048,10 @@ Select a quick analysis pill below or ask me any question!`,
                 </div>
               ) : riskAuditResult ? (
                 <div className="space-y-3">
+                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-50 border border-amber-200 text-[11px] font-medium text-amber-900">
+                    <MaterialIcon name="shield" size={14} className="text-amber-700 shrink-0" />
+                    <span>AI Forensic Diagnostic — Non-binding anomaly analysis. Formal tender suspension, vendor debarment, or statutory audit flags require authorized compliance officer approval.</span>
+                  </div>
                   <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl space-y-2">
                     <div className="flex items-center justify-between">
                       <span className="font-bold text-rose-900">Forensic Risk Score:</span>

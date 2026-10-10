@@ -5,6 +5,7 @@ import {
   mockLogin,
   mockGoogleAuth,
   setAdminSession,
+  getAdminSession,
   detectRoleFromLoginId,
 } from "../../lib/mockAuth"
 import { signInWithSupabase } from "../../services/authService"
@@ -103,8 +104,11 @@ export default function AuthModal({
     if (pending && pending.targetScreen) {
       clearPendingAction()
       if (detectedRole === "admin") {
-        setAdminSession(true)
-        navigate("admin.home")
+        if (getAdminSession()) {
+          navigate("admin.home")
+        } else {
+          navigate("login.admin")
+        }
       } else {
         navigate(pending.targetScreen)
       }
@@ -114,8 +118,11 @@ export default function AuthModal({
     if (targetScreen) {
       // If logging in as admin, always preserve admin route authority
       if (detectedRole === "admin") {
-        setAdminSession(true)
-        navigate("admin.home")
+        if (getAdminSession()) {
+          navigate("admin.home")
+        } else {
+          navigate("login.admin")
+        }
       } else {
         navigate(targetScreen)
       }
@@ -123,8 +130,11 @@ export default function AuthModal({
     }
 
     if (detectedRole === "admin") {
-      setAdminSession(true)
-      navigate("admin.home")
+      if (getAdminSession()) {
+        navigate("admin.home")
+      } else {
+        navigate("login.admin")
+      }
     } else if (detectedRole === "msme") {
       navigate("msme.home")
     } else {
@@ -200,6 +210,11 @@ export default function AuthModal({
     setSubmitting(true)
     setErrorMsg("")
     const preferredRole = initialRole || (email.trim() ? detectRoleFromLoginId(email) : "startup")
+    if (preferredRole === "admin") {
+      setErrorMsg("Admin access requires explicit username and password authentication.")
+      setSubmitting(false)
+      return
+    }
     setRole(preferredRole)
 
     const defaultEmail = preferredRole === "msme" ? "director@apexprecision.in" : "founder@novabio.tech"
@@ -241,8 +256,8 @@ export default function AuthModal({
     completeSignInRedirect(role)
   }
 
-  // Quick fill demo accounts
-  const quickFillAccount = (type: "startup" | "msme" | "admin") => {
+  // Quick fill demo accounts (development only)
+  const quickFillAccount = (type: "startup" | "msme") => {
     setErrorMsg("")
     setActiveQuickFill(type)
     setMode("login")
@@ -254,10 +269,6 @@ export default function AuthModal({
       setEmail("director@apexprecision.in")
       setPassword("Apex@123")
       setRole("msme")
-    } else {
-      setEmail("admin")
-      setPassword("bhavesh@123")
-      setRole("admin")
     }
   }
 
@@ -366,73 +377,57 @@ export default function AuthModal({
             </div>
           )}
 
-          {/* ⚡ Quick Fill Demo Accounts Banner (Always visible for easy testing) */}
-          <div className="mb-5 p-3 rounded-xl bg-gradient-to-br from-emerald-50/90 to-teal-50/90 border border-emerald-200 shadow-2xs">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-1.5 text-xs font-bold text-[#051F16]">
-                <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span>⚡ 1-Click Test Accounts</span>
+          {/* ⚡ Quick Fill Demo Accounts Banner (Development only - disabled in production) */}
+          {Boolean(typeof import.meta !== "undefined" && import.meta.env?.DEV) && (
+            <div className="mb-5 p-3 rounded-xl bg-gradient-to-br from-emerald-50/90 to-teal-50/90 border border-emerald-200 shadow-2xs">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-[#051F16]">
+                  <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span>⚡ Dev Test Personas</span>
+                </div>
+                <span className="text-[10px] font-semibold text-emerald-800 bg-emerald-100/80 px-2 py-0.5 rounded-full">
+                  Local Dev Only
+                </span>
               </div>
-              <span className="text-[10px] font-semibold text-emerald-800 bg-emerald-100/80 px-2 py-0.5 rounded-full">
-                MPI Secure Auth
-              </span>
-            </div>
-            <div className="grid grid-cols-3 gap-2">
-              <button
-                type="button"
-                onClick={() => quickFillAccount("startup")}
-                className={`p-2 text-left rounded-lg border transition-all cursor-pointer shadow-2xs hover:shadow-xs group ${
-                  activeQuickFill === "startup"
-                    ? "bg-emerald-100/90 border-emerald-500 ring-1 ring-emerald-500"
-                    : "bg-white hover:bg-emerald-50 border-emerald-100"
-                }`}
-                title="Pre-fill Startup founder credentials"
-              >
-                <div className="flex items-center gap-1 font-bold text-xs text-[#051F16]">
-                  <span>🚀</span>
-                  <span>Startup</span>
-                </div>
-                <div className="text-[10px] text-slate-500 truncate mt-0.5">NovaBio Health</div>
-                <div className="text-[9px] font-mono text-emerald-700 truncate">founder@...</div>
-              </button>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => quickFillAccount("startup")}
+                  className={`p-2 text-left rounded-lg border transition-all cursor-pointer shadow-2xs hover:shadow-xs group ${
+                    activeQuickFill === "startup"
+                      ? "bg-emerald-100/90 border-emerald-500 ring-1 ring-emerald-500"
+                      : "bg-white hover:bg-emerald-50 border-emerald-100"
+                  }`}
+                  title="Pre-fill Startup founder credentials"
+                >
+                  <div className="flex items-center gap-1 font-bold text-xs text-[#051F16]">
+                    <span>🚀</span>
+                    <span>Startup</span>
+                  </div>
+                  <div className="text-[10px] text-slate-500 truncate mt-0.5">NovaBio Health</div>
+                  <div className="text-[9px] font-mono text-emerald-700 truncate">founder@...</div>
+                </button>
 
-              <button
-                type="button"
-                onClick={() => quickFillAccount("msme")}
-                className={`p-2 text-left rounded-lg border transition-all cursor-pointer shadow-2xs hover:shadow-xs group ${
-                  activeQuickFill === "msme"
-                    ? "bg-emerald-100/90 border-emerald-500 ring-1 ring-emerald-500"
-                    : "bg-white hover:bg-emerald-50 border-emerald-100"
-                }`}
-                title="Pre-fill MSME supplier credentials"
-              >
-                <div className="flex items-center gap-1 font-bold text-xs text-[#051F16]">
-                  <span>🏭</span>
-                  <span>MSME</span>
-                </div>
-                <div className="text-[10px] text-slate-500 truncate mt-0.5">Apex Packaging</div>
-                <div className="text-[9px] font-mono text-emerald-700 truncate">director@...</div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => quickFillAccount("admin")}
-                className={`p-2 text-left rounded-lg border transition-all cursor-pointer shadow-2xs hover:shadow-xs group ${
-                  activeQuickFill === "admin"
-                    ? "bg-emerald-100/90 border-emerald-500 ring-1 ring-emerald-500"
-                    : "bg-white hover:bg-emerald-50 border-emerald-100"
-                }`}
-                title="Pre-fill Admin credentials"
-              >
-                <div className="flex items-center gap-1 font-bold text-xs text-[#051F16]">
-                  <span>🛡️</span>
-                  <span>Admin</span>
-                </div>
-                <div className="text-[10px] text-slate-500 truncate mt-0.5">Control Center</div>
-                <div className="text-[9px] font-mono text-emerald-700 truncate">admin/bhavesh</div>
-              </button>
+                <button
+                  type="button"
+                  onClick={() => quickFillAccount("msme")}
+                  className={`p-2 text-left rounded-lg border transition-all cursor-pointer shadow-2xs hover:shadow-xs group ${
+                    activeQuickFill === "msme"
+                      ? "bg-emerald-100/90 border-emerald-500 ring-1 ring-emerald-500"
+                      : "bg-white hover:bg-emerald-50 border-emerald-100"
+                  }`}
+                  title="Pre-fill MSME supplier credentials"
+                >
+                  <div className="flex items-center gap-1 font-bold text-xs text-[#051F16]">
+                    <span>🏭</span>
+                    <span>MSME</span>
+                  </div>
+                  <div className="text-[10px] text-slate-500 truncate mt-0.5">Apex Packaging</div>
+                  <div className="text-[9px] font-mono text-emerald-700 truncate">director@...</div>
+                </button>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* ─────────── MODE 1: LOG IN ─────────── */}
           {mode === "login" && (
@@ -519,36 +514,30 @@ export default function AuthModal({
                 </button>
               </form>
 
-              {/* Quick Demo Fill Buttons for frictionless evaluation */}
-              <div className="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-1.5 text-[11px] text-slate-500">
-                <span className="font-semibold text-slate-400">⚡ Demo 1-Click:</span>
-                <div className="flex items-center gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() => quickFillAccount("startup")}
-                    className="px-2 py-0.5 rounded bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 text-slate-700 font-medium transition-colors cursor-pointer"
-                    title="Pre-fill Startup founder credentials"
-                  >
-                    Startup
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => quickFillAccount("msme")}
-                    className="px-2 py-0.5 rounded bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 text-slate-700 font-medium transition-colors cursor-pointer"
-                    title="Pre-fill MSME supplier credentials"
-                  >
-                    MSME
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => quickFillAccount("admin")}
-                    className="px-2 py-0.5 rounded bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 text-slate-700 font-medium transition-colors cursor-pointer"
-                    title="Pre-fill Admin credentials"
-                  >
-                    Admin
-                  </button>
+              {/* Quick Demo Fill Buttons for frictionless evaluation (Development only) */}
+              {Boolean(typeof import.meta !== "undefined" && import.meta.env?.DEV) && (
+                <div className="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-1.5 text-[11px] text-slate-500">
+                  <span className="font-semibold text-slate-400">⚡ Dev 1-Click:</span>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => quickFillAccount("startup")}
+                      className="px-2 py-0.5 rounded bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 text-slate-700 font-medium transition-colors cursor-pointer"
+                      title="Pre-fill Startup founder credentials"
+                    >
+                      Startup
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => quickFillAccount("msme")}
+                      className="px-2 py-0.5 rounded bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 text-slate-700 font-medium transition-colors cursor-pointer"
+                      title="Pre-fill MSME supplier credentials"
+                    >
+                      MSME
+                    </button>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           )}
 
