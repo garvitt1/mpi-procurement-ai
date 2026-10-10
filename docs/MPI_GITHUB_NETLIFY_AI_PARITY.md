@@ -217,9 +217,9 @@ The serverless function was inspected and tested:
 
 | Variable Name | Target Environment | Scope | Required / Optional | Purpose | Sanitized Example Value |
 | :--- | :--- | :--- | :---: | :--- | :--- |
-| `GEMINI_API_KEY` | **Netlify Dashboard**<br>(Site Configuration -> Environment Variables) | **Secret**<br>(Serverless Only) | **Required for Live AI** | Upstream API key used by `netlify/functions/gemini.ts` to execute inference. Never bundled in client JavaScript. | `AIzaSyD...` (from Google AI Studio) |
+| `GEMINI_API_KEY` | **Netlify Dashboard**<br>(Site Configuration -> Environment Variables) | **Secret**<br>(Serverless Only) | **Required for Live AI** | Upstream API key used by `netlify/functions/gemini.ts` to execute inference. Never bundled in client JavaScript. | `your_gemini_api_key_here` |
 | `VITE_SUPABASE_URL` | **Netlify Dashboard** & Local `.env` | **Public**<br>(Client Bundle) | **Required for Live DB** | Supabase REST / Auth gateway URL. | `https://utjysxkaidvbrmatngyb.supabase.co` |
-| `VITE_SUPABASE_PUBLISHABLE_KEY` | **Netlify Dashboard** & Local `.env` | **Public**<br>(Client Bundle) | **Required for Live DB** | Supabase public anonymous API key for client-side persistence and auth. | `eyJhbGciOiJIUzI1Ni...` |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | **Netlify Dashboard** & Local `.env` | **Public**<br>(Client Bundle) | **Required for Live DB** | Supabase public anonymous API key for client-side persistence and auth. | `your_supabase_anon_key_here` |
 | `VITE_GEMINI_MODEL` | **Netlify Dashboard** & Local `.env` | **Public**<br>(Client Bundle) | Optional (Defaults to `gemini-3.1-flash-lite`) | Model override if specific model version is preferred. | `gemini-3.1-flash-lite` |
 
 > [!IMPORTANT]

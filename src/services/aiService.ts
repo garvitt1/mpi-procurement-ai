@@ -196,10 +196,7 @@ export function getGeminiApiKey(): string {
     const local = localStorage.getItem(STORAGE_KEY_GEMINI_KEY)
     if (local && local.trim().length > 0) return local.trim()
   }
-  const envKey =
-    (typeof import.meta !== "undefined" && import.meta.env && (import.meta.env.VITE_GEMINI_API_KEY || (import.meta.env as any).GEMINI_API_KEY)) ||
-    ""
-  return envKey.trim()
+  return ""
 }
 
 /**
