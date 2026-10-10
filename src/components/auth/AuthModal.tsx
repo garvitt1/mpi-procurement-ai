@@ -57,6 +57,7 @@ export default function AuthModal({
 
   // Registration step
   const [step, setStep] = useState<1 | 2>(1)
+  const [activeQuickFill, setActiveQuickFill] = useState<"startup" | "msme" | "admin" | null>(null)
 
   // Sync mode and role whenever modal opens or props change
   useEffect(() => {
@@ -243,6 +244,8 @@ export default function AuthModal({
   // Quick fill demo accounts
   const quickFillAccount = (type: "startup" | "msme" | "admin") => {
     setErrorMsg("")
+    setActiveQuickFill(type)
+    setMode("login")
     if (type === "startup") {
       setEmail("founder@novabio.tech")
       setPassword("Founder@123")
@@ -362,6 +365,74 @@ export default function AuthModal({
               <span>{errorMsg}</span>
             </div>
           )}
+
+          {/* ⚡ Quick Fill Demo Accounts Banner (Always visible for easy testing) */}
+          <div className="mb-5 p-3 rounded-xl bg-gradient-to-br from-emerald-50/90 to-teal-50/90 border border-emerald-200 shadow-2xs">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-1.5 text-xs font-bold text-[#051F16]">
+                <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span>⚡ 1-Click Test Accounts</span>
+              </div>
+              <span className="text-[10px] font-semibold text-emerald-800 bg-emerald-100/80 px-2 py-0.5 rounded-full">
+                Supabase Auth
+              </span>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              <button
+                type="button"
+                onClick={() => quickFillAccount("startup")}
+                className={`p-2 text-left rounded-lg border transition-all cursor-pointer shadow-2xs hover:shadow-xs group ${
+                  activeQuickFill === "startup"
+                    ? "bg-emerald-100/90 border-emerald-500 ring-1 ring-emerald-500"
+                    : "bg-white hover:bg-emerald-50 border-emerald-100"
+                }`}
+                title="Pre-fill Startup founder credentials"
+              >
+                <div className="flex items-center gap-1 font-bold text-xs text-[#051F16]">
+                  <span>🚀</span>
+                  <span>Startup</span>
+                </div>
+                <div className="text-[10px] text-slate-500 truncate mt-0.5">NovaBio Health</div>
+                <div className="text-[9px] font-mono text-emerald-700 truncate">founder@...</div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => quickFillAccount("msme")}
+                className={`p-2 text-left rounded-lg border transition-all cursor-pointer shadow-2xs hover:shadow-xs group ${
+                  activeQuickFill === "msme"
+                    ? "bg-emerald-100/90 border-emerald-500 ring-1 ring-emerald-500"
+                    : "bg-white hover:bg-emerald-50 border-emerald-100"
+                }`}
+                title="Pre-fill MSME supplier credentials"
+              >
+                <div className="flex items-center gap-1 font-bold text-xs text-[#051F16]">
+                  <span>🏭</span>
+                  <span>MSME</span>
+                </div>
+                <div className="text-[10px] text-slate-500 truncate mt-0.5">Apex Packaging</div>
+                <div className="text-[9px] font-mono text-emerald-700 truncate">director@...</div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => quickFillAccount("admin")}
+                className={`p-2 text-left rounded-lg border transition-all cursor-pointer shadow-2xs hover:shadow-xs group ${
+                  activeQuickFill === "admin"
+                    ? "bg-emerald-100/90 border-emerald-500 ring-1 ring-emerald-500"
+                    : "bg-white hover:bg-emerald-50 border-emerald-100"
+                }`}
+                title="Pre-fill Admin credentials"
+              >
+                <div className="flex items-center gap-1 font-bold text-xs text-[#051F16]">
+                  <span>🛡️</span>
+                  <span>Admin</span>
+                </div>
+                <div className="text-[10px] text-slate-500 truncate mt-0.5">Control Center</div>
+                <div className="text-[9px] font-mono text-emerald-700 truncate">admin/bhavesh</div>
+              </button>
+            </div>
+          </div>
 
           {/* ─────────── MODE 1: LOG IN ─────────── */}
           {mode === "login" && (

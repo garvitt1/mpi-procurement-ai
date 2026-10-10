@@ -198,3 +198,4 @@ export async function getVerifiedSupabaseUser(): Promise<{
     return { isAuthenticated: false, user: null, userId: null }
   }
 }
+

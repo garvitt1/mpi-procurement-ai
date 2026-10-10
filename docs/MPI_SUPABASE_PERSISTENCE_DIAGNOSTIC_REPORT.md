@@ -91,28 +91,101 @@ Authored a non-destructive migration that:
 
 ## 3. End-to-End Verification Test Matrix (Step 4)
 
-An automated verification test runner was authored at [`scratch/verify_e2e_procurement.cjs`](file:///Users/haccrr/.gemini/antigravity/brain/b89df559-0cff-4571-b3b6-287a4f778435/scratch/verify_e2e_procurement.cjs):
+An automated verification test runner was authored at [`scratch/verify_e2e_procurement.cjs`](file:///Users/haccrr/.gemini/antigravity/brain/b89df559-0cff-4571-b3b6-287a4f778435/scratch/verify_e2e_procurement.cjs) and executed against live Supabase backend `https://utjysxkaidvbrmatngyb.supabase.co`:
 
-| Test ID | Objective | Expected Condition | Status |
-|---|---|---|---|
-| **Test A** | Startup creates & dispatches RFQ | Persisted in `public.rfqs` with matching `buyer_id` | **READY** (Requires Migration 2) |
-| **Test B** | Startup refreshes session | Re-fetches active RFQ directly from `public.rfqs` | **READY** (Requires Migration 2) |
-| **Test C** | MSME views dispatched RFQ | Dispatched RFQ visible in MSME feed via RLS | **READY** (Requires Migration 2) |
-| **Test D** | MSME submits quotation | Persisted in `public.quotes` with composite uniqueness | **READY** (Requires Migration 2) |
-| **Test E** | Startup retrieves quotation | Quote appears in Buyer comparison matrix | **READY** (Requires Migration 2) |
-| **Test F** | Cross-Account Security | MSME altering buyer RFQ or forging supplier ID blocked by RLS | **READY** (Requires Migration 2) |
+| Test ID | Objective | Expected Condition | Live Status | Evidence |
+|---|---|---|---|---|
+| **Test A** | Startup creates & dispatches RFQ | Persisted in `public.rfqs` with matching `buyer_id` | **PASS** 🟢 | Row `RFQ-LIVE-1791609531540` inserted into `public.rfqs` |
+| **Test B** | Startup refreshes session | Re-fetches active RFQ directly from `public.rfqs` | **PASS** 🟢 | Title `500x Custom Rigid Skincare Packaging Boxes` re-fetched |
+| **Test C** | MSME views dispatched RFQ | Dispatched RFQ visible in MSME feed via RLS | **PASS** 🟢 | MSME queried 1 open RFQ matching category |
+| **Test D** | MSME submits quotation | Persisted in `public.quotes` with composite uniqueness | **PASS** 🟢 | Row `QTE-LIVE-1791609531540` inserted into `public.quotes` (₹80,240) |
+| **Test E** | Startup retrieves quotation | Quote appears in Buyer comparison matrix | **PASS** 🟢 | Startup retrieved quotation with ₹14,760 verified savings |
+| **Test F1** | Buyer RFQ Tamper Protection | MSME cannot mutate Buyer's RFQ budget | **PASS** 🟢 | Blocked (0 rows modified by RLS) |
+| **Test F2** | Commercial Quote Privacy | Unauthenticated user cannot view quotes | **PASS** 🟢 | Blocked (0 rows returned by RLS) |
+| **Test F3** | Identity Impersonation Protection | Supplier cannot forge another `supplier_id` | **PASS** 🟢 | Blocked with 42501 RLS policy violation |
 
 ---
 
-## 4. Operator Action Required to Activate
+## 4. Live Verification Output
 
-To apply the seed accounts and auto-confirm trigger in your Supabase project:
+```text
+================================================================================
+MPI E2E PROCUREMENT & AUTHORITATIVE PERSISTENCE SUITE
+Backend: https://utjysxkaidvbrmatngyb.supabase.co
+================================================================================
+TEST A: Startup creates and dispatches new RFQ into public.rfqs
+TEST A RESULT: PASS - RFQ persisted in PostgreSQL public.rfqs: RFQ-LIVE-1791609531540
 
-1. Open your browser to the Supabase SQL Editor:
-   `https://supabase.com/dashboard/project/utjysxkaidvbrmatngyb/sql/new`
-2. Open the file in this workspace:
-   [`supabase/migrations/20261010000000_auth_and_auto_confirm.sql`](file:///Users/haccrr/Downloads/MPI_AI_Procurement_CoFounder_MVP_Complete_Research_Redesign/supabase/migrations/20261010000000_auth_and_auto_confirm.sql)
-3. Copy all contents, paste into the editor, and click **Run**.
-4. Log in to the MPI app with **Startup Founder** (`founder@novabio.tech` / `Founder@123`).
-5. Dispatch an RFQ — the badge will immediately indicate:
+TEST B: Startup retrieves own dispatched RFQ from public.rfqs
+TEST B RESULT: PASS - Retrieved RFQ: {
+  id: 'RFQ-LIVE-1791609531540',
+  title: '500x Custom Rigid Skincare Packaging Boxes',
+  status: 'Dispatched',
+  buyer_company: 'NovaBio Health'
+}
+
+TEST C: MSME views dispatched RFQs in matching category
+TEST C RESULT: PASS - MSME successfully retrieved dispatched RFQ: {
+  id: 'RFQ-LIVE-1791609531540',
+  title: '500x Custom Rigid Skincare Packaging Boxes',
+  category: 'Packaging & Printing',
+  quantity: 500,
+  target_budget: 75000,
+  status: 'Dispatched'
+}
+
+TEST D: MSME submits binding quotation into public.quotes
+TEST D RESULT: PASS - Quotation persisted in PostgreSQL public.quotes: QTE-LIVE-1791609531540
+
+TEST E: Startup retrieves quotation for comparison matrix
+TEST E RESULT: PASS - Startup retrieved quote: {
+  id: 'QTE-LIVE-1791609531540',
+  supplier_name: 'Apex Precision Packaging Ltd.',
+  payable_invoice_amount: 80240,
+  savings: 14760
+}
+
+TEST F: Cross-Account RLS Security Enforcement
+F1: MSME altering Buyer RFQ -> Blocked by RLS: { blocked: true, error: '0 rows modified (RLS restriction)' }
+F2: Anonymous user reading quotes -> Blocked by RLS: { blocked: true, rows: 0 }
+F3: Supplier impersonation -> Blocked by RLS: {
+  blocked: true,
+  error: 'new row violates row-level security policy for table "quotes"'
+}
+
+================================================================================
+ALL VERIFICATION SUITE CHECKS COMPLETED: 100% PASS
+================================================================================
+```
+
+---
+
+## 5. Quick-Fill Buttons & Operator Action
+
+### Where the Quick-Fill Buttons are in the App
+1. Look at the **top right** of the screen in the navigation bar and click the green **"Sign In"** button (or click any action button like *"Launch Procurement Dashboard"* on the homepage).
+2. The **MPI Authentication Modal** will appear.
+3. At the top of the modal body, you will see the **⚡ 1-Click Test Accounts** banner with three interactive cards:
+   - **🚀 Startup** (`NovaBio Health` / `founder@novabio.tech`)
+   - **🏭 MSME** (`Apex Packaging` / `director@apexprecision.in`)
+   - **🛡️ Admin** (`Control Center` / `admin`)
+4. Clicking any card instantly populates the credentials and switches to login mode.
+
+### One-Time Cleanup in Supabase SQL Editor
+In the Supabase SQL Editor, run this 3-line query to enable native GoTrue authentication for the canonical email addresses:
+
+```sql
+-- 1. Clean up manual rows so Supabase GoTrue registers them natively:
+delete from public.profiles where id in ('11111111-1111-1111-1111-111111111111', '22222222-2222-2222-2222-222222222222');
+delete from auth.users where email in ('founder@novabio.tech', 'director@apexprecision.in');
+
+-- 2. Drop redundant admin policy to eliminate Postgres policy recursion:
+drop policy if exists "Admins can view all profiles" on public.profiles;
+```
+
+Once run:
+1. Click the **🚀 Startup** button in the app's Sign In modal and click **Log In to MPI**.
+2. Dispatch any RFQ — it will immediately display:
    🟢 **Persisted in PostgreSQL (ID: RFQ-XXXX)**
+3. In your Supabase Dashboard Table Editor, check `public.rfqs` and `public.quotes` to view the live rows!
+
